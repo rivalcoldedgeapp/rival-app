@@ -347,6 +347,7 @@ tr:hover td{background:var(--sf2)}
           <div class="gc-stat">Tu mejor: <span id="hb5">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr5">—</span></div>
         </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bo)" id="hld5">—</div>
       </div>
       <div class="gc g10" onclick="startGame(10)">
         <div class="gc-top">
@@ -357,6 +358,7 @@ tr:hover td{background:var(--sf2)}
           <div class="gc-stat">Tu mejor: <span id="hb10">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr10" style="color:var(--c10)">—</span></div>
         </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bo)" id="hld10">—</div>
       </div>
       <div class="gc g15" onclick="startGame(15)">
         <div class="gc-top">
@@ -367,6 +369,7 @@ tr:hover td{background:var(--sf2)}
           <div class="gc-stat">Tu mejor: <span id="hb15">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr15" style="color:var(--c15)">—</span></div>
         </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bo)" id="hld15">—</div>
       </div>
       <div class="gc gr" onclick="startReaction()">
         <div class="gc-top">
@@ -377,6 +380,7 @@ tr:hover td{background:var(--sf2)}
           <div class="gc-stat">Tu mejor: <span id="hbr">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hrr" style="color:var(--cr)">—</span></div>
         </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bo)" id="hldr">—</div>
       </div>
     </div>
   </div>
@@ -610,10 +614,10 @@ function getWeekLabel() {
 // ══ AUTO DAILY RESET — generates new targets at 00:00 CDMX ══
 function checkDailyReset() {
   var currentDay = getTodayKey();
-  db.ref('gameConfig/lastDay').once('value').then(function(s) {
-    var lastDay = s.val();
-    if (lastDay !== currentDay) {
-      // New day — generate new random targets
+  db.ref('gameConfig').once('value').then(function(s) {
+    var cfg = s.val();
+    // Generate if: no config exists OR it's a new day
+    if (!cfg || !cfg.t5 || cfg.lastDay !== currentDay) {
       var t5  = Math.round((3.0 + Math.random() * 4.0) * 1000) / 1000;
       var t10 = Math.round((7.0 + Math.random() * 6.0) * 1000) / 1000;
       var t15 = Math.round((12.0 + Math.random() * 6.0) * 1000) / 1000;
@@ -794,10 +798,23 @@ function updateHomecards() {
   [5, 10, 15, 'r'].forEach(function(g) {
     var ws = wScores[g][uid];
     var isR = g === 'r';
+    // My best & rank
     var bEl = document.getElementById('hb' + g);
     var rEl = document.getElementById('hr' + g);
     if (bEl) bEl.textContent = ws && ws.bestTime ? ws.bestTime + (isR ? 'ms' : 's') : '—';
     if (rEl) rEl.textContent = ws && ws.bestTime ? '#' + getRank(uid, g) : '—';
+    // Leader info
+    var ldEl = document.getElementById('hld' + g);
+    if (ldEl) {
+      var sorted = getSorted(g, 1);
+      if (sorted.length > 0) {
+        var leader = sorted[0][1];
+        var isLeaderMe = sorted[0][0] === uid;
+        ldEl.innerHTML = '🥇 <strong>' + leader.name + '</strong> · ' + leader.bestTime + (isR ? 'ms' : 's') + (isLeaderMe ? ' 👈' : '');
+      } else {
+        ldEl.textContent = 'Sin jugadores aún — ¡sé el primero!';
+      }
+    }
   });
 }
  
