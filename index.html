@@ -920,7 +920,7 @@ function stopClock(){
     var players=r2?r2.players||{}:{};
     var joined=Object.keys(players).length;
     var playedNow=Object.values(players).filter(function(p){return p&&p.time!=null;}).length+1;
-    var allDone=playedNow>=joined;
+    var allDone=playedNow>=max;
  
     // Save time
     db.ref('retos/'+myRetoId+'/players/'+curUser.alias).update({time:fmt}).then(function(){
@@ -978,7 +978,7 @@ function renderResult(id,r){
   var max=r.maxPlayers||4;
   var joined=Object.keys(players).length;
   var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-  var allDone=played>=joined;
+  var allDone=played>=max;
  
   document.getElementById('resRN').textContent=r.titulo||'Reto';
   document.getElementById('resTitle').textContent=allDone?'RESULTADO FINAL':'EN CURSO';
