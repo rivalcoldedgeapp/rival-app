@@ -281,7 +281,7 @@ tr:hover td{background:var(--sf2)}
 <div class="overlay" id="overlay"><div class="modal" id="modalBody"></div></div>
  
 <nav>
-  <div style="display:flex;align-items:baseline;gap:8px"><div class="logo">RIVAL</div><div style="font-size:11px;letter-spacing:3px;color:var(--td);text-transform:uppercase;font-family:'DM Sans',sans-serif;font-weight:500;padding:2px 7px;border:1px solid var(--td);border-radius:4px">DEMO</div></div>
+  <div style="display:flex;align-items:baseline;gap:8px"><div class="logo">RIVAL</div><div style="font-size:11px;letter-spacing:3px;color:#fff;text-transform:uppercase;font-family:'DM Sans',sans-serif;font-weight:400;padding:2px 8px;border:1px solid rgba(255,255,255,.25);border-radius:4px;opacity:.7">DEMO</div></div>
   <div class="nav-tabs" id="navTabs">
     <button class="ntab on" id="nt-home" onclick="goTab('home')">🎮 Juegos</button>
     <button class="ntab" id="nt-rank" onclick="goTab('rank')">🏆 Ranking</button>
@@ -346,8 +346,8 @@ tr:hover td{background:var(--sf2)}
 <!-- HOME — Game select -->
 <div class="screen" id="sHome">
   <div class="home-inner">
-    <div class="home-title">ELIGE TU RETO</div>
-    <div class="home-sub">Para el reloj exactamente en el tiempo objetivo</div>
+    <div class="home-title" id="homeTitle">RETOS</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px"><div class="home-sub" style="margin-bottom:0">Para el reloj exactamente en el tiempo objetivo</div><div style="font-size:11px;color:var(--tm);font-family:'DM Mono',sans-serif" id="homeDate"></div></div>
     <div class="game-cards">
       <!-- 5 sec -->
       <div class="game-card g5" onclick="startGame(5)">
@@ -356,7 +356,7 @@ tr:hover td{background:var(--sf2)}
             <div class="gc-title">RETO 5</div>
             <div class="gc-sub">Para exactamente en 5 segundos</div>
           </div>
-          <div class="gc-target">5s</div>
+          <div><div class="gc-target">5s</div><div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--c5);margin-top:2px" id="cardTarget5">5.000s</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb5">—</span></div>
@@ -370,7 +370,7 @@ tr:hover td{background:var(--sf2)}
             <div class="gc-title">RETO 10</div>
             <div class="gc-sub">Para exactamente en 10 segundos</div>
           </div>
-          <div class="gc-target">10s</div>
+          <div><div class="gc-target">10s</div><div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--c10);margin-top:2px" id="cardTarget10">10.000s</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb10">—</span></div>
@@ -384,7 +384,7 @@ tr:hover td{background:var(--sf2)}
             <div class="gc-title">RETO 15</div>
             <div class="gc-sub">Para exactamente en 15 segundos</div>
           </div>
-          <div class="gc-target">15s</div>
+          <div><div class="gc-target">15s</div><div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--c15);margin-top:2px" id="cardTarget15">15.000s</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb15">—</span></div>
@@ -528,6 +528,24 @@ tr:hover td{background:var(--sf2)}
         <div class="ast"><div class="asl">Mejor 10s/15s</div><div class="asv b" id="stBo">—</div></div>
       </div>
       <!-- Winners -->
+      <div class="sec-hdr">
+        <div class="sec-lbl">🎲 Tiempos objetivo de hoy</div>
+        <button class="btn btn-g" onclick="genTargets()">🎲 Generar aleatorios</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px" id="targetsDisplay">
+        <div style="background:var(--sf);border:1px solid var(--c5);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:9px;letter-spacing:2px;color:var(--c5);text-transform:uppercase;margin-bottom:6px">🟢 Reto 5s</div>
+          <div style="font-family:'DM Mono',monospace;font-size:18px;color:var(--c5)" id="admT5">5.000s</div>
+        </div>
+        <div style="background:var(--sf);border:1px solid var(--c10);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:9px;letter-spacing:2px;color:var(--c10);text-transform:uppercase;margin-bottom:6px">🔵 Reto 10s</div>
+          <div style="font-family:'DM Mono',monospace;font-size:18px;color:var(--c10)" id="admT10">10.000s</div>
+        </div>
+        <div style="background:var(--sf);border:1px solid var(--c15);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:9px;letter-spacing:2px;color:var(--c15);text-transform:uppercase;margin-bottom:6px">🟣 Reto 15s</div>
+          <div style="font-family:'DM Mono',monospace;font-size:18px;color:var(--c15)" id="admT15">15.000s</div>
+        </div>
+      </div>
       <div class="sec-hdr"><div class="sec-lbl">🏆 Ganadores actuales</div></div>
       <div id="winnersWrap" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
       <!-- Table tabs -->
@@ -574,6 +592,21 @@ var curUser=null, curGame=5;
 var gState='idle', t0=null, raf=null, elapsed=0;
 var admGame=5, rankGame=5;
 var weekKey=getWeekKey();
+var gameConfig = {5: 5.0, 10: 10.0, 15: 15.0};
+ 
+// Day names in Spanish
+var DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+ 
+function getTodayLabel() {
+  var d = getCDMX();
+  return 'RETOS · ' + DAYS[d.getDay()].toUpperCase();
+}
+ 
+function getTodayDate() {
+  var d = getCDMX();
+  var months = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  return d.getDate() + ' ' + months[d.getMonth()];
+}
  
 // ══ WEEK ══
 function getCDMX(){var n=new Date();return new Date(n.getTime()+n.getTimezoneOffset()*60000+(-6)*3600000);}
@@ -591,6 +624,25 @@ function getWeekLabel(){
 }
  
 // ══ LISTENERS ══
+// Listen to game config (targets) from Firebase
+db.ref('gameConfig').on('value', function(s) {
+  var cfg = s.val();
+  if (cfg) {
+    if (cfg.t5)  gameConfig[5]  = parseFloat(cfg.t5);
+    if (cfg.t10) gameConfig[10] = parseFloat(cfg.t10);
+    if (cfg.t15) gameConfig[15] = parseFloat(cfg.t15);
+  }
+  // Update UI if visible
+  updateTargetDisplays();
+  // Update admin display
+  var a5 = document.getElementById('admT5');
+  var a10 = document.getElementById('admT10');
+  var a15 = document.getElementById('admT15');
+  if (a5) a5.textContent = gameConfig[5].toFixed(3) + 's';
+  if (a10) a10.textContent = gameConfig[10].toFixed(3) + 's';
+  if (a15) a15.textContent = gameConfig[15].toFixed(3) + 's';
+});
+ 
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();renderAdmTable();}});
 db.ref('weekScores/'+weekKey+'/gr').on('value',function(s){
   weekScores['r']=s.val()||{};
@@ -699,7 +751,33 @@ function showApp(fu,profile){
   document.getElementById('navRight').classList.add('show');
   document.getElementById('navTabs').classList.add('show');
   updateHomecards();
+  updateTargetDisplays();
   goTab('home');
+}
+ 
+// ══ UPDATE TARGET DISPLAYS ══
+function updateTargetDisplays() {
+  // Update home title
+  var htEl = document.getElementById('homeTitle');
+  var hdEl = document.getElementById('homeDate');
+  if (htEl) htEl.textContent = getTodayLabel();
+  if (hdEl) hdEl.textContent = getTodayDate();
+ 
+  // Update each game card target
+  [5, 10, 15].forEach(function(g) {
+    var tEl = document.getElementById('cardTarget' + g);
+    if (tEl) tEl.textContent = gameConfig[g].toFixed(3) + 's';
+  });
+ 
+  // Update game screen if visible
+  if (document.getElementById('sGame').classList.contains('on') && curGame !== 'r') {
+    var tNum = document.getElementById('tNum');
+    if (tNum) {
+      tNum.textContent = gameConfig[curGame].toFixed(3);
+      // Update GAMES config
+      GAMES[curGame].target = gameConfig[curGame];
+    }
+  }
 }
  
 // ══ HOME CARDS ══
@@ -735,8 +813,9 @@ function startGame(g){
   var cfg=GAMES[g];
   // Colors
   document.getElementById('ghTitle').textContent='RETO '+g+'s';
-  document.getElementById('ghSub').textContent='Para exactamente en '+g+' segundos';
-  document.getElementById('tNum').textContent=g+'.000';
+  GAMES[g].target = gameConfig[g];
+  document.getElementById('ghSub').textContent='Para exactamente en '+gameConfig[g].toFixed(3)+' segundos';
+  document.getElementById('tNum').textContent=gameConfig[g].toFixed(3);
   document.getElementById('tNum').style.color=cfg.color;
   document.getElementById('tNum').style.textShadow='0 0 30px '+cfg.shadow;
   document.getElementById('rfg').style.stroke=cfg.stroke;
@@ -1129,6 +1208,52 @@ function renderAdmTable(){
       '<td class="mono">'+(w.attempts||0)+'</td>'+
     '</tr>';
   }).join('');
+}
+ 
+function genTargets() {
+  // Generate random targets within logical ranges
+  var t5  = (3.0 + Math.random() * 4.0);   // 3.000 - 7.000
+  var t10 = (7.0 + Math.random() * 6.0);   // 7.000 - 13.000
+  var t15 = (12.0 + Math.random() * 6.0);  // 12.000 - 18.000
+ 
+  // Round to 3 decimals
+  t5  = Math.round(t5  * 1000) / 1000;
+  t10 = Math.round(t10 * 1000) / 1000;
+  t15 = Math.round(t15 * 1000) / 1000;
+ 
+  document.getElementById('modalBody').innerHTML =
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">' +
+    '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c5);border-radius:9px">' +
+    '<span style="color:var(--c5)">🟢 Reto 5s</span>' +
+    '<span style="font-family:DM Mono,monospace;color:var(--c5);font-size:16px">' + t5.toFixed(3) + 's</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c10);border-radius:9px">' +
+    '<span style="color:var(--c10)">🔵 Reto 10s</span>' +
+    '<span style="font-family:DM Mono,monospace;color:var(--c10);font-size:16px">' + t10.toFixed(3) + 's</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c15);border-radius:9px">' +
+    '<span style="color:var(--c15)">🟣 Reto 15s</span>' +
+    '<span style="font-family:DM Mono,monospace;color:var(--c15);font-size:16px">' + t15.toFixed(3) + 's</span></div>' +
+    '</div>' +
+    '<p style="font-size:11px;color:var(--tm);margin-bottom:14px">⚠️ Esto cambia el objetivo para todos los jugadores inmediatamente.</p>' +
+    '<div class="mbtns">' +
+    '<button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>' +
+    '<button class="btn btn-g" onclick="saveTargets(' + t5 + ',' + t10 + ',' + t15 + ')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button>' +
+    '</div>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
+function saveTargets(t5, t10, t15) {
+  db.ref('gameConfig').set({ t5: t5, t10: t10, t15: t15, updatedAt: Date.now() }).then(function() {
+    closeModal();
+    toast('✅ Tiempos actualizados para todos');
+    // Update admin display
+    var a5 = document.getElementById('admT5');
+    var a10 = document.getElementById('admT10');
+    var a15 = document.getElementById('admT15');
+    if (a5) a5.textContent = t5.toFixed(3) + 's';
+    if (a10) a10.textContent = t10.toFixed(3) + 's';
+    if (a15) a15.textContent = t15.toFixed(3) + 's';
+  });
 }
  
 function confReset(){
