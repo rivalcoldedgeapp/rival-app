@@ -340,8 +340,8 @@ tr:hover td{background:var(--sf2)}
     <div class="game-cards">
       <div class="gc g5" onclick="startGame(5)">
         <div class="gc-top">
-          <div><div class="gc-title">RETO 5s</div><div class="gc-sub">Para en 5 segundos</div><div class="gc-objective" id="obj5">Objetivo: 5.000s</div></div>
-          <div class="gc-tgt">5s</div>
+          <div><div class="gc-title">RETO 5s</div><div class="gc-sub">Para en 5 segundos</div><div class="gc-objective" id="obj5">Cargando...</div></div>
+          <div style="text-align:right"><div class="gc-tgt" id="tgt5">5s</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--c5);margin-top:2px" id="tgtSub5">5.000s</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb5">—</span></div>
@@ -351,8 +351,8 @@ tr:hover td{background:var(--sf2)}
       </div>
       <div class="gc g10" onclick="startGame(10)">
         <div class="gc-top">
-          <div><div class="gc-title">RETO 10s</div><div class="gc-sub">Para en 10 segundos</div><div class="gc-objective" id="obj10">Objetivo: 10.000s</div></div>
-          <div class="gc-tgt">10s</div>
+          <div><div class="gc-title">RETO 10s</div><div class="gc-sub">Para en 10 segundos</div><div class="gc-objective" id="obj10">Cargando...</div></div>
+          <div style="text-align:right"><div class="gc-tgt" id="tgt10">10s</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--c10);margin-top:2px" id="tgtSub10">10.000s</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb10">—</span></div>
@@ -362,8 +362,8 @@ tr:hover td{background:var(--sf2)}
       </div>
       <div class="gc g15" onclick="startGame(15)">
         <div class="gc-top">
-          <div><div class="gc-title">RETO 15s</div><div class="gc-sub">Para en 15 segundos</div><div class="gc-objective" id="obj15">Objetivo: 15.000s</div></div>
-          <div class="gc-tgt">15s</div>
+          <div><div class="gc-title">RETO 15s</div><div class="gc-sub">Para en 15 segundos</div><div class="gc-objective" id="obj15">Cargando...</div></div>
+          <div style="text-align:right"><div class="gc-tgt" id="tgt15">15s</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--c15);margin-top:2px" id="tgtSub15">15.000s</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb15">—</span></div>
@@ -783,12 +783,6 @@ function updateConfigUI() {
   if (obj5) obj5.textContent = 'Objetivo: ' + GCFG[5].toFixed(3) + 's';
   if (obj10) obj10.textContent = 'Objetivo: ' + GCFG[10].toFixed(3) + 's';
   if (obj15) obj15.textContent = 'Objetivo: ' + GCFG[15].toFixed(3) + 's';
-  var a5 = document.getElementById('admT5');
-  var a10 = document.getElementById('admT10');
-  var a15 = document.getElementById('admT15');
-  if (a5) a5.textContent = GCFG[5].toFixed(3) + 's';
-  if (a10) a10.textContent = GCFG[10].toFixed(3) + 's';
-  if (a15) a15.textContent = GCFG[15].toFixed(3) + 's';
 }
  
 // ══ HOME CARDS ══
@@ -1125,9 +1119,12 @@ function goTab(t) {
  
 // ══ ADMIN ══
 function showAdmin() {
-  // Always reset to login state when navigating to admin
+  // Always force login — never auto-open panel
+  admLoggedIn = false;
   document.getElementById('admLC').style.display = 'block';
-  if (!admLoggedIn) document.getElementById('admP').classList.remove('show');
+  document.getElementById('admP').classList.remove('show');
+  document.getElementById('au').value = '';
+  document.getElementById('ap').value = '';
   showScreen('sAdmin');
 }
  
