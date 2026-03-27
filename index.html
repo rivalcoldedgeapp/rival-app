@@ -1403,14 +1403,9 @@ function renderAdmWeek(g) {
  
   var today = getTodayKey();
   var fetches = days.map(function(dayObj) {
+    // Only read from day-specific path — no legacy fallback (legacy has no day info)
     return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
-      if (s.val()) return { day:dayObj, scores:s.val() };
-      if (dayObj.key <= today) {
-        return db.ref('weekScores/'+weekKey+'/'+gkey).once('value').then(function(s2) {
-          return { day:dayObj, scores:s2.val()||{}, isLegacy:true };
-        });
-      }
-      return { day:dayObj, scores:{} };
+      return { day:dayObj, scores:s.val()||{} };
     });
   });
  
@@ -1432,7 +1427,7 @@ function renderAdmWeek(g) {
  
       html += '<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:11px;padding:12px;margin-bottom:8px">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-      html += '<div style="font-size:12px;font-weight:700">'+r.day.label+(isToday?' · Hoy':''+(r.isLegacy?' (hist.)':''))+'</div>';
+      html += '<div style="font-size:12px;font-weight:700">'+r.day.label+(isToday?' · Hoy':'')+'</div>';
       html += '<div style="font-size:11px;color:var(--tm)">'+sorted.length+' jugador(es)</div>';
       html += '</div>';
  
@@ -1522,11 +1517,6 @@ function admUserHist(btn) {
         db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
           if (s.val()) return { day: dayObj, game: gObj, data: s.val() };
           // Fallback to old weekScores path
-          if (dayObj.key <= today) {
-            return db.ref('weekScores/' + weekKey + '/' + key + '/' + uid).once('value').then(function(s2) {
-              return { day: dayObj, game: gObj, data: s2.val() || null, isLegacy: true };
-            });
-          }
           return { day: dayObj, game: gObj, data: null };
         })
       );
@@ -1631,15 +1621,8 @@ function showHistory(g) {
       if (s.val()) {
         return { day: dayObj, data: s.val() };
       }
-      // Fallback: read from old weekScores path (data from before migration)
-      return db.ref('weekScores/' + weekKey + '/' + key + '/' + uid).once('value').then(function(s2) {
-        // Only show old data on the days it could have been recorded (before today)
-        var today = getTodayKey();
-        if (s2.val() && dayObj.key < today) {
-          return { day: dayObj, data: s2.val(), isLegacy: true };
-        }
-        return { day: dayObj, data: null };
-      });
+      // No legacy fallback in per-day view — legacy data has no day info
+      return Promise.resolve({ day: dayObj, data: null });
     });
   });
  
@@ -1781,7 +1764,6 @@ function renderWeekDays(g) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
       var dayLabelHtml = r.day.label;
       if (isToday) dayLabelHtml += ' · Hoy';
-      if (r.isLegacy) dayLabelHtml += ' (hist.)';
       var dayColor = isToday ? 'var(--tx)' : 'var(--tm)';
       html += '<div style="font-size:13px;font-weight:700;color:' + dayColor + '">' + dayLabelHtml + '</div>';
       if (myRank >= 0 && myScore) {
