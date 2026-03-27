@@ -174,7 +174,12 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .rh-diff{font-size:12px;color:var(--tm);margin-top:4px}
 .rh-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-top:5px}
 .nr{text-align:center;padding:8px;background:var(--adim);border:1px solid var(--amid);border-radius:9px;margin-bottom:10px;font-size:12px;color:var(--ac);display:none}
-.nr.show{display:block}
+.nr.show{display:block;animation:recAnim .5s ease-out}
+@keyframes recAnim{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.pts-pop{animation:ptsPop .6s ease-out}
+@keyframes ptsPop{0%{transform:translateY(10px);opacity:0}60%{transform:translateY(-4px)}100%{transform:translateY(0);opacity:1}}
+.rh-time.anim{animation:timePop .4s ease-out}
+@keyframes timePop{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
 .lb-hdr{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--bo)}
 .li{display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--sf);border:1px solid var(--bo);border-radius:11px;margin-bottom:5px}
 .li.me{border-color:var(--bl)}.li.top1{background:var(--adim)}
@@ -544,6 +549,13 @@ body.playing{overflow:hidden}
   <div class="rank-inner" style="padding-top:18px">
     <div class="rank-title" id="rankTitle">RANKING DE HOY</div>
     <div class="rank-sub" id="rankSub">TOP 50 · Esta semana</div>
+    <!-- Explicación de puntos — solo visible en global -->
+    <div id="ptsExplain" style="display:none;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--tm);line-height:1.8">
+      🏅 <strong style="color:var(--tx)">¿Cómo se ganan puntos?</strong><br>
+      Cada día, los mejores tiempos de cada reto suman puntos:<br>
+      <span style="color:var(--wn)">🥇 10pts &nbsp; 🥈 7pts &nbsp; 🥉 5pts</span> &nbsp;·&nbsp; 4to 3pts &nbsp;·&nbsp; 5to–10mo 1pt<br>
+      El ranking global muestra quién acumuló más puntos en la semana.
+    </div>
     <div class="rg-tabs">
       <button class="rgt" id="rgtG" onclick="setRankGame('global')">🏅 Global</button>
       <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 Reto 1</button>
@@ -1212,6 +1224,13 @@ function reactTap() {
     var ms = Math.round(performance.now() - window._reactT0);
     reactState = 'done';
     var z = document.getElementById('rZone');
+    // Filtrar tiempos físicamente imposibles
+    if (ms <= 100) {
+      z.className = 'rzone early';
+      z.innerHTML = '<div class="rz-icon">🤨</div><div class="rz-t" style="color:#fff">SOSPECHOSO</div><div class="rz-s" style="color:rgba(255,255,255,.7)">'+ms+'ms es imposible para humanos — no cuenta</div>';
+      setTimeout(function() { reactState='idle'; showReactIdle(); }, 2000);
+      return;
+    }
     z.className = 'rzone done';
     z.innerHTML = '<div class="react-ms-big">' + ms + '</div><div class="react-ms-lbl">MILISEGUNDOS</div>';
     setTimeout(function() { saveScore(String(ms), ms, 'r'); }, 800);
@@ -1277,8 +1296,13 @@ function showResult(fmt, diff, isRec, g) {
   var uid = curUser.uid;
   var isR = g === 'r';
   var cfg = GCOLORS[g];
-  document.getElementById('rhTime').textContent = fmt + (isR ? 'ms' : 's');
-  document.getElementById('rhTime').style.color = cfg.color;
+  // Animate time number
+  var rhTime = document.getElementById('rhTime');
+  rhTime.textContent = fmt + (isR ? 'ms' : 's');
+  rhTime.style.color = cfg.color;
+  rhTime.classList.remove('anim');
+  void rhTime.offsetWidth; // reflow to retrigger
+  rhTime.classList.add('anim');
   if (isR) {
     document.getElementById('rhDiff').textContent = diff<200?'⚡ Velocidad de rayo':diff<300?'🟢 Muy bueno':diff<400?'🟡 Promedio':'🔴 Sigue practicando';
   } else {
@@ -1299,6 +1323,9 @@ function showResult(fmt, diff, isRec, g) {
     if (ptsEarned > 0) {
       ptsEl.innerHTML = '<span style="color:var(--wn)">+' + ptsEarned + ' pts 🏅</span> &nbsp;·&nbsp; Total semana: <strong style="color:var(--wn)">' + totalPts + ' pts</strong>';
       ptsEl.style.display = 'block';
+      ptsEl.classList.remove('pts-pop');
+      void ptsEl.offsetWidth;
+      ptsEl.classList.add('pts-pop');
     } else {
       ptsEl.style.display = 'none';
     }
@@ -1352,6 +1379,9 @@ function setRankGame(g) {
     el.style.background = ''; el.style.color = ''; el.style.borderColor = '';
     el.className = 'rgt';
   });
+  // Mostrar/ocultar explicación de puntos
+  var ptsEx = document.getElementById('ptsExplain');
+  if (ptsEx) ptsEx.style.display = g === 'global' ? 'block' : 'none';
   if (g === 'global') {
     var gEl = document.getElementById('rgtG');
     if (gEl) { gEl.style.background='var(--wn)'; gEl.style.color='#000'; gEl.style.borderColor='var(--wn)'; }
