@@ -1284,7 +1284,17 @@ function findRef(code){return Object.keys(profiles).find(function(uid){return pr
 function genRef(name){var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase();}
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera','auth/operation-not-allowed':'Método no activado en Firebase'};return m[code]||('Error: '+code);}
-function goScreen(id){document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});var el=document.getElementById(id);el.classList.add('on');el.style.display='flex';}
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});
+  var el=document.getElementById(id);
+  el.classList.add('on');
+  el.style.display='flex';
+  // If going to admin and not yet logged in, ensure login card is visible
+  if(id==='sAdmin' && !document.getElementById('admP').classList.contains('show')){
+    var lc=document.getElementById('admLC');
+    if(lc) lc.style.display='block';
+  }
+}
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
 var tt;
