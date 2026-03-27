@@ -1769,21 +1769,21 @@ function renderWeekDays(g) {
     });
   });
  
-  Promise.all(fetches).then(function(res) {
-    var results = res[0];
-    var legacyData = res[1].val() || {};
-    // Assign legacy scores to the correct day using lastPlayed timestamp
-    Object.entries(legacyData).forEach(function(e) {
-      var uid2=e[0], w=e[1];
-      if (!w || !w.lastPlayed) return;
-      var dayK = dayKeyFromTimestamp(w.lastPlayed);
-      if (!dayK) return;
-      var dayResult = results.find(function(r){ return r.day.key===dayK; });
-      if (dayResult && !dayResult.hasNewData && !dayResult.scores[uid2]) {
-        dayResult.scores[uid2] = w;
-        dayResult.isLegacy = true;
-      }
-    });
+  // Also fetch legacy weekScores — assign to correct day via lastPlayed
+  db.ref('weekScores/'+weekKey+'/'+gkey).once('value').then(function(legacySnap) {
+    var legacyData = legacySnap.val() || {};
+    Promise.all(fetches).then(function(results) {
+      // Merge legacy into correct day using lastPlayed timestamp
+      Object.entries(legacyData).forEach(function(e) {
+        var uid2=e[0], w=e[1];
+        if (!w||!w.lastPlayed) return;
+        var dayK = dayKeyFromTimestamp(w.lastPlayed);
+        if (!dayK) return;
+        var dayResult = results.find(function(r){ return r.day.key===dayK; });
+        if (dayResult && Object.keys(dayResult.scores).length===0 && !dayResult.scores[uid2]) {
+          dayResult.scores[uid2] = w;
+        }
+      });
  
     var html = '';
     results.forEach(function(r) {
@@ -1854,7 +1854,8 @@ function renderWeekDays(g) {
     });
  
     wrap.innerHTML = html || '<div style="text-align:center;color:var(--tm);padding:40px">Sin datos esta semana</div>';
-  });
+    }); // Promise.all
+  }); // legacySnap
 }
  
 // ══ UTILS ══
