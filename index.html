@@ -250,12 +250,62 @@ tr:hover td{background:var(--sf2)}
 .spin{width:16px;height:16px;border:2px solid var(--bo);border-top-color:var(--ac);border-radius:50%;animation:sp2 .7s linear infinite;display:inline-block}
 @keyframes sp2{to{transform:rotate(360deg)}}
  
-@media(max-width:480px){
-  .tnum{font-size:56px}.cring{width:165px;height:165px}.cs{font-size:40px}
-  nav{padding:10px 14px}.logo{font-size:22px}
-  .ap-stats{grid-template-columns:1fr 1fr}.rh-time{font-size:44px}
+@media(max-width:600px){
+  /* Nav */
+  nav{padding:8px 12px;flex-wrap:wrap;gap:6px}
+  .logo{font-size:20px}
+  .nav-name{display:none}
+  .nav-tabs{flex:1;justify-content:center}
+  .ntab{padding:5px 8px;font-size:11px}
+  .out-btn{padding:3px 7px;font-size:10px}
+ 
+  /* Screens — no extra scroll */
+  .screen{min-height:0;height:calc(100dvh - 53px);overflow-y:auto;justify-content:flex-start;padding-top:12px}
+  #sGame{justify-content:center;padding-top:8px}
+  #sReaction{justify-content:center;padding-top:8px}
+  #sResult{height:auto;min-height:calc(100dvh - 53px)}
+  #sRanking{height:auto;min-height:calc(100dvh - 53px)}
+  #sAdmin{height:auto;min-height:calc(100dvh - 53px)}
+  #sWeek{height:auto;min-height:calc(100dvh - 53px)}
+ 
+  /* Game clock */
+  .gi{gap:10px;padding:0 12px 16px}
+  .cring{width:160px;height:160px}
+  .cs{font-size:38px}.cm{font-size:13px}
+  .tnum{font-size:54px}
+  .gbtn{height:50px;font-size:18px;max-width:100%}
+  .score-row{padding:8px 12px}
+  .sr-val{font-size:13px}
+ 
+  /* Home cards */
+  .home-inner{padding:0 12px 20px}
+  .gc{padding:14px}
+  .home-title{font-size:28px}
+  .game-cards{gap:10px}
+ 
+  /* Result */
+  .res-inner{padding:0 12px 20px}
+  .rh-time{font-size:44px}
+ 
+  /* Reaction */
+  .ri{padding:0 12px 16px}
+  .rzone{height:180px}
   .react-ms-big{font-size:50px}
+ 
+  /* Admin */
+  .ap-stats{grid-template-columns:1fr 1fr}
+  .adm-inner{padding:12px}
+ 
+  /* Auth */
+  #sAuth{padding:12px}
+  .auth-card{padding:20px}
+ 
+  /* Weekly ranking */
+  .week-day-card{margin-bottom:10px}
 }
+ 
+/* Prevent body scroll on game screens */
+body.playing{overflow:hidden}
 </style>
 </head>
 <body>
@@ -271,6 +321,7 @@ tr:hover td{background:var(--sf2)}
   <div class="nav-tabs" id="navTabs">
     <button class="ntab on" id="nt-home" onclick="goTab('home')">🎮 Juegos</button>
     <button class="ntab" id="nt-rank" onclick="goTab('rank')">🏆 Ranking</button>
+    <button class="ntab" id="nt-week" onclick="goTab('week')">📅 Semana</button>
   </div>
   <div class="nav-right" id="navRight">
     <div class="nav-av" id="navAv">R</div>
@@ -489,6 +540,27 @@ tr:hover td{background:var(--sf2)}
     <div class="rank-my" id="rankMy">
       <div class="rmy-pos" id="rmyPos">—</div>
       <div class="rmy-time" id="rmyTime">—</div>
+    </div>
+  </div>
+</div>
+ 
+<!-- WEEKLY RANKING -->
+<div class="screen" id="sWeek" style="align-items:flex-start;justify-content:flex-start">
+  <div style="width:100%;max-width:560px;margin:0 auto;padding:18px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px">SEMANA</div>
+      <div style="font-size:11px;color:var(--tm);font-family:'DM Mono',monospace" id="weekRangeLbl"></div>
+    </div>
+    <div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">Top 3 por día · Tu posición</div>
+    <!-- Game filter tabs -->
+    <div style="display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap" id="weekGameTabs">
+      <button class="rgt" id="wgt5" onclick="setWeekGame(5)">🟢 Reto 1</button>
+      <button class="rgt" id="wgt10" onclick="setWeekGame(10)">🔵 Reto 2</button>
+      <button class="rgt" id="wgt15" onclick="setWeekGame(15)">🟣 Reto 3</button>
+      <button class="rgt" id="wgtr" onclick="setWeekGame('r')">⚡ Reacción</button>
+    </div>
+    <div id="weekDaysWrap">
+      <div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Cargando...</div>
     </div>
   </div>
 </div>
@@ -916,6 +988,7 @@ function startRun() {
   var ring = document.getElementById('cRing');
   if (ring) { ring.className='cring run'; ring.style.borderColor=cfg.stroke; }
   document.getElementById('cL').textContent = 'CORRIENDO';
+  document.body.classList.add('playing');
   var maxT = GMAXTIME[curGame];
   raf = requestAnimationFrame(function loop() {
     if (gState !== 'running') return;
@@ -931,6 +1004,7 @@ function startRun() {
  
 function stopClock() {
   cancelAnimationFrame(raf); gState = 'stopped';
+  document.body.classList.remove('playing');
   elapsed = (performance.now() - t0) / 1000;
   var target = GCFG[curGame];
   var fmt = elapsed.toFixed(3);
@@ -948,6 +1022,7 @@ function stopClock() {
  
 function resetClock() {
   gState = 'idle'; cancelAnimationFrame(raf);
+  document.body.classList.remove('playing');
   document.getElementById('cS').textContent = '0';
   document.getElementById('cM').textContent = '.000';
   document.getElementById('cL').textContent = 'LISTO';
@@ -1159,14 +1234,25 @@ function getRank(uid, g) {
 function goTab(t) {
   document.getElementById('nt-home').classList.toggle('on', t==='home');
   document.getElementById('nt-rank').classList.toggle('on', t==='rank');
-  if (t === 'home') { showScreen('sHome'); updateHomecards(); updateConfigUI(); }
-  else if (t === 'rank') {
+  document.getElementById('nt-week').classList.toggle('on', t==='week');
+  if (t === 'home') {
+    showScreen('sHome'); updateHomecards(); updateConfigUI();
+  } else if (t === 'rank') {
     [5,10,15,'r'].forEach(function(x){
       var el=document.getElementById('rgt'+(x==='r'?'r':x));
       if(el){el.style.background='';el.style.color='';el.style.borderColor='';}
     });
     setRankGame(5);
     showScreen('sRanking');
+  } else if (t === 'week') {
+    document.getElementById('weekRangeLbl').textContent = getWeekLabel();
+    // Reset tabs
+    [5,10,15,'r'].forEach(function(x){
+      var el=document.getElementById('wgt'+(x==='r'?'r':x));
+      if(el){el.style.background='';el.style.color='';el.style.borderColor='';}
+    });
+    setWeekGame(5);
+    showScreen('sWeek');
   }
 }
  
@@ -1505,6 +1591,137 @@ function showHistory(g) {
     if (!rowsHtml) rowsHtml = '<div style="text-align:center;color:var(--tm);padding:20px;font-size:13px">Sin datos esta semana</div>';
     var rowsEl = document.getElementById('historyRows');
     if (rowsEl) rowsEl.innerHTML = rowsHtml;
+  });
+}
+ 
+// ══ WEEKLY RANKING ══
+var weekGame = 5;
+var weekDaysCache = {};
+ 
+function setWeekGame(g) {
+  weekGame = g;
+  // Style tabs
+  [5,10,15,'r'].forEach(function(x) {
+    var el = document.getElementById('wgt'+(x==='r'?'r':x));
+    if (!el) return;
+    el.style.background=''; el.style.color=''; el.style.borderColor='';
+    el.className='rgt';
+  });
+  var active = document.getElementById('wgt'+(g==='r'?'r':g));
+  if (active) {
+    var cfg = GCOLORS[g];
+    active.style.background = cfg.stroke;
+    active.style.color = '#000';
+    active.style.borderColor = cfg.stroke;
+  }
+  renderWeekDays(g);
+}
+ 
+function renderWeekDays(g) {
+  var wrap = document.getElementById('weekDaysWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';
+ 
+  var cfg = GCOLORS[g];
+  var isR = g === 'r';
+  var gkey = g === 'r' ? 'gr' : 'g' + g;
+  var uid = curUser ? curUser.uid : null;
+  var labels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', r:'REACCIÓN'};
+ 
+  // Build week days array
+  var d = getCDMX();
+  var day = d.getDay();
+  var diff = day === 0 ? -6 : 1 - day;
+  var monday = new Date(d); monday.setDate(d.getDate() + diff);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var dd = new Date(monday); dd.setDate(monday.getDate() + i);
+    var dk = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    days.push({ key: dk, label: DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()] });
+  }
+ 
+  var today = getTodayKey();
+  // Fetch all days
+  var fetches = days.map(function(dayObj) {
+    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
+      var data = s.val() || {};
+      // Also try legacy weekScores path if no new data and it's a past day
+      if (Object.keys(data).length === 0 && dayObj.key < today) {
+        return db.ref('weekScores/'+weekKey+'/'+gkey).once('value').then(function(s2) {
+          return { day: dayObj, scores: s2.val() || {}, isLegacy: true };
+        });
+      }
+      return { day: dayObj, scores: data, isLegacy: false };
+    });
+  });
+ 
+  Promise.all(fetches).then(function(results) {
+    var html = '';
+    results.forEach(function(r) {
+      var isToday = r.day.key === today;
+      var isFuture = r.day.key > today;
+      var scores = r.scores;
+      var sorted = Object.entries(scores)
+        .filter(function(e){ return e[1].bestDiff != null; })
+        .sort(function(a,b){
+          if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
+          return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
+        });
+ 
+      var top3 = sorted.slice(0, 3);
+      var myRank = uid ? sorted.findIndex(function(e){ return e[0]===uid; }) : -1;
+      var myScore = uid ? scores[uid] : null;
+ 
+      html += '<div class="week-day-card" style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:12px;padding:14px;margin-bottom:8px;opacity:'+(isFuture?'.3':'1')+'">';
+      // Day header
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+      html += '<div style="font-size:13px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+r.day.label+(isToday?' · <span style="color:'+cfg.stroke+'">Hoy</span>':'')+(r.isLegacy?' <span style="font-size:9px;color:var(--td)">hist.</span>':'')+'</div>';
+      if (myRank >= 0 && myScore) {
+        html += '<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>';
+      } else if (!isFuture && sorted.length === 0) {
+        html += '<div style="font-size:10px;color:var(--td)">Sin partidas</div>';
+      } else if (!isFuture && myRank < 0) {
+        html += '<div style="font-size:10px;color:var(--td)">No jugaste</div>';
+      }
+      html += '</div>';
+ 
+      if (isFuture) {
+        html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:8px 0">Por jugar</div>';
+      } else if (sorted.length === 0) {
+        html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:8px 0">Nadie jugó este día</div>';
+      } else {
+        // Top 3
+        var medals = ['🥇','🥈','🥉'];
+        top3.forEach(function(e, i) {
+          var w = e[1];
+          var isMe = uid && e[0] === uid;
+          html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border-radius:8px;margin-bottom:4px;'+(isMe?'border:1px solid '+cfg.stroke+';':'')+'">';
+          html += '<span style="font-size:16px;width:22px">' + medals[i] + '</span>';
+          var avLetter = (w.name||'?')[0].toUpperCase();
+          html += '<div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">' + avLetter + '</div>';
+          html += '<div style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div>';
+          html += '<div style="font-family:'DM Mono',monospace;font-size:12px;color:'+cfg.stroke+'">' + w.bestTime + (isR?'ms':'s') + '</div>';
+          html += '<div style="font-size:10px;color:var(--tm)">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>';
+          html += '</div>';
+        });
+ 
+        // Show my position if outside top 3
+        if (myRank >= 3 && myScore && myScore.bestTime) {
+          html += '<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div>';
+          html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px;">';
+          html += '<span style="font-size:13px;font-weight:700;color:'+cfg.stroke+';width:22px">#'+(myRank+1)+'</span>';
+          var myLetter = (myScore.name||'?')[0].toUpperCase();
+          html += '<div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">' + myLetter + '</div>';
+          html += '<div style="flex:1;font-size:12px;font-weight:700">'+(myScore.name||'?')+' 👈</div>';
+          html += '<div style="font-family:'DM Mono',monospace;font-size:12px;color:'+cfg.stroke+'">' + myScore.bestTime + (isR?'ms':'s') + '</div>';
+          html += '<div style="font-size:10px;color:var(--tm)">±'+(myScore.bestDiff*1000).toFixed(0)+'ms</div>';
+          html += '</div>';
+        }
+      }
+      html += '</div>';
+    });
+ 
+    wrap.innerHTML = html || '<div style="text-align:center;color:var(--tm);padding:40px">Sin datos esta semana</div>';
   });
 }
  
