@@ -145,7 +145,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .cl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:3px}
 .big-btn{width:100%;max-width:240px;height:54px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:5px;cursor:pointer;transition:all .15s}
 .btn-s{background:var(--ac);color:#000}.btn-s:active{transform:scale(.97)}
-.btn-p{background:transparent;color:var(--ac);animation:sp 1s ease-in-out infinite}
+.btn-p{background:transparent;color:var(--ac);animation:sp 1s ease-in-out infinite;border:3px solid var(--ac)}
 .btn-o{background:var(--bo);color:var(--td);cursor:not-allowed}
 @keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--amid)}50%{box-shadow:0 0 0 12px transparent}}
  
@@ -697,7 +697,7 @@ function startCD(){
 function startRun(){
   gState='running';t0=performance.now();elapsed=0;
   var btn=document.getElementById('gBtn'),cfg=GAMES[curGame];
-  if(btn){btn.className='big-btn btn-p';btn.textContent='PARAR';btn.style.borderColor=cfg.stroke;btn.style.color=cfg.stroke;}
+  if(btn){btn.className='big-btn btn-p';btn.textContent='PARAR';btn.style.background='transparent';btn.style.border='3px solid '+cfg.stroke;btn.style.color=cfg.stroke;btn.style.setProperty('--amid',cfg.shadow);}
   var ring=document.getElementById('cRing');
   if(ring){ring.className='clock-ring run';ring.style.borderColor=cfg.stroke;}
   document.getElementById('cL').textContent='CORRIENDO';
@@ -807,7 +807,7 @@ function resetClock(){
   document.getElementById('cRing').className='clock-ring';
   document.getElementById('rfg').style.strokeDashoffset='565';
   var btn=document.getElementById('gBtn');
-  if(btn){btn.className='big-btn btn-s';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';}
+  if(btn){btn.className='big-btn btn-s';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.border='none';}
 }
  
 function playAgain(){resetClock();startGame(curGame);}
