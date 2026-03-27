@@ -241,13 +241,17 @@ tr:hover td{background:var(--sf2)}
  
 <nav>
   <div class="logo">RIVAL</div>
+  <div style="display:none;align-items:center;gap:8px" id="navGameTabs">
+    <button id="nbGame" onclick="showGameTab()" style="padding:7px 14px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:var(--ac);color:#000;transition:all .2s">🎮 Jugar</button>
+    <button id="nbRank" onclick="showRankTab()" style="padding:7px 14px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:var(--sf);border:1px solid var(--bo);color:var(--tm);transition:all .2s">🏆 Ranking</button>
+  </div>
   <div class="nav-user" id="navUser">
     <div class="nav-avatar" id="navAvatar">R</div>
     <div class="nav-info">
       <div class="nav-name" id="navName">—</div>
       <div class="nav-sub" id="navSub">—</div>
     </div>
-    <div class="nav-attempts" id="navAttempts">
+    <div class="nav-attempts" id="navAttempts" style="display:none">
       <span style="font-size:10px;color:var(--tm)">Intentos</span>
       <span class="n" id="navAttN">0</span>
     </div>
@@ -259,7 +263,7 @@ tr:hover td{background:var(--sf2)}
 <div class="screen on" id="sAuth">
   <div class="auth-card">
     <div class="auth-logo">RIVAL</div>
-    <div class="auth-tagline">Para el reloj · Gana cada semana</div>
+    <div class="auth-tagline">Para el reloj en 5 segundos · Gana cada semana</div>
     <button class="google-btn" onclick="googleLogin()">
       <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar con Google
@@ -308,11 +312,11 @@ tr:hover td{background:var(--sf2)}
 <!-- GAME -->
 <div class="screen" id="sGame">
   <div class="game-inner">
-    <div class="week-timer">
+    <div class="week-timer" style="display:none">
       <div><div class="wt-lbl">Cierre de semana</div><div class="wt-val" id="weekTimer">—</div></div>
       <div style="text-align:right"><div class="wt-lbl">Semana</div><div class="wt-val" id="weekLabel" style="color:var(--tm)">—</div></div>
     </div>
-    <div class="attempts-bar">
+    <div class="attempts-bar" style="display:none">
       <div class="ab-top">
         <div class="ab-lbl">Intentos esta semana</div>
         <div class="ab-num" id="attNum">0/3</div>
@@ -326,11 +330,11 @@ tr:hover td{background:var(--sf2)}
     </div>
     <div>
       <div class="game-title">PARA EL RELOJ</div>
-      <div class="game-desc">Detente exactamente en 30 segundos</div>
+      <div class="game-desc">Detente exactamente en 5 segundos</div>
     </div>
     <div class="target-wrap">
       <div class="tlbl">Objetivo</div>
-      <div class="tnum">30.000</div>
+      <div class="tnum">5.000</div>
       <div class="tunit">SEGUNDOS</div>
     </div>
     <div id="gameClockArea">
@@ -358,16 +362,35 @@ tr:hover td{background:var(--sf2)}
       <div class="my-diff" id="resDiff">±0ms del objetivo</div>
       <div class="my-rank" id="resRank">Posición <span>#1</span></div>
     </div>
-    <div class="attempts-left" id="attLeft"></div>
+    <div class="attempts-left" id="attLeft" style="display:none"></div>
     <div class="new-record" id="newRecord">🎉 ¡Nuevo récord personal esta semana!</div>
     <div class="lb-hdr">🏆 TABLA DE LÍDERES — ESTA SEMANA</div>
     <div id="lbList"></div>
     <button class="play-again-btn" id="playAgainBtn" onclick="playAgain()">▶️ JUGAR DE NUEVO</button>
-    <div class="ref-promo" id="refPromo">
+    <div class="ref-promo" id="refPromo" style="display:none">
       <div class="rp-title">🎯 ¿Quieres más intentos?</div>
       <div class="rp-sub">Invita a alguien con tu código y ganas +3 intentos esta semana.</div>
       <div class="rp-code" id="refPromoCode">—</div>
       <button class="rp-btn" onclick="shareRef()">📤 COMPARTIR MI CÓDIGO</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- RANKING -->
+<div class="screen" id="sRanking">
+  <div style="width:100%;max-width:500px;padding:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px">RANKING</div>
+      <div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase" id="rankWeekLbl">—</div>
+    </div>
+    <div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px">TOP 50 — ESTA SEMANA</div>
+    <div id="fullRankList"></div>
+    <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--bo)">
+      <div style="font-size:12px;color:var(--tm);margin-bottom:12px">Tu posición esta semana</div>
+      <div id="myRankCard" style="background:var(--sf);border:1px solid var(--bl);border-radius:12px;padding:14px;display:none">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--bl)" id="myRankPos">—</div>
+        <div style="font-size:13px;color:var(--tm);margin-top:2px" id="myRankTime">Sin tiempo aún</div>
+      </div>
     </div>
   </div>
 </div>
@@ -427,7 +450,7 @@ var auth = firebase.auth();
 var db = firebase.database();
  
 // ══ CONSTANTS ══
-var TARGET = 30.0;
+var TARGET = 5.0;
 var BASE_ATTEMPTS = 3;
 var BONUS_PER_REFERRAL = 3;
 // Mexico City = UTC-6 (standard) / UTC-5 (DST)
@@ -614,6 +637,7 @@ function resendVerif() {
  
 function doLogout() {
   gState = 'idle'; cancelAnimationFrame(raf); stopWeekTimer();
+  document.getElementById('navGameTabs').style.display = 'none';
   auth.signOut();
 }
  
@@ -640,6 +664,7 @@ function loadAndEnter(fu) {
 function enterGame(fu, profile) {
   var navUser = document.getElementById('navUser');
   navUser.classList.add('show');
+  document.getElementById('navGameTabs').style.display = 'flex';
   var av = document.getElementById('navAvatar');
   if (profile.photoURL) av.innerHTML = '<img src="' + profile.photoURL + '">';
   else av.textContent = (profile.name || 'R')[0].toUpperCase();
@@ -662,7 +687,7 @@ function getUsedAttempts(uid) {
 }
  
 function getRemainingAttempts(uid) {
-  return Math.max(0, getMaxAttempts(uid) - getUsedAttempts(uid));
+  return 999; // Sin límite
 }
  
 // ══ UPDATE GAME UI ══
@@ -702,24 +727,11 @@ function updateGameUI() {
  
   // Show/hide clock vs no-attempts
   var clockArea = document.getElementById('gameClockArea');
-  if (remaining <= 0) {
-    clockArea.innerHTML = '<div class="no-attempts">' +
-      '<div class="na-title">SIN INTENTOS</div>' +
-      '<div class="na-sub">Agotaste tus ' + max + ' intentos esta semana.<br>¡Invita amigos para ganar más!</div>' +
-      '<div class="ref-code-box">' +
-      '<div class="rcb-lbl">Tu código de referido</div>' +
-      '<div class="rcb-code">' + (profile.referralCode || '—') + '</div>' +
-      '<div class="rcb-hint">Cada persona que se registre con tu código te da +3 intentos esta semana</div>' +
-      '</div>' +
-      '<button class="share-btn" onclick="shareRef()">📤 COMPARTIR MI CÓDIGO</button>' +
-      '</div>';
-  } else {
-    clockArea.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:16px">' +
-      '<div class="clock-ring" id="cRing"><svg class="svgr" viewBox="0 0 198 198"><circle class="rt" cx="99" cy="99" r="95"/><circle class="rfg" id="rfg" cx="99" cy="99" r="95"/></svg>' +
-      '<div class="cs" id="cS">0</div><div class="cm" id="cM">.000</div><div class="cl" id="cL">LISTO</div></div>' +
-      '<button class="big-btn btn-start" id="gBtn" onclick="handleBtn()">INICIAR</button></div>';
-    gState = 'idle';
-  }
+  clockArea.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:16px">' +
+    '<div class="clock-ring" id="cRing"><svg class="svgr" viewBox="0 0 198 198"><circle class="rt" cx="99" cy="99" r="95"/><circle class="rfg" id="rfg" cx="99" cy="99" r="95"/></svg>' +
+    '<div class="cs" id="cS">0</div><div class="cm" id="cM">.000</div><div class="cl" id="cL">LISTO</div></div>' +
+    '<button class="big-btn btn-start" id="gBtn" onclick="handleBtn()">INICIAR</button></div>';
+  gState = 'idle';
 }
  
 // ══ WEEK TIMER ══
@@ -779,8 +791,8 @@ function startRun() {
     if(cS)cS.textContent=Math.floor(elapsed);
     if(cM)cM.textContent='.'+String(Math.floor((elapsed%1)*1000)).padStart(3,'0');
     var rfg=document.getElementById('rfg');
-    if(rfg)rfg.style.strokeDashoffset=565-(565*Math.min(elapsed/60,1));
-    if(elapsed>=60)stopClock();
+    if(rfg)rfg.style.strokeDashoffset=565-(565*Math.min(elapsed/10,1));
+    if(elapsed>=15)stopClock();
     else raf=requestAnimationFrame(loop);
   });
 }
@@ -819,7 +831,7 @@ function saveResult(fmt, diff) {
 function showResultScreen(fmt,diff,isRecord){
   var uid=curFireUser.uid;
   document.getElementById('resTime').textContent=fmt+'s';
-  document.getElementById('resDiff').textContent='±'+(diff*1000).toFixed(0)+'ms del objetivo (30.000s)';
+  document.getElementById('resDiff').textContent='±'+(diff*1000).toFixed(0)+'ms del objetivo (5.000s)';
   var rank=getRank(uid);
   var total=Object.values(weekScores).filter(function(w){return w.bestDiff!=null;}).length;
   document.getElementById('resRank').innerHTML='Posición <span>#'+rank+'</span> de '+total+' esta semana';
@@ -830,13 +842,13 @@ function showResultScreen(fmt,diff,isRecord){
   al.innerHTML=remaining>0?'Te quedan <strong>'+remaining+' intento(s)</strong> esta semana':'Sin más intentos esta semana — invita amigos para ganar más';
   // Play again btn
   var pab=document.getElementById('playAgainBtn');
-  if(remaining>0){pab.className='play-again-btn';pab.disabled=false;}
-  else{pab.className='play-again-btn disabled';pab.disabled=true;}
+  pab.className='play-again-btn';pab.disabled=false;
   // Ref promo
   var profile=profiles[uid]||{};
   document.getElementById('refPromoCode').textContent=profile.referralCode||'—';
   renderLeaderboard(uid);
   goScreen('sResult');
+  renderFullRanking();
 }
  
 function renderLeaderboard(highlightUid){
@@ -971,6 +983,72 @@ function goScreen(id){
   document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});
   var el=document.getElementById(id);
   el.classList.add('on');el.style.display='flex';
+}
+ 
+// ══ TABS ══
+function showGameTab() {
+  document.getElementById('nbGame').style.background = 'var(--ac)';
+  document.getElementById('nbGame').style.color = '#000';
+  document.getElementById('nbGame').style.border = 'none';
+  document.getElementById('nbRank').style.background = 'var(--sf)';
+  document.getElementById('nbRank').style.color = 'var(--tm)';
+  document.getElementById('nbRank').style.border = '1px solid var(--bo)';
+  goScreen('sGame');
+}
+ 
+function showRankTab() {
+  document.getElementById('nbRank').style.background = 'var(--ac)';
+  document.getElementById('nbRank').style.color = '#000';
+  document.getElementById('nbRank').style.border = 'none';
+  document.getElementById('nbGame').style.background = 'var(--sf)';
+  document.getElementById('nbGame').style.color = 'var(--tm)';
+  document.getElementById('nbGame').style.border = '1px solid var(--bo)';
+  renderFullRanking();
+  goScreen('sRanking');
+}
+ 
+function renderFullRanking() {
+  document.getElementById('rankWeekLbl').textContent = getWeekLabel();
+  var sorted = Object.entries(weekScores)
+    .filter(function(e) { return e[1].bestDiff != null; })
+    .sort(function(a, b) { return a[1].bestDiff - b[1].bestDiff; })
+    .slice(0, 50);
+ 
+  var html = '';
+  if (sorted.length === 0) {
+    html = '<div style="text-align:center;color:var(--tm);padding:40px;font-size:14px;line-height:2">Nadie ha jugado esta semana.<br>¡Sé el primero!</div>';
+  } else {
+    sorted.forEach(function(e, i) {
+      var uid2 = e[0], w = e[1];
+      var isMe = curFireUser && uid2 === curFireUser.uid;
+      var isTop3 = i < 3;
+      var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+      var pos = i + 1;
+      var avHtml = w.photoURL
+        ? '<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="' + w.photoURL + '" style="width:100%;height:100%;object-fit:cover"></div>'
+        : '<div style="width:36px;height:36px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">' + (w.name || '?')[0].toUpperCase() + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:' + (isTop3 ? 'var(--adim)' : 'var(--sf)') + ';border:1px solid ' + (isMe ? 'var(--bl)' : isTop3 ? 'var(--amid)' : 'var(--bo)') + ';border-radius:12px;margin-bottom:6px">' +
+        '<div style="font-family:'Bebas Neue',sans-serif;font-size:' + (isTop3 ? '22' : '16') + 'px;color:' + (isTop3 ? 'var(--wn)' : 'var(--td)') + ';width:32px;text-align:center">' + (medal || pos) + '</div>' +
+        avHtml +
+        '<div style="flex:1">' +
+          '<div style="font-size:14px;font-weight:' + (isTop3 ? '700' : '500') + '">' + (w.name || '?') + (isMe ? ' 👈' : '') + '</div>' +
+          '<div style="font-size:11px;color:var(--tm);margin-top:1px">±' + (w.bestDiff * 1000).toFixed(0) + 'ms del objetivo</div>' +
+        '</div>' +
+        '<div style="font-family:'DM Mono',monospace;font-size:' + (isTop3 ? '15' : '13') + 'px;color:' + (isTop3 ? 'var(--ac)' : 'var(--tm)') + '">' + w.bestTime + 's</div>' +
+      '</div>';
+    });
+  }
+  document.getElementById('fullRankList').innerHTML = html;
+ 
+  // My rank card
+  if (curFireUser) {
+    var rank = getRank(curFireUser.uid);
+    var myW = weekScores[curFireUser.uid];
+    var myCard = document.getElementById('myRankCard');
+    myCard.style.display = 'block';
+    document.getElementById('myRankPos').textContent = myW && myW.bestTime ? '#' + rank + ' de ' + sorted.length : '—';
+    document.getElementById('myRankTime').textContent = myW && myW.bestTime ? myW.bestTime + 's — ±' + (myW.bestDiff * 1000).toFixed(0) + 'ms' : 'Juega para aparecer en el ranking';
+  }
 }
  
 // ══ UTILS ══
