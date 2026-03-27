@@ -553,7 +553,7 @@ tr:hover td{background:var(--sf2)}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>#</th><th>Jugador</th><th>Email</th><th>Mejor tiempo</th><th>±ms</th><th>Partidas</th></tr></thead>
+          <thead><tr><th>#</th><th>Jugador</th><th>Email</th><th>Mejor hoy</th><th>±ms</th><th>Partidas</th><th></th></tr></thead>
           <tbody id="admTbl"></tbody>
         </table>
       </div>
@@ -673,7 +673,18 @@ db.ref('profiles').on('value', function(s) {
  
 function getScorePath(g) {
   var key = g === 'r' ? 'gr' : 'g' + g;
-  return 'dayScores/' + todayKey + '/' + key;
+  return 'scores/' + weekKey + '/' + todayKey + '/' + key;
+}
+ 
+function getHistoryPath(g, dayK) {
+  var key = g === 'r' ? 'gr' : 'g' + g;
+  return 'scores/' + weekKey + '/' + dayK + '/' + key;
+}
+ 
+// Get all paths for a game across the week (for admin/history views)
+function getWeekPath(g) {
+  var key = g === 'r' ? 'gr' : 'g' + g;
+  return 'scores/' + weekKey;
 }
  
 function listenWeekScore(g) {
@@ -1255,7 +1266,7 @@ function renderAdmTable() {
   var isR = g === 'r';
   var sorted = getSorted(g, 100);
   var cfg = GCOLORS[g];
-  if (sorted.length === 0) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:24px">Sin partidas esta semana</td></tr>'; return; }
+  if (sorted.length === 0) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:24px">Sin partidas hoy</td></tr>'; return; }
   tbody.innerHTML = sorted.map(function(e,i) {
     var uid=e[0],w=e[1],p=profiles[uid]||{};
     return '<tr>'+
@@ -1265,8 +1276,92 @@ function renderAdmTable() {
       '<td class="mono" style="color:'+cfg.color+'">'+(w.bestTime||'—')+(isR?'ms':'s')+'</td>'+
       '<td class="mono">±'+(w.bestDiff*1000).toFixed(0)+'ms</td>'+
       '<td class="mono">'+(w.attempts||0)+'</td>'+
+      '<td><button class="btn btn-gh" onclick="admShowUserHistory(''+uid+'',''+w.name+'')" style="padding:4px 8px;font-size:10px">📅 Semana</button></td>'+
     '</tr>';
   }).join('');
+}
+ 
+function admShowUserHistory(uid, name) {
+  var d = getCDMX();
+  var day = d.getDay();
+  var diff = day === 0 ? -6 : 1 - day;
+  var monday = new Date(d); monday.setDate(d.getDate() + diff);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var dd = new Date(monday); dd.setDate(monday.getDate() + i);
+    var dk = dd.getFullYear() + '-' + String(dd.getMonth()+1).padStart(2,'0') + '-' + String(dd.getDate()).padStart(2,'0');
+    days.push({ key: dk, label: DAYS[dd.getDay()] + ' ' + dd.getDate() });
+  }
+ 
+  var html = '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:4px">📅 '+name+'</div>';
+  html += '<div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Historial de la semana</div>';
+  html += '<div id="admHistRows">Cargando...</div>';
+  html += '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-top:12px">Cerrar</button>';
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+ 
+  var games = [
+    {g:5, label:'RETO 1', cfg:GCOLORS[5]},
+    {g:10, label:'RETO 2', cfg:GCOLORS[10]},
+    {g:15, label:'RETO 3', cfg:GCOLORS[15]},
+    {g:'r', label:'REACCIÓN', cfg:GCOLORS['r']}
+  ];
+  var today = getTodayKey();
+ 
+  // Load all game+day combos
+  var fetches = [];
+  days.forEach(function(dayObj) {
+    games.forEach(function(gObj) {
+      var key = gObj.g === 'r' ? 'gr' : 'g' + gObj.g;
+      fetches.push(
+        db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
+          return { day: dayObj, game: gObj, data: s.val() };
+        })
+      );
+    });
+  });
+ 
+  Promise.all(fetches).then(function(results) {
+    var rowsHtml = '';
+    var byDay = {};
+    results.forEach(function(r) {
+      if (!byDay[r.day.key]) byDay[r.day.key] = { dayObj: r.day, games: {} };
+      byDay[r.day.key].games[r.game.g] = { data: r.data, game: r.game };
+    });
+ 
+    days.forEach(function(dayObj) {
+      var dayData = byDay[dayObj.key];
+      var isToday = dayObj.key === today;
+      var isFuture = dayObj.key > today;
+      var anyPlayed = false;
+      var gameRows = '';
+ 
+      games.forEach(function(gObj) {
+        var info = dayData && dayData.games[gObj.g];
+        var d2 = info ? info.data : null;
+        var isR = gObj.g === 'r';
+        if (d2 && d2.bestTime) {
+          anyPlayed = true;
+          gameRows += '<div style="display:flex;justify-content:space-between;padding:4px 10px;background:var(--sf2);border-radius:6px;margin-top:4px;font-size:11px">'+
+            '<span style="color:'+gObj.cfg.stroke+'">'+gObj.label+'</span>'+
+            '<span class="mono" style="color:'+gObj.cfg.stroke+'">'+d2.bestTime+(isR?'ms':'s')+'</span>'+
+            '<span style="color:var(--tm)">±'+(d2.bestDiff*1000).toFixed(0)+'ms</span>'+
+            '<span style="color:var(--tm)">'+d2.attempts+'x</span>'+
+          '</div>';
+        }
+      });
+ 
+      if (!isFuture) {
+        rowsHtml += '<div style="padding:10px 12px;background:var(--sf);border:1px solid '+(isToday?'var(--ac)':'var(--bo)')+';border-radius:10px;margin-bottom:6px">'+
+          '<div style="font-size:12px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+dayObj.label+(isToday?' · Hoy':'')+'</div>'+
+          (anyPlayed ? gameRows : '<div style="font-size:11px;color:var(--td);margin-top:4px">Sin partidas</div>')+
+        '</div>';
+      }
+    });
+ 
+    var el = document.getElementById('admHistRows');
+    if (el) el.innerHTML = rowsHtml || '<div style="color:var(--tm);font-size:12px;text-align:center;padding:20px">Sin datos esta semana</div>';
+  });
 }
  
 function confReset() {
@@ -1280,7 +1375,8 @@ function confReset() {
 }
  
 function doReset() {
-  db.ref('dayScores/' + todayKey).remove().then(function() {
+  var key = 'scores/' + weekKey + '/' + todayKey;
+  db.ref(key).remove().then(function() {
     wScores = {5:{},10:{},15:{},'r':{}};
     closeModal(); toast('✅ Día reseteado');
     updateHomecards(); updateAdmStats(); buildWinners(); renderAdmTable();
@@ -1318,7 +1414,7 @@ function showHistory(g) {
  
   // Load all days in parallel
   var promises = days.map(function(dayObj) {
-    return db.ref('dayScores/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
+    return db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
       return { day: dayObj, data: s.val() };
     });
   });
