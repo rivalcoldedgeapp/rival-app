@@ -1359,7 +1359,7 @@ function setRankGame(g) {
     var gEl = document.getElementById('rgtG');
     if (gEl) { gEl.style.background='var(--wn)'; gEl.style.color='#000'; gEl.style.borderColor='var(--wn)'; }
     document.getElementById('rankTitle').textContent = 'RANKING GLOBAL';
-    document.getElementById('rankSub').textContent = 'Puntos acumulados · ' + getWeekLabel();
+    document.getElementById('rankSub').textContent = 'Puntos acumulados esta semana · ' + getWeekLabel();
     renderGlobalRank();
     return;
   }
@@ -1371,9 +1371,31 @@ function setRankGame(g) {
 }
  
 function renderGlobalRank() {
-  var sorted = Object.entries(weekPoints)
-    .filter(function(e) { return e[1] && e[1].total > 0; })
-    .sort(function(a, b) { return (b[1].total||0) - (a[1].total||0); })
+  // Build complete list: merge weekPoints users + anyone who played today (wScores)
+  var allUids = new Set(Object.keys(weekPoints));
+  // Add users from today's scores who might not have points yet
+  [5, 10, 15, 'r'].forEach(function(g) {
+    Object.keys(wScores[g]).forEach(function(uid2) { allUids.add(uid2); });
+  });
+ 
+  var allUsers = Array.from(allUids).map(function(uid2) {
+    var wp = weekPoints[uid2] || {};
+    var name = wp.name || (profiles[uid2] && profiles[uid2].name) || '?';
+    var photoURL = wp.photoURL || (profiles[uid2] && profiles[uid2].photoURL) || null;
+    // Also try name from any game score
+    if (name === '?') {
+      [5,10,15,'r'].forEach(function(g) {
+        if (wScores[g][uid2] && wScores[g][uid2].name) name = wScores[g][uid2].name;
+      });
+    }
+    return [uid2, { total: wp.total || 0, name: name, photoURL: photoURL }];
+  });
+ 
+  var sorted = allUsers
+    .sort(function(a, b) {
+      if (b[1].total !== a[1].total) return b[1].total - a[1].total;
+      return a[1].name.localeCompare(b[1].name);
+    })
     .slice(0, 50);
  
   var uid = curUser ? curUser.uid : null;
