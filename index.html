@@ -5,227 +5,232 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>RIVAL</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;700&display=swap');
 :root{--bg:#080808;--sf:#0f0f0f;--sf2:#161616;--bo:#222;--ac:#00e87a;--adim:#00e87a15;--amid:#00e87a40;--dg:#ff3d5a;--wn:#ffb800;--bl:#3d9bff;--tx:#f0f0f0;--tm:#666;--td:#333}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+ 
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bo);position:sticky;top:0;background:rgba(8,8,8,.95);backdrop-filter:blur(10px);z-index:100}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--ac)}
-.nav-right{display:flex;align-items:center;gap:12px}
-.tabs{display:flex;gap:4px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:4px}
-.tab{padding:8px 16px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--tm);transition:all .2s}
-.tab.on{background:var(--ac);color:#000}
-.saldo-pill{background:var(--sf);border:1px solid var(--bo);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--tm);display:none;align-items:center;gap:6px}
-.saldo-pill.show{display:flex}
-.saldo-pill .amt{color:var(--ac);font-weight:700;font-family:'DM Mono',monospace}
-.view{display:none}.view.on{display:block}
-/* AUTH */
-.auth-wrap{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:20px}
-.auth-box{width:100%;max-width:360px;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:30px}
-.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:6px;color:var(--ac);text-align:center;margin-bottom:4px}
+.nav-user{display:none;align-items:center;gap:10px}
+.nav-user.show{display:flex}
+.nav-avatar{width:32px;height:32px;border-radius:50%;border:2px solid var(--ac);background:var(--adim);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--ac);flex-shrink:0;overflow:hidden}
+.nav-avatar img{width:100%;height:100%;object-fit:cover}
+.nav-info{display:flex;flex-direction:column}
+.nav-name{font-weight:700;font-size:13px;line-height:1.2}
+.nav-sub{font-size:11px;color:var(--tm)}
+.nav-attempts{background:var(--sf);border:1px solid var(--bo);border-radius:20px;padding:4px 12px;font-size:12px;display:flex;align-items:center;gap:6px}
+.nav-attempts .n{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--ac);line-height:1}
+.logout-btn{background:transparent;border:1px solid var(--bo);border-radius:8px;color:var(--tm);padding:5px 10px;cursor:pointer;font-size:11px;transition:all .2s}
+.logout-btn:hover{border-color:var(--dg);color:var(--dg)}
+ 
+.screen{display:none;min-height:calc(100vh - 57px);flex-direction:column;align-items:center;justify-content:center}
+.screen.on{display:flex}
+ 
+/* ── AUTH ── */
+#sAuth{padding:20px}
+.auth-card{width:100%;max-width:360px;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:28px}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:6px;color:var(--ac);text-align:center;margin-bottom:2px}
 .auth-tagline{font-size:11px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;text-align:center;margin-bottom:24px}
-.auth-tabs{display:flex;gap:4px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:4px;margin-bottom:22px}
-.atab{flex:1;padding:8px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--tm);transition:all .2s}
-.atab.on{background:var(--ac);color:#000}
-.afield{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.google-btn{width:100%;height:48px;border-radius:10px;border:1px solid var(--bo);background:var(--sf2);color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;margin-bottom:18px}
+.google-btn:hover{border-color:#4285f4;background:var(--sf)}
+.google-btn svg{width:20px;height:20px;flex-shrink:0}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.div-line{flex:1;height:1px;background:var(--bo)}
+.div-txt{font-size:11px;color:var(--td);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.etabs{display:flex;gap:4px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:4px;margin-bottom:14px}
+.etab{flex:1;padding:8px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--tm);transition:all .2s;text-align:center}
+.etab.on{background:var(--ac);color:#000}
+.afield{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
 .afield label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
-.afield input{height:46px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;padding:0 14px;outline:none;transition:border-color .2s}
+.afield input{height:44px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;padding:0 14px;outline:none;transition:border-color .2s}
 .afield input:focus{border-color:var(--ac)}
 .afield input::placeholder{color:var(--tm)}
-.pin-row{display:flex;gap:8px;justify-content:center}
-.pdig{width:54px;height:58px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:30px;text-align:center;outline:none;transition:border-color .2s;-webkit-text-security:disc}
-.pdig:focus{border-color:var(--ac)}
-.abtn{width:100%;height:50px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:8px;transition:opacity .2s}
-.abtn:hover{opacity:.9}
-.ahint{font-size:11px;color:var(--tm);text-align:center;margin-top:10px;line-height:1.7}
-.admin-link{margin-top:16px;padding-top:14px;border-top:1px solid var(--bo);text-align:center}
-.admin-link button{background:transparent;border:none;color:var(--tm);font-size:12px;cursor:pointer;letter-spacing:1px}
-.admin-link button:hover{color:var(--ac)}
-/* PROFILE HEADER */
-.prof-header{background:var(--sf);border-bottom:1px solid var(--bo);padding:14px 20px;display:none}
-.prof-header.show{display:flex;align-items:center;gap:14px}
-.prof-avatar{width:42px;height:42px;border-radius:50%;background:var(--adim);border:2px solid var(--ac);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--ac);flex-shrink:0}
-.prof-info{flex:1}
-.prof-alias{font-weight:700;font-size:16px}
-.prof-name{font-size:12px;color:var(--tm);margin-top:1px}
-.prof-stats{display:flex;gap:16px;margin-top:4px;flex-wrap:wrap}
-.pstat{font-size:11px;color:var(--tm)}
-.pstat .g{color:var(--ac)}.pstat .r{color:var(--dg)}.pstat .y{color:var(--wn)}
-.saldo-info{text-align:right;flex-shrink:0}
-.saldo-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
-.saldo-total{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--ac);letter-spacing:2px}
-.saldo-breakdown{font-size:10px;color:var(--tm);margin-top:2px}
-.logout-btn{background:transparent;border:1px solid var(--bo);border-radius:8px;color:var(--tm);padding:5px 10px;cursor:pointer;font-size:12px;margin-left:8px;transition:all .2s}
-.logout-btn:hover{border-color:var(--dg);color:var(--dg)}
-/* LOBBY */
-.lobby{padding:18px;max-width:600px;margin:0 auto}
-.lob-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;margin-bottom:4px}
-.lob-sub{font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
-.sec-sep{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;padding:8px 0;border-bottom:1px solid var(--bo);margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.sep-dot{width:6px;height:6px;border-radius:50%;background:var(--ac)}
-.sep-dot.off{background:var(--td)}
-.reto-card{background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:16px;margin-bottom:10px;transition:all .2s;position:relative;overflow:hidden}
-.reto-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
-.reto-card.open::before{background:var(--ac)}
-.reto-card.full::before{background:var(--wn)}
-.reto-card.done::before{background:var(--td)}
-.reto-card.open{cursor:pointer}.reto-card.open:hover{border-color:var(--ac);transform:translateY(-1px)}
-.rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
-.rc-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;line-height:1}
-.bdg{font-size:10px;padding:3px 9px;border-radius:5px;font-weight:700;letter-spacing:1px;white-space:nowrap}
-.bo{background:#00e87a20;color:var(--ac)}.bf{background:#ffb80020;color:var(--wn)}.bd{background:#ffffff10;color:var(--tm)}
-.rc-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
-.rcm{font-size:12px;color:var(--tm)}.rcm span{color:var(--tx);font-weight:600}
-.rc-bar{background:var(--bo);border-radius:4px;height:4px;margin-bottom:8px;overflow:hidden}
-.rc-fill{height:100%;border-radius:4px;background:var(--ac)}.rc-fill.ff{background:var(--wn)}
-.rc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
-.chip{background:var(--sf2);border:1px solid var(--bo);border-radius:20px;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:4px}
-.chip.played{border-color:var(--ac);color:var(--ac)}.chip.lead{border-color:var(--wn);color:var(--wn)}
-.chip-empty{border:1px dashed var(--td);background:transparent;color:var(--td);border-radius:20px;padding:3px 10px;font-size:11px}
-.cdot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.rc-btn{width:100%;height:42px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;transition:opacity .2s}
-.rc-btn:hover{opacity:.9}.rc-btn.disabled{background:var(--sf2);border:1px solid var(--bo);color:var(--tm);cursor:not-allowed}
-.win-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--adim);border:1px solid var(--amid);border-radius:8px;margin-bottom:10px;font-size:12px}
-.win-chip .wname{font-weight:700;color:var(--ac)}.win-chip .wtime{font-family:'DM Mono',monospace;color:var(--tm)}
-.no-saldo-msg{font-size:11px;color:var(--dg);text-align:center;margin-top:6px}
-.empty-state{text-align:center;padding:48px 20px;color:var(--tm);font-size:14px;line-height:2}
-/* GAME */
-.game-wrap{min-height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative}
-.game-wrap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.25;pointer-events:none}
-.game-box{width:100%;max-width:400px;position:relative;z-index:1}
-.gt{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;text-align:center;line-height:1}
-.grn{font-size:12px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;text-align:center;margin:4px 0 5px;font-weight:600}
-.gsub{font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:16px}
-.pbadge{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:11px 15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.pb-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
-.pb-alias{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--ac)}
-.pb-r{text-align:right}.pb-n{font-size:17px;font-weight:700;color:var(--tm)}
-.lead-banner{background:#ffb80010;border:1px solid #ffb80040;border-radius:10px;padding:9px 13px;margin-bottom:14px;display:none;align-items:center;gap:8px}
-.lead-banner.show{display:flex}
-.lb-txt{font-size:12px;color:var(--wn);flex:1;line-height:1.5}
-.lb-t{font-family:'DM Mono',monospace;font-size:13px;color:var(--wn);font-weight:700}
-.clock-sec{display:flex;flex-direction:column;align-items:center;gap:16px}
-.tgt{text-align:center}
+.afield .hint{font-size:11px;color:var(--td);margin-top:2px}
+.email-btn{width:100%;height:48px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:4px;transition:opacity .2s}
+.email-btn:hover{opacity:.9}
+.auth-msg{font-size:12px;text-align:center;margin-top:8px;min-height:18px;line-height:1.5}
+.auth-msg.err{color:var(--dg)}.auth-msg.ok{color:var(--ac)}
+.forgot-link{font-size:11px;color:var(--tm);text-align:right;cursor:pointer;display:block;margin-top:4px}
+.forgot-link:hover{color:var(--ac)}
+.admin-link{margin-top:14px;padding-top:12px;border-top:1px solid var(--bo);text-align:center}
+.admin-link button{background:transparent;border:none;color:var(--td);font-size:11px;cursor:pointer}
+.admin-link button:hover{color:var(--tm)}
+ 
+/* ── VERIFY ── */
+#sVerify{padding:24px}
+.verify-card{width:100%;max-width:340px;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:30px;text-align:center}
+.v-icon{font-size:52px;margin-bottom:14px}
+.v-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:10px}
+.v-sub{font-size:13px;color:var(--tm);line-height:1.8;margin-bottom:20px}
+.v-email{font-weight:700;color:var(--ac);display:block;font-size:14px}
+.vbtn{width:100%;height:44px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;cursor:pointer;border:none;margin-bottom:8px;transition:opacity .2s}
+.vbtn:hover{opacity:.9}
+.vbtn-p{background:var(--ac);color:#000}
+.vbtn-g{background:transparent;border:1px solid var(--bo);color:var(--tm)}
+.v-msg{font-size:12px;color:var(--tm);margin-top:6px;min-height:18px}
+ 
+/* ── GAME ── */
+#sGame{padding:20px;position:relative}
+#sGame::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.2;pointer-events:none}
+.game-inner{width:100%;max-width:380px;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}
+ 
+/* week timer */
+.week-timer{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:10px 16px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.wt-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
+.wt-val{font-family:'DM Mono',monospace;font-size:14px;color:var(--wn);font-weight:700}
+ 
+/* attempts bar */
+.attempts-bar{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 16px;width:100%}
+.ab-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ab-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
+.ab-num{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--ac);line-height:1}
+.ab-dots{display:flex;gap:6px;flex-wrap:wrap}
+.ab-dot{width:12px;height:12px;border-radius:50%;background:var(--bo);transition:all .3s}
+.ab-dot.used{background:var(--tm)}
+.ab-dot.avail{background:var(--ac);box-shadow:0 0 6px var(--amid)}
+.ab-dot.bonus{background:var(--wn);box-shadow:0 0 6px #ffb80060}
+.ab-ref{font-size:11px;color:var(--tm);margin-top:6px}
+.ab-ref span{color:var(--wn);font-weight:600}
+ 
+/* best score */
+.best-row{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:10px 16px;width:100%;display:flex;justify-content:space-between;align-items:center}
+.br-col{}.br-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
+.br-val{font-family:'DM Mono',monospace;font-size:15px;color:var(--ac);font-weight:700}
+ 
+.game-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;text-align:center;line-height:1}
+.game-desc{font-size:11px;color:var(--tm);letter-spacing:3px;text-transform:uppercase;text-align:center}
+.target-wrap{text-align:center}
 .tlbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px}
-.tnum{font-family:'Bebas Neue',sans-serif;font-size:68px;color:var(--ac);line-height:1;text-shadow:0 0 40px var(--amid)}
+.tnum{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--ac);line-height:1;text-shadow:0 0 40px var(--amid)}
 .tunit{font-size:11px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
-.cring{width:180px;height:180px;border-radius:50%;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
-.cring.run{border-color:var(--ac);box-shadow:0 0 30px var(--adim)}
-.cring.good{border-color:var(--ac);box-shadow:0 0 60px var(--amid);animation:gp .4s}
-.cring.bad{border-color:var(--dg);box-shadow:0 0 40px #ff3d5a30;animation:bs .4s}
-@keyframes gp{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-@keyframes bs{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.clock-ring{width:185px;height:185px;border-radius:50%;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
+.clock-ring.run{border-color:var(--ac);box-shadow:0 0 40px var(--adim)}
+.clock-ring.good{border-color:var(--ac);box-shadow:0 0 80px var(--amid);animation:gp .4s}
+.clock-ring.bad{border-color:var(--dg);box-shadow:0 0 40px #ff3d5a30;animation:bs .4s}
+@keyframes gp{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes bs{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 .svgr{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);transform:rotate(-90deg)}
-.rtr{fill:none;stroke:var(--bo);stroke-width:3}
+.rt{fill:none;stroke:var(--bo);stroke-width:3}
 .rfg{fill:none;stroke:var(--ac);stroke-width:3;stroke-linecap:round;stroke-dasharray:565;stroke-dashoffset:565;transition:stroke-dashoffset .1s linear}
-.cns{font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:1}
-.cnm{font-family:'DM Mono',monospace;font-size:15px;color:var(--tm)}
-.cnl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:4px}
-.gbtn{width:100%;max-width:250px;height:54px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:4px;cursor:pointer;transition:all .15s}
-.gbs{background:var(--ac);color:#000}.gbs:active{transform:scale(.97)}
-.gbp{background:transparent;border:2px solid var(--ac);color:var(--ac);animation:sp 1s ease-in-out infinite}
-.gbo{background:var(--bo);color:var(--td);cursor:not-allowed}
-@keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--amid)}50%{box-shadow:0 0 0 10px transparent}}
-/* RESULT */
-.result-wrap{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:22px}
-.result-box{width:100%;max-width:420px}
-.res-rn{font-size:12px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;text-align:center;font-weight:600;margin-bottom:3px}
-.res-t{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;text-align:center;margin-bottom:3px}
-.res-s{font-size:11px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;text-align:center;margin-bottom:16px}
-.rank-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:7px}
-.rank-item.me{border-color:var(--bl)}.rank-item.winner{border-color:var(--ac);background:var(--adim)}.rank-item.leader{border-color:var(--wn);background:#ffb80010}
-.rpos{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--td);width:28px;text-align:center}
-.rank-item.winner .rpos,.rank-item.leader .rpos{color:var(--wn)}
-.rinfo{flex:1}.rname{font-size:13px;font-weight:600}.rdiff{font-size:11px;color:var(--tm);margin-top:1px}
-.rank-item.winner .rdiff,.rank-item.leader .rdiff{color:var(--ac)}
-.rtime{font-family:'DM Mono',monospace;font-size:12px;color:var(--tm)}
-.rank-item.winner .rtime,.rank-item.leader .rtime{color:var(--ac)}
-.pend-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--sf);border:1px dashed var(--bo);border-radius:12px;margin-bottom:7px;opacity:.45}
-.prize-box{background:var(--adim);border:1px solid var(--amid);border-radius:12px;padding:16px;margin:12px 0;text-align:center}
-.pz-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:6px;font-weight:700}
-.pz-amt{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--ac);letter-spacing:2px}
-.pz-to{font-size:13px;color:var(--tm);margin-top:3px}
-.wait-box{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin:12px 0;text-align:center}
-.wb-l{font-size:10px;letter-spacing:3px;color:var(--wn);text-transform:uppercase;margin-bottom:6px;font-weight:700}
-.wb-s{font-size:12px;color:var(--tm)}
-.credited-box{background:#00e87a08;border:1px solid var(--ac);border-radius:12px;padding:14px;margin:12px 0;text-align:center;display:none}
-.credited-box.show{display:block}
-.cb-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:4px;font-weight:700}
-.cb-amt{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--ac)}
-.back-btn{width:100%;height:42px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;color:var(--tm);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:6px}
-.back-btn:hover{border-color:var(--ac);color:var(--ac)}
-/* ADMIN */
-.adm-wrap{padding:20px;max-width:980px;margin:0 auto}
-.login-box{max-width:360px;margin:60px auto;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:32px}
-.lt{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;text-align:center;margin-bottom:6px}
-.ls{font-size:11px;letter-spacing:2px;color:var(--tm);text-align:center;margin-bottom:24px;text-transform:uppercase}
-.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.cs{font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:1}
+.cm{font-family:'DM Mono',monospace;font-size:15px;color:var(--tm)}
+.cl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:4px}
+.big-btn{width:100%;max-width:250px;height:58px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;cursor:pointer;transition:all .15s}
+.btn-start{background:var(--ac);color:#000}.btn-start:active{transform:scale(.97)}
+.btn-stop{background:transparent;border:3px solid var(--ac);color:var(--ac);animation:sp 1s ease-in-out infinite}
+.btn-off{background:var(--bo);color:var(--td);cursor:not-allowed}
+@keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--amid)}50%{box-shadow:0 0 0 12px transparent}}
+ 
+/* no attempts */
+.no-attempts{background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:24px;width:100%;text-align:center}
+.na-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--dg);margin-bottom:8px}
+.na-sub{font-size:13px;color:var(--tm);line-height:1.8;margin-bottom:16px}
+.ref-code-box{background:var(--sf2);border:1px solid var(--ac);border-radius:10px;padding:14px;margin-bottom:14px}
+.rcb-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.rcb-code{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:6px;color:var(--ac)}
+.rcb-hint{font-size:11px;color:var(--tm);margin-top:4px}
+.share-btn{width:100%;height:44px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;transition:opacity .2s}
+.share-btn:hover{opacity:.9}
+ 
+/* ── RESULT ── */
+#sResult{padding:20px}
+.result-inner{width:100%;max-width:380px}
+.res-header{text-align:center;margin-bottom:16px}
+.my-time{font-family:'Bebas Neue',sans-serif;font-size:58px;color:var(--ac);letter-spacing:2px;line-height:1}
+.my-diff{font-size:13px;color:var(--tm);margin-top:4px}
+.my-rank{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin-top:6px}
+.my-rank span{color:var(--ac)}
+.attempts-left{text-align:center;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px;color:var(--tm)}
+.attempts-left strong{color:var(--ac)}
+.new-record{text-align:center;padding:10px;background:var(--adim);border:1px solid var(--amid);border-radius:10px;margin-bottom:12px;font-size:13px;color:var(--ac);display:none}
+.new-record.show{display:block}
+.lb-hdr{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bo)}
+.lb-item{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:6px}
+.lb-item.me{border-color:var(--bl);background:#3d9bff08}
+.lb-item.top{border-color:var(--ac);background:var(--adim)}
+.lb-pos{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--td);width:26px;text-align:center}
+.lb-item.top .lb-pos{color:var(--wn)}
+.lb-av{width:28px;height:28px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;overflow:hidden}
+.lb-av img{width:100%;height:100%;object-fit:cover}
+.lb-info{flex:1}
+.lb-name{font-size:13px;font-weight:600}
+.lb-diff{font-size:11px;color:var(--tm);margin-top:1px}
+.lb-item.top .lb-diff{color:var(--ac)}
+.lb-time{font-family:'DM Mono',monospace;font-size:13px;color:var(--tm)}
+.lb-item.top .lb-time{color:var(--ac)}
+.lb-sep{text-align:center;font-size:12px;color:var(--td);padding:4px}
+.play-again-btn{width:100%;height:52px;background:var(--ac);color:#000;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;cursor:pointer;margin-top:12px;transition:opacity .2s}
+.play-again-btn:hover{opacity:.9}.play-again-btn:active{transform:scale(.98)}
+.play-again-btn.disabled{background:var(--bo);color:var(--td);cursor:not-allowed}
+ 
+/* referral promo */
+.ref-promo{background:var(--sf);border:1px solid var(--wn);border-radius:12px;padding:14px;margin-top:12px}
+.rp-title{font-size:12px;font-weight:700;color:var(--wn);margin-bottom:6px}
+.rp-sub{font-size:12px;color:var(--tm);margin-bottom:10px;line-height:1.6}
+.rp-code{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--wn);text-align:center;margin-bottom:8px}
+.rp-btn{width:100%;height:38px;background:var(--wn);color:#000;border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer}
+ 
+/* ── ADMIN ── */
+#sAdmin{padding:20px;align-items:flex-start;justify-content:flex-start}
+.adm-inner{width:100%;max-width:900px;margin:0 auto}
+.adm-login-card{max-width:340px;margin:60px auto;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:28px}
+.adm-t{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;text-align:center;margin-bottom:18px}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
 .fld label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
 .fld input{height:44px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px;color:var(--tx);font-family:'DM Mono',monospace;font-size:14px;padding:0 12px;outline:none;transition:border-color .2s}
 .fld input:focus{border-color:var(--ac)}
-.btn-login{width:100%;height:48px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;cursor:pointer;margin-top:6px}
-.hint{font-size:11px;color:var(--tm);text-align:center;margin-top:10px}
+.adm-login-btn{width:100%;height:46px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;margin-top:4px}
 .adm-panel{display:none}.adm-panel.show{display:block}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.stat{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px}
-.sl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px}
-.sv{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;line-height:1}
+.adm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.astat{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:13px}
+.asl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:5px}
+.asv{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;line-height:1}
 .g{color:var(--ac)}.y{color:var(--wn)}.b{color:var(--bl)}.r{color:var(--dg)}
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:24px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:20px}
 .sec-lbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase}
 .btn{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s}
-.btn-g{background:var(--ac);color:#000}.btn-g:hover{opacity:.85}
-.btn-y{background:var(--wn);color:#000}.btn-y:hover{opacity:.85}
-.btn-r{background:var(--dg);color:#fff}.btn-r:hover{opacity:.85}
-.btn-b{background:var(--bl);color:#fff}.btn-b:hover{opacity:.85}
+.btn-g{background:var(--ac);color:#000}.btn-r{background:var(--dg);color:#fff}
+.btn-y{background:var(--wn);color:#000}
 .btn-gh{background:var(--sf2);border:1px solid var(--bo);color:var(--tm)}.btn-gh:hover{border-color:var(--tm);color:var(--tx)}
-.tbl-wrap{overflow-x:auto;margin-bottom:20px}
+.tbl-wrap{overflow-x:auto;margin-bottom:16px}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--bo);white-space:nowrap}
-td{padding:12px;border-bottom:1px solid var(--bo);font-size:13px;vertical-align:middle}
+td{padding:11px 12px;border-bottom:1px solid var(--bo);font-size:13px;vertical-align:middle}
 tr:hover td{background:var(--sf2)}
 .mono{font-family:'DM Mono',monospace}
-.btn-row{display:flex;gap:5px;flex-wrap:wrap}
+.winner-card{background:var(--adim);border:2px solid var(--ac);border-radius:14px;padding:20px;margin-bottom:20px}
+.wc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--ac);margin-bottom:12px}
+.wc-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--amid);font-size:13px}
+.wc-row:last-child{border:none}
+.wc-l{color:var(--tm)}.wc-v{font-weight:600}
+ 
+/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
 .overlay.show{display:flex}
-.modal{background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:26px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;margin:12px;animation:mi .2s ease-out}
+.modal{background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:24px;width:100%;max-width:380px;margin:16px;animation:mi .2s ease-out}
 @keyframes mi{from{transform:scale(.95) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-.mt{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:3px;margin-bottom:18px}
-.ir{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bo);font-size:13px}
-.ir:last-child{border:none}
-.il{color:var(--tm)}.iv{font-weight:500}
-.ibox{background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:13px;margin-bottom:13px}
-.pbox{background:var(--adim);border:1px solid var(--amid);border-radius:10px;padding:13px;margin:13px 0}
-.pl2{font-size:10px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;font-weight:700;margin-bottom:5px}
-.pa{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--ac);letter-spacing:2px}
-.pt{font-size:12px;color:var(--tm);margin-top:3px}
-.mbtns{display:flex;gap:10px;margin-top:16px}
+.mbtns{display:flex;gap:10px;margin-top:14px}
 .mbtns button{flex:1;height:44px;border-radius:10px;font-size:13px}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
-.ff{display:flex;flex-direction:column;gap:5px}
-.ff label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
-.ff input,.ff select{height:42px;background:var(--sf2);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 10px;outline:none;transition:border-color .2s}
-.ff input:focus,.ff select:focus{border-color:var(--ac)}
-.ff select option{background:var(--sf2)}.ff.full{grid-column:1/-1}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--sf);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;font-size:13px;z-index:300;display:none;max-width:280px;box-shadow:0 4px 20px rgba(0,232,122,.15);animation:ti .3s ease-out}
-.toast.show{display:block}
-@keyframes ti{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.cd-wrap{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+ 
+.cd-wrap{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px}
 .cd-wrap.show{display:flex}
-.cdn{font-family:'Bebas Neue',sans-serif;font-size:180px;color:var(--ac);text-shadow:0 0 80px var(--amid);animation:cdp .8s ease-out;line-height:1}
-@keyframes cdp{from{transform:scale(1.4);opacity:0}30%{transform:scale(.95);opacity:1}to{transform:scale(1);opacity:1}}
+.cdn{font-family:'Bebas Neue',sans-serif;font-size:190px;color:var(--ac);text-shadow:0 0 80px var(--amid);animation:cdp .8s ease-out;line-height:1}
+@keyframes cdp{from{transform:scale(1.5);opacity:0}40%{transform:scale(.9);opacity:1}to{transform:scale(1);opacity:1}}
 .cds{font-size:13px;letter-spacing:4px;color:var(--tm);text-transform:uppercase}
-@media(max-width:680px){
-  .stats{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}
-  .game-wrap,.result-wrap,.lobby{padding:14px}
-  .gt{font-size:30px}.tnum{font-size:56px}
-  .cring{width:165px;height:165px}.cns{font-size:42px}
-  nav{padding:10px 14px}.logo{font-size:22px}
-  .tab{padding:7px 11px;font-size:12px}
-  .adm-wrap{padding:12px}.modal{padding:20px 14px;margin:8px}
-  .prof-header{flex-wrap:wrap}.saldo-info{width:100%;text-align:left;margin-top:8px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--sf);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;font-size:13px;z-index:300;display:none;max-width:280px}
+.toast.show{display:block;animation:ti .3s ease-out}
+@keyframes ti{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.spinner{width:18px;height:18px;border:2px solid var(--bo);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+ 
+@media(max-width:480px){
+  .tnum{font-size:60px}.clock-ring{width:165px;height:165px}.cs{font-size:40px}
+  nav{padding:10px 14px}.logo{font-size:22px}.adm-stats{grid-template-columns:1fr 1fr}
+  .my-time{font-size:48px}
 }
 </style>
 </head>
@@ -236,165 +241,172 @@ tr:hover td{background:var(--sf2)}
  
 <nav>
   <div class="logo">RIVAL</div>
-  <div class="nav-right">
-    <div class="tabs">
-      <button class="tab on" id="tab-game" onclick="goTo('game')">🎮 Juegos</button>
-      <button class="tab" id="tab-admin" onclick="goTo('admin')">⚙️ Admin</button>
+  <div class="nav-user" id="navUser">
+    <div class="nav-avatar" id="navAvatar">R</div>
+    <div class="nav-info">
+      <div class="nav-name" id="navName">—</div>
+      <div class="nav-sub" id="navSub">—</div>
     </div>
-    <div class="saldo-pill" id="saldoPill">💰 <span class="amt" id="saldoPillAmt">$0</span></div>
+    <div class="nav-attempts" id="navAttempts">
+      <span style="font-size:10px;color:var(--tm)">Intentos</span>
+      <span class="n" id="navAttN">0</span>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Salir</button>
   </div>
 </nav>
  
-<div class="prof-header" id="profHeader">
-  <div class="prof-avatar" id="profAvatar">R</div>
-  <div class="prof-info">
-    <div class="prof-alias" id="profAlias">—</div>
-    <div class="prof-name" id="profName">—</div>
-    <div class="prof-stats">
-      <div class="pstat">🏆 <span class="g" id="psWins">0</span> ganadas</div>
-      <div class="pstat">💀 <span class="r" id="psLosses">0</span> perdidas</div>
-      <div class="pstat">⚡ <span class="y" id="psBest">—</span> mejor</div>
-      <div class="pstat">🔥 Racha: <span class="y" id="psRacha">0</span></div>
+<!-- AUTH -->
+<div class="screen on" id="sAuth">
+  <div class="auth-card">
+    <div class="auth-logo">RIVAL</div>
+    <div class="auth-tagline">Para el reloj · Gana cada semana</div>
+    <button class="google-btn" onclick="googleLogin()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuar con Google
+    </button>
+    <div class="divider"><div class="div-line"></div><div class="div-txt">o con email</div><div class="div-line"></div></div>
+    <div class="etabs">
+      <button class="etab on" id="etab-in" onclick="switchTab('in')">Entrar</button>
+      <button class="etab" id="etab-reg" onclick="switchTab('reg')">Registrarse</button>
     </div>
+    <div id="fIn">
+      <div class="afield"><label>Correo</label><input id="inEmail" type="email" placeholder="tu@correo.com" autocomplete="email" onkeydown="if(event.key==='Enter')doEmailLogin()"></div>
+      <div class="afield"><label>Contraseña</label><input id="inPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doEmailLogin()"></div>
+      <span class="forgot-link" onclick="forgotPass()">¿Olvidaste tu contraseña?</span>
+      <button class="email-btn" onclick="doEmailLogin()">ENTRAR</button>
+      <div class="auth-msg" id="loginMsg"></div>
+    </div>
+    <div id="fReg" style="display:none">
+      <div class="afield"><label>Tu nombre / apodo</label><input id="regName" placeholder="CarlosRey" autocomplete="off"></div>
+      <div class="afield"><label>Correo</label><input id="regEmail" type="email" placeholder="tu@correo.com" autocomplete="email"></div>
+      <div class="afield"><label>Contraseña (mínimo 6 caracteres)</label><input id="regPass" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="afield">
+        <label>Código de referido (opcional)</label>
+        <input id="regRef" placeholder="RIVAL-XXXX" autocomplete="off" style="text-transform:uppercase">
+        <div class="hint">Si alguien te invitó, escribe su código aquí</div>
+      </div>
+      <button class="email-btn" onclick="doEmailRegister()">CREAR CUENTA</button>
+      <div class="auth-msg" id="regMsg"></div>
+    </div>
+    <div class="admin-link"><button onclick="goScreen('sAdmin')">⚙️ Admin</button></div>
   </div>
-  <div class="saldo-info">
-    <div class="saldo-lbl">Saldo</div>
-    <div class="saldo-total" id="profSaldo">$0</div>
-    <div class="saldo-breakdown" id="profBreakdown">Fondo: $0 | Ganancia: $0</div>
-  </div>
-  <button class="logout-btn" onclick="doLogout()">Salir</button>
 </div>
  
-<!-- AUTH -->
-<div id="view-auth" class="view on">
-  <div class="auth-wrap">
-    <div class="auth-box">
-      <div class="auth-logo">RIVAL</div>
-      <div class="auth-tagline">Juegos de habilidad</div>
-      <div class="auth-tabs">
-        <button class="atab on" id="atab-login" onclick="switchAuthTab('login')">Entrar</button>
-        <button class="atab" id="atab-reg" onclick="switchAuthTab('reg')">Registrarse</button>
-      </div>
-      <div id="authLogin">
-        <div class="afield"><label>Tu alias</label><input id="loginAlias" placeholder="CarlosRey" autocomplete="off"></div>
-        <div class="afield"><label>PIN (4 dígitos)</label>
-          <div class="pin-row">
-            <input class="pdig" id="lp1" maxlength="1" type="tel" oninput="pinNext(this,'lp2')" onkeydown="pinBack(event,this,null)">
-            <input class="pdig" id="lp2" maxlength="1" type="tel" oninput="pinNext(this,'lp3')" onkeydown="pinBack(event,this,'lp1')">
-            <input class="pdig" id="lp3" maxlength="1" type="tel" oninput="pinNext(this,'lp4')" onkeydown="pinBack(event,this,'lp2')">
-            <input class="pdig" id="lp4" maxlength="1" type="tel" oninput="pinNext(this,null)" onkeydown="pinBack(event,this,'lp3')">
-          </div>
-        </div>
-        <button class="abtn" onclick="doLogin()">ENTRAR</button>
-        <div class="ahint">¿No tienes cuenta? Pide un código de invitación</div>
-        <div class="admin-link"><button onclick="goTo('admin')">⚙️ Acceso Admin</button></div>
-      </div>
-      <div id="authReg" style="display:none">
-        <div class="afield"><label>Código de invitación</label><input id="regCode" placeholder="RIVAL-XXXX" autocomplete="off" style="text-transform:uppercase"></div>
-        <div class="afield"><label>Nombre completo</label><input id="regName" placeholder="Carlos García"></div>
-        <div class="afield"><label>Alias (apodo único)</label><input id="regAlias" placeholder="CarlosRey" autocomplete="off"></div>
-        <div class="afield"><label>PIN (4 dígitos)</label>
-          <div class="pin-row">
-            <input class="pdig" id="rp1" maxlength="1" type="tel" oninput="pinNext(this,'rp2')" onkeydown="pinBack(event,this,null)">
-            <input class="pdig" id="rp2" maxlength="1" type="tel" oninput="pinNext(this,'rp3')" onkeydown="pinBack(event,this,'rp1')">
-            <input class="pdig" id="rp3" maxlength="1" type="tel" oninput="pinNext(this,'rp4')" onkeydown="pinBack(event,this,'rp2')">
-            <input class="pdig" id="rp4" maxlength="1" type="tel" oninput="pinNext(this,null)" onkeydown="pinBack(event,this,'rp3')">
-          </div>
-        </div>
-        <button class="abtn" onclick="doRegister()">CREAR CUENTA</button>
-        <div class="ahint">Pídele el código al administrador</div>
-      </div>
-    </div>
+<!-- VERIFY -->
+<div class="screen" id="sVerify">
+  <div class="verify-card">
+    <div class="v-icon">✉️</div>
+    <div class="v-title">VERIFICA TU EMAIL</div>
+    <div class="v-sub">Enviamos un enlace a:<br><span class="v-email" id="vEmail">—</span><br>Revisa tu bandeja (y el spam).</div>
+    <button class="vbtn vbtn-p" onclick="checkVerified()">✅ YA VERIFIQUÉ</button>
+    <button class="vbtn vbtn-g" onclick="resendVerif()">Reenviar correo</button>
+    <button class="vbtn vbtn-g" onclick="doLogout()">Usar otra cuenta</button>
+    <div class="v-msg" id="vMsg"></div>
   </div>
 </div>
  
 <!-- GAME -->
-<div id="view-game" class="view">
-  <div id="sLobby">
-    <div class="lobby">
-      <div class="lob-title">RETOS</div>
-      <div class="lob-sub">Elige y únete</div>
-      <div id="retosList"></div>
+<div class="screen" id="sGame">
+  <div class="game-inner">
+    <div class="week-timer">
+      <div><div class="wt-lbl">Cierre de semana</div><div class="wt-val" id="weekTimer">—</div></div>
+      <div style="text-align:right"><div class="wt-lbl">Semana</div><div class="wt-val" id="weekLabel" style="color:var(--tm)">—</div></div>
     </div>
-  </div>
-  <div id="sGame" style="display:none">
-    <div class="game-wrap">
-      <div class="game-box">
-        <div class="gt">PARA EL RELOJ</div>
-        <div class="grn" id="gRetoName">—</div>
-        <div class="gsub" id="gSub">—</div>
-        <div class="pbadge">
-          <div><div class="pb-lbl">Jugando como</div><div class="pb-alias" id="pbAlias">—</div></div>
-          <div class="pb-r"><div class="pb-lbl">Jugaron</div><div class="pb-n" id="pbJugaron">0/0</div></div>
+    <div class="attempts-bar">
+      <div class="ab-top">
+        <div class="ab-lbl">Intentos esta semana</div>
+        <div class="ab-num" id="attNum">0/3</div>
+      </div>
+      <div class="ab-dots" id="attDots"></div>
+      <div class="ab-ref" id="attRef"></div>
+    </div>
+    <div class="best-row">
+      <div><div class="br-lbl">Tu mejor tiempo</div><div class="br-val" id="myBest">—</div></div>
+      <div style="text-align:right"><div class="br-lbl">Posición semana</div><div class="br-val" style="color:var(--wn)" id="myPos">—</div></div>
+    </div>
+    <div>
+      <div class="game-title">PARA EL RELOJ</div>
+      <div class="game-desc">Detente exactamente en 30 segundos</div>
+    </div>
+    <div class="target-wrap">
+      <div class="tlbl">Objetivo</div>
+      <div class="tnum">30.000</div>
+      <div class="tunit">SEGUNDOS</div>
+    </div>
+    <div id="gameClockArea">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+        <div class="clock-ring" id="cRing">
+          <svg class="svgr" viewBox="0 0 198 198">
+            <circle class="rt" cx="99" cy="99" r="95"/>
+            <circle class="rfg" id="rfg" cx="99" cy="99" r="95"/>
+          </svg>
+          <div class="cs" id="cS">0</div>
+          <div class="cm" id="cM">.000</div>
+          <div class="cl" id="cL">LISTO</div>
         </div>
-        <div class="lead-banner" id="leadBanner">
-          <span style="font-size:18px">⚡</span>
-          <div class="lb-txt" id="leadTxt">Llevas el mejor tiempo</div>
-          <div class="lb-t" id="leadTime">—</div>
-        </div>
-        <div class="clock-sec">
-          <div class="tgt">
-            <div class="tlbl">Para exactamente en</div>
-            <div class="tnum" id="tgtNum">5.000</div>
-            <div class="tunit">SEGUNDOS</div>
-          </div>
-          <div class="cring" id="cRing">
-            <svg class="svgr" viewBox="0 0 188 188">
-              <circle class="rtr" cx="94" cy="94" r="90"/>
-              <circle class="rfg" id="rfg" cx="94" cy="94" r="90"/>
-            </svg>
-            <div class="cns" id="cS">0</div>
-            <div class="cnm" id="cM">.000</div>
-            <div class="cnl" id="cL">LISTO</div>
-          </div>
-          <button class="gbtn gbs" id="gBtn" onclick="handleBtn()">INICIAR</button>
-        </div>
+        <button class="big-btn btn-start" id="gBtn" onclick="handleBtn()">INICIAR</button>
       </div>
     </div>
   </div>
-  <div id="sResult" style="display:none">
-    <div class="result-wrap">
-      <div class="result-box">
-        <div class="res-rn" id="resRN">—</div>
-        <div class="res-t" id="resTitle">RESULTADO</div>
-        <div class="res-s" id="resSub">—</div>
-        <div id="rankList"></div>
-        <div class="credited-box" id="creditedBox"><div class="cb-lbl">✅ Ganancia acreditada</div><div class="cb-amt" id="creditedAmt">+$0</div></div>
-        <div class="prize-box" id="prizeBox" style="display:none"></div>
-        <div class="wait-box" id="waitBox" style="display:none"><div class="wb-l">⏳ ESPERANDO JUGADORES</div><div class="wb-s" id="waitTxt">—</div></div>
-        <button class="back-btn" onclick="goBack()">← Volver a los retos</button>
-      </div>
+</div>
+ 
+<!-- RESULT -->
+<div class="screen" id="sResult">
+  <div class="result-inner">
+    <div class="res-header">
+      <div class="my-time" id="resTime">30.000s</div>
+      <div class="my-diff" id="resDiff">±0ms del objetivo</div>
+      <div class="my-rank" id="resRank">Posición <span>#1</span></div>
+    </div>
+    <div class="attempts-left" id="attLeft"></div>
+    <div class="new-record" id="newRecord">🎉 ¡Nuevo récord personal esta semana!</div>
+    <div class="lb-hdr">🏆 TABLA DE LÍDERES — ESTA SEMANA</div>
+    <div id="lbList"></div>
+    <button class="play-again-btn" id="playAgainBtn" onclick="playAgain()">▶️ JUGAR DE NUEVO</button>
+    <div class="ref-promo" id="refPromo">
+      <div class="rp-title">🎯 ¿Quieres más intentos?</div>
+      <div class="rp-sub">Invita a alguien con tu código y ganas +3 intentos esta semana.</div>
+      <div class="rp-code" id="refPromoCode">—</div>
+      <button class="rp-btn" onclick="shareRef()">📤 COMPARTIR MI CÓDIGO</button>
     </div>
   </div>
 </div>
  
 <!-- ADMIN -->
-<div id="view-admin" class="view">
-  <div class="adm-wrap">
-    <div id="loginBox" class="login-box">
-      <div class="lt">ADMIN RIVAL</div>
-      <div class="ls">Acceso restringido</div>
+<div class="screen" id="sAdmin" style="align-items:flex-start;justify-content:flex-start;padding:20px">
+  <div class="adm-inner">
+    <div id="admLoginCard" class="adm-login-card">
+      <div class="adm-t">ADMIN</div>
       <div class="fld"><label>Usuario</label><input id="alu" placeholder="admin" autocomplete="off"></div>
       <div class="fld"><label>Contraseña</label><input id="alp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
-      <button class="btn-login" onclick="doAdminLogin()">ENTRAR</button>
-      <div class="hint">admin / rival2024 — socio / rival2024</div>
+      <button class="adm-login-btn" onclick="doAdminLogin()">ENTRAR</button>
+      <div style="margin-top:12px;text-align:center"><button onclick="goScreen('sAuth')" style="background:transparent;border:none;color:var(--tm);font-size:12px;cursor:pointer">← Volver</button></div>
     </div>
     <div id="admPanel" class="adm-panel">
-      <div class="stats">
-        <div class="stat"><div class="sl">Jugadores</div><div class="sv g" id="stU">0</div></div>
-        <div class="stat"><div class="sl">Retos activos</div><div class="sv y" id="stR">0</div></div>
-        <div class="stat"><div class="sl">Por dispersar</div><div class="sv r" id="stD">0</div></div>
-        <div class="stat"><div class="sl">Saldo total</div><div class="sv b" id="stV">$0</div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-r" onclick="confirmReset()">🗑️ Resetear semana</button>
+          <button class="btn btn-gh" onclick="goScreen('sAuth')">← Salir</button>
+        </div>
       </div>
-      <div class="sec-hdr"><div class="sec-lbl">👥 Jugadores</div><button class="btn btn-b" onclick="genCode()">+ Código invitación</button></div>
-      <div class="tbl-wrap">
-        <table><thead><tr><th>Alias</th><th>Nombre</th><th>Saldo</th><th>Fondo</th><th>Ganancia</th><th>Stats</th><th>Acciones</th></tr></thead>
-        <tbody id="usersTable"></tbody></table>
+      <div class="adm-stats">
+        <div class="astat"><div class="asl">Jugadores</div><div class="asv g" id="stU">0</div></div>
+        <div class="astat"><div class="asl">Partidas semana</div><div class="asv y" id="stP">0</div></div>
+        <div class="astat"><div class="asl">Referidos semana</div><div class="asv b" id="stRef">0</div></div>
+        <div class="astat"><div class="asl">Mejor tiempo</div><div class="asv r" id="stB">—</div></div>
       </div>
-      <div class="sec-hdr"><div class="sec-lbl">⚔️ Retos</div><button class="btn btn-g" onclick="openCreateReto()">+ Nuevo reto</button></div>
+      <!-- Winner card -->
+      <div class="winner-card" id="winnerCard" style="display:none">
+        <div class="wc-title">🏆 GANADOR DE LA SEMANA</div>
+        <div id="winnerInfo"></div>
+      </div>
+      <div class="sec-hdr"><div class="sec-lbl">🏆 Tabla de líderes esta semana</div><div id="weekLblAdm" style="font-size:11px;color:var(--tm)"></div></div>
       <div class="tbl-wrap">
-        <table><thead><tr><th>Título</th><th>Objetivo</th><th>Jugadores</th><th>Apuesta</th><th>Estado</th><th>Acciones</th></tr></thead>
-        <tbody id="retosTable"></tbody></table>
+        <table>
+          <thead><tr><th>#</th><th>Jugador</th><th>Email</th><th>Mejor tiempo</th><th>±ms</th><th>Intentos usados</th><th>Referidos</th></tr></thead>
+          <tbody id="admTable"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -411,757 +423,569 @@ firebase.initializeApp({
   messagingSenderId: "669224883015",
   appId: "1:669224883015:web:af16120105ee0504967262"
 });
+var auth = firebase.auth();
 var db = firebase.database();
  
-// ══ STATE ══
-var users = {}, retos = {}, invCodes = {};
-var curUser = null, myRetoId = null, adminLoggedIn = false;
-var gState = 'idle', t0 = null, raf = null, elapsed = 0, curScreen = 'lobby';
+// ══ CONSTANTS ══
+var TARGET = 30.0;
+var BASE_ATTEMPTS = 3;
+var BONUS_PER_REFERRAL = 3;
+// Mexico City = UTC-6 (standard) / UTC-5 (DST)
+// We use UTC-6 fixed for simplicity
+var CDMX_OFFSET = -6;
  
-function getDeviceId() {
-  var k = localStorage.getItem('rival_did');
-  if (!k) { k = 'dev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); localStorage.setItem('rival_did', k); }
-  return k;
+// ══ STATE ══
+var profiles = {}, weekScores = {}, weekReferrals = {};
+var curFireUser = null;
+var gState = 'idle', t0 = null, raf = null, elapsed = 0;
+var weekKey = getWeekKey();
+var timerInterval = null;
+ 
+// ══ WEEK KEY ══
+// Week key: "YYYY-WNN" based on CDMX time
+// Week starts Monday, ends Sunday 23:59:59
+function getCDMXDate() {
+  var now = new Date();
+  // Convert to CDMX (UTC-6)
+  var utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utc + CDMX_OFFSET * 3600000);
 }
-var DEVICE_ID = getDeviceId();
+ 
+function getWeekKey() {
+  var d = getCDMXDate();
+  // Get Monday of current week
+  var day = d.getDay(); // 0=Sunday
+  var diff = (day === 0 ? -6 : 1 - day);
+  var monday = new Date(d);
+  monday.setDate(d.getDate() + diff);
+  var y = monday.getFullYear();
+  var m = String(monday.getMonth() + 1).padStart(2, '0');
+  var dd = String(monday.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dd;
+}
+ 
+function getWeekEnd() {
+  var d = getCDMXDate();
+  var day = d.getDay();
+  var diff = day === 0 ? 0 : 7 - day;
+  var sunday = new Date(d);
+  sunday.setDate(d.getDate() + diff);
+  sunday.setHours(23, 59, 59, 999);
+  return sunday;
+}
+ 
+function getWeekLabel() {
+  var d = getCDMXDate();
+  var day = d.getDay();
+  var diff = (day === 0 ? -6 : 1 - day);
+  var monday = new Date(d);
+  monday.setDate(d.getDate() + diff);
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return monday.getDate() + ' ' + months[monday.getMonth()] + ' – ' + sunday.getDate() + ' ' + months[sunday.getMonth()];
+}
+ 
+function generateRefCode(name) {
+  var clean = (name || 'RIVAL').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 4);
+  if (clean.length < 4) clean = (clean + 'RVLX').slice(0, 4);
+  var rand = Math.random().toString(36).slice(2, 4).toUpperCase();
+  return clean + rand;
+}
  
 // ══ LISTENERS ══
-db.ref('users').on('value', function(s) {
-  users = s.val() || {};
-  if (adminLoggedIn) renderUsersTable();
+db.ref('profiles').on('value', function(s) {
+  profiles = s.val() || {};
+  if (document.getElementById('admPanel').classList.contains('show')) updateAdminTable();
   updateAdminStats();
-  if (curUser && users[curUser.uid]) {
-    var fresh = users[curUser.uid];
-    fresh.uid = curUser.uid;
-    curUser = fresh;
-    localStorage.setItem('rival_user', JSON.stringify(curUser));
-    updateProfileUI();
-  }
 });
  
-db.ref('retos').on('value', function(s) {
-  retos = s.val() || {};
-  renderLobby();
-  if (adminLoggedIn) renderRetosTable();
+db.ref('weekScores/' + weekKey).on('value', function(s) {
+  weekScores = s.val() || {};
+  if (curFireUser) updateGameUI();
+  if (document.getElementById('sResult').classList.contains('on') && curFireUser) renderLeaderboard(curFireUser.uid);
+  if (document.getElementById('admPanel').classList.contains('show')) updateAdminTable();
   updateAdminStats();
-  if (myRetoId && curUser) {
-    var r = retos[myRetoId];
-    if (r && curScreen === 'result') renderResult(myRetoId, r);
-    if (r && curScreen === 'game') updateGameInfo(r);
-  }
+  updateWinnerCard();
 });
  
-db.ref('invCodes').on('value', function(s) { invCodes = s.val() || {}; });
- 
-// ══ AUTO LOGIN ══
-window.addEventListener('load', function() {
-  var saved = localStorage.getItem('rival_user');
-  if (saved) {
-    try { var u = JSON.parse(saved); if (u && u.uid) { curUser = u; showLoggedIn(); } }
-    catch(e) { localStorage.removeItem('rival_user'); }
-  }
+db.ref('weekReferrals/' + weekKey).on('value', function(s) {
+  weekReferrals = s.val() || {};
+  if (curFireUser) updateGameUI();
+  updateAdminStats();
 });
  
 // ══ AUTH ══
-function switchAuthTab(t) {
-  document.getElementById('atab-login').classList.toggle('on', t === 'login');
-  document.getElementById('atab-reg').classList.toggle('on', t === 'reg');
-  document.getElementById('authLogin').style.display = t === 'login' ? 'block' : 'none';
-  document.getElementById('authReg').style.display = t === 'reg' ? 'block' : 'none';
-}
+auth.onAuthStateChanged(function(fu) {
+  if (fu) {
+    curFireUser = fu;
+    if (!fu.emailVerified && fu.providerData[0].providerId === 'password') {
+      document.getElementById('vEmail').textContent = fu.email;
+      goScreen('sVerify');
+      document.getElementById('navUser').classList.remove('show');
+    } else {
+      loadAndEnter(fu);
+    }
+  } else {
+    curFireUser = null;
+    document.getElementById('navUser').classList.remove('show');
+    stopWeekTimer();
+    goScreen('sAuth');
+  }
+});
  
-function pinNext(el, nextId) { if (el.value && nextId) document.getElementById(nextId).focus(); }
-function pinBack(e, el, prevId) { if (e.key === 'Backspace' && !el.value && prevId) document.getElementById(prevId).focus(); }
-function getPin(prefix) {
-  return ['1','2','3','4'].map(function(n) {
-    var el = document.getElementById(prefix + n);
-    return el ? el.value : '';
-  }).join('');
-}
-function clearPin(prefix) {
-  ['1','2','3','4'].forEach(function(n) {
-    var el = document.getElementById(prefix + n);
-    if (el) el.value = '';
+function googleLogin() {
+  var p = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(p).catch(function(e) {
+    if (e.code !== 'auth/popup-closed-by-user') showMsg('loginMsg', errMsg(e.code), 'err');
   });
 }
  
-function doLogin() {
-  var alias = document.getElementById('loginAlias').value.trim();
-  var pin = getPin('lp');
-  if (!alias || pin.length < 4) { toast('❌ Alias y PIN requeridos'); return; }
-  var uid = Object.keys(users).find(function(k) { return users[k].alias === alias; });
-  if (!uid) { toast('❌ Alias no encontrado'); return; }
-  var u = users[uid];
-  if (u.pin !== pin) { toast('❌ PIN incorrecto'); return; }
-  curUser = Object.assign({}, u, { uid: uid });
-  localStorage.setItem('rival_user', JSON.stringify(curUser));
-  db.ref('users/' + uid).update({ lastDevice: DEVICE_ID, lastLogin: Date.now() });
-  showLoggedIn();
-  toast('✅ Bienvenido, ' + u.alias);
-  clearPin('lp');
+function switchTab(t) {
+  document.getElementById('etab-in').classList.toggle('on', t === 'in');
+  document.getElementById('etab-reg').classList.toggle('on', t === 'reg');
+  document.getElementById('fIn').style.display = t === 'in' ? 'block' : 'none';
+  document.getElementById('fReg').style.display = t === 'reg' ? 'block' : 'none';
 }
  
-function doRegister() {
-  var code = document.getElementById('regCode').value.trim().toUpperCase();
+function doEmailLogin() {
+  var email = document.getElementById('inEmail').value.trim();
+  var pass = document.getElementById('inPass').value;
+  if (!email || !pass) { showMsg('loginMsg', 'Llena todos los campos', 'err'); return; }
+  document.getElementById('loginMsg').innerHTML = '<div class="spinner"></div>';
+  auth.signInWithEmailAndPassword(email, pass).catch(function(e) { showMsg('loginMsg', errMsg(e.code), 'err'); });
+}
+ 
+function doEmailRegister() {
   var name = document.getElementById('regName').value.trim();
-  var alias = document.getElementById('regAlias').value.trim();
-  var pin = getPin('rp');
-  if (!code || !name || !alias || pin.length < 4) { toast('❌ Llena todos los campos'); return; }
-  var codeData = invCodes[code];
-  if (!codeData || codeData.used) { toast('❌ Código inválido o ya usado'); return; }
-  var exists = Object.values(users).find(function(u) { return u.alias === alias; });
-  if (exists) { toast('❌ Ese alias ya existe, elige otro'); return; }
-  var devUsed = Object.values(users).find(function(u) { return u.lastDevice === DEVICE_ID; });
-  if (devUsed) { toast('❌ Ya existe una cuenta en este dispositivo'); return; }
-  var uid = 'usr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-  var newUser = { alias: alias, name: name, pin: pin, saldoFondo: 0, saldoGanancia: 0, ganadas: 0, perdidas: 0, mejorTiempo: null, racha: 0, lastDevice: DEVICE_ID, createdAt: Date.now() };
-  db.ref('users/' + uid).set(newUser).then(function() {
-    db.ref('invCodes/' + code).update({ used: true, usedBy: alias, usedAt: Date.now() });
-    curUser = Object.assign({}, newUser, { uid: uid });
-    localStorage.setItem('rival_user', JSON.stringify(curUser));
-    showLoggedIn();
-    toast('✅ Cuenta creada. ¡Bienvenido, ' + alias + '!');
-    clearPin('rp');
-  }).catch(function() { toast('❌ Error al crear cuenta'); });
+  var email = document.getElementById('regEmail').value.trim();
+  var pass = document.getElementById('regPass').value;
+  var refCode = document.getElementById('regRef').value.trim().toUpperCase();
+  if (!name || !email || !pass) { showMsg('regMsg', 'Llena todos los campos', 'err'); return; }
+  if (pass.length < 6) { showMsg('regMsg', 'Contraseña mínimo 6 caracteres', 'err'); return; }
+  // Validate ref code if provided
+  if (refCode) {
+    var referrerUid = findRefOwner(refCode);
+    if (!referrerUid) { showMsg('regMsg', 'Código de referido inválido', 'err'); return; }
+  }
+  document.getElementById('regMsg').innerHTML = '<div class="spinner"></div>';
+  auth.createUserWithEmailAndPassword(email, pass).then(function(result) {
+    return result.user.updateProfile({ displayName: name }).then(function() {
+      return result.user.sendEmailVerification();
+    }).then(function() {
+      // Save profile
+      var uid = result.user.uid;
+      var refCodeOwn = generateRefCode(name);
+      var profile = { name: name, email: email, photoURL: null, provider: 'password', referralCode: refCodeOwn, referredBy: null, createdAt: Date.now() };
+      if (refCode) {
+        var rUid = findRefOwner(refCode);
+        if (rUid) {
+          profile.referredBy = rUid;
+          // Credit referral bonus to referrer for this week
+          db.ref('weekReferrals/' + weekKey + '/' + rUid + '/count').transaction(function(v) { return (v || 0) + 1; });
+        }
+      }
+      return db.ref('profiles/' + uid).set(profile);
+    });
+  }).catch(function(e) { showMsg('regMsg', errMsg(e.code), 'err'); });
+}
+ 
+function findRefOwner(code) {
+  return Object.keys(profiles).find(function(uid) { return profiles[uid].referralCode === code; }) || null;
+}
+ 
+function forgotPass() {
+  var email = document.getElementById('inEmail').value.trim();
+  if (!email) { showMsg('loginMsg', 'Escribe tu correo arriba primero', 'err'); return; }
+  auth.sendPasswordResetEmail(email).then(function() { showMsg('loginMsg', '✅ Correo de recuperación enviado', 'ok'); }).catch(function(e) { showMsg('loginMsg', errMsg(e.code), 'err'); });
+}
+ 
+function checkVerified() {
+  document.getElementById('vMsg').textContent = 'Verificando...';
+  curFireUser.reload().then(function() {
+    if (curFireUser.emailVerified) { document.getElementById('vMsg').textContent = ''; loadAndEnter(curFireUser); }
+    else document.getElementById('vMsg').textContent = '❌ Aún no verificado — revisa tu correo';
+  });
+}
+ 
+function resendVerif() {
+  curFireUser.sendEmailVerification().then(function() { document.getElementById('vMsg').textContent = '✅ Correo reenviado'; }).catch(function() { document.getElementById('vMsg').textContent = '❌ Espera antes de reenviar'; });
 }
  
 function doLogout() {
-  curUser = null;
-  localStorage.removeItem('rival_user');
-  myRetoId = null; gState = 'idle'; cancelAnimationFrame(raf);
-  document.getElementById('profHeader').classList.remove('show');
-  document.getElementById('saldoPill').classList.remove('show');
-  goTo('auth');
+  gState = 'idle'; cancelAnimationFrame(raf); stopWeekTimer();
+  auth.signOut();
 }
  
-function showLoggedIn() {
-  db.ref('users/' + curUser.uid).once('value').then(function(s) {
-    var u = s.val();
-    if (!u) { doLogout(); return; }
-    curUser = Object.assign({}, u, { uid: curUser.uid });
-    localStorage.setItem('rival_user', JSON.stringify(curUser));
-    document.getElementById('profHeader').classList.add('show');
-    document.getElementById('saldoPill').classList.add('show');
-    updateProfileUI();
-    showScreen('lobby');
-    goTo('game');
+// ══ LOAD PROFILE & ENTER ══
+function loadAndEnter(fu) {
+  db.ref('profiles/' + fu.uid).once('value').then(function(s) {
+    var p = s.val();
+    if (!p) {
+      var refCode = generateRefCode(fu.displayName || 'RIVAL');
+      var newP = { name: fu.displayName || fu.email.split('@')[0], email: fu.email, photoURL: fu.photoURL || null, provider: fu.providerData[0].providerId, referralCode: refCode, referredBy: null, createdAt: Date.now() };
+      db.ref('profiles/' + fu.uid).set(newP).then(function() { enterGame(fu, newP); });
+    } else {
+      // Ensure ref code exists
+      if (!p.referralCode) {
+        var rc = generateRefCode(p.name);
+        db.ref('profiles/' + fu.uid + '/referralCode').set(rc);
+        p.referralCode = rc;
+      }
+      enterGame(fu, p);
+    }
   });
 }
  
-function updateProfileUI() {
-  if (!curUser) return;
-  var total = (curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0);
-  document.getElementById('profAlias').textContent = curUser.alias || '—';
-  document.getElementById('profName').textContent = curUser.name || '—';
-  document.getElementById('profAvatar').textContent = (curUser.alias || 'R')[0].toUpperCase();
-  document.getElementById('psWins').textContent = curUser.ganadas || 0;
-  document.getElementById('psLosses').textContent = curUser.perdidas || 0;
-  document.getElementById('psBest').textContent = curUser.mejorTiempo ? curUser.mejorTiempo + 's' : '—';
-  document.getElementById('psRacha').textContent = curUser.racha || 0;
-  document.getElementById('profSaldo').textContent = '$' + total;
-  document.getElementById('profBreakdown').textContent = 'Fondo: $' + (curUser.saldoFondo || 0) + ' | Ganancia: $' + (curUser.saldoGanancia || 0);
-  document.getElementById('saldoPillAmt').textContent = '$' + total;
+function enterGame(fu, profile) {
+  var navUser = document.getElementById('navUser');
+  navUser.classList.add('show');
+  var av = document.getElementById('navAvatar');
+  if (profile.photoURL) av.innerHTML = '<img src="' + profile.photoURL + '">';
+  else av.textContent = (profile.name || 'R')[0].toUpperCase();
+  document.getElementById('navName').textContent = profile.name;
+  resetClock();
+  updateGameUI();
+  startWeekTimer();
+  goScreen('sGame');
 }
  
-// ══ NAV ══
-function goTo(v) {
-  document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('on'); });
-  document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('on'); });
-  document.getElementById('view-' + v).classList.add('on');
-  var t = document.getElementById('tab-' + v);
-  if (t) t.classList.add('on');
+// ══ ATTEMPTS LOGIC ══
+function getMaxAttempts(uid) {
+  var bonus = weekReferrals[uid] ? (weekReferrals[uid].count || 0) * BONUS_PER_REFERRAL : 0;
+  return BASE_ATTEMPTS + bonus;
 }
  
-function showScreen(s) {
-  curScreen = s;
-  document.getElementById('sLobby').style.display = s === 'lobby' ? 'block' : 'none';
-  document.getElementById('sGame').style.display = s === 'game' ? 'block' : 'none';
-  document.getElementById('sResult').style.display = s === 'result' ? 'block' : 'none';
+function getUsedAttempts(uid) {
+  var w = weekScores[uid];
+  return w ? (w.attempts || 0) : 0;
 }
  
-function goBack() { myRetoId = null; gState = 'idle'; cancelAnimationFrame(raf); showScreen('lobby'); }
- 
-// ══ LOBBY ══
-function renderLobby() {
-  var list = document.getElementById('retosList');
-  if (!list) return;
-  var keys = Object.keys(retos);
-  if (keys.length === 0) { list.innerHTML = '<div class="empty-state">Sin retos disponibles</div>'; return; }
-  var active = keys.filter(function(k) { var s = retos[k].status; return s !== 'done' && s !== 'dispersado'; });
-  var inactive = keys.filter(function(k) { var s = retos[k].status; return s === 'done' || s === 'dispersado'; });
-  var html = '';
-  if (active.length > 0) {
-    html += '<div class="sec-sep"><div class="sep-dot"></div>Activos (' + active.length + ')</div>';
-    active.forEach(function(id) { html += buildCard(id, retos[id]); });
-  }
-  if (inactive.length > 0) {
-    html += '<div class="sec-sep" style="margin-top:20px"><div class="sep-dot off"></div>Terminados</div>';
-    inactive.forEach(function(id) { html += buildCard(id, retos[id]); });
-  }
-  list.innerHTML = html;
+function getRemainingAttempts(uid) {
+  return Math.max(0, getMaxAttempts(uid) - getUsedAttempts(uid));
 }
  
-function buildCard(id, r) {
-  var players = r.players || {};
-  var joined = Object.keys(players).length;
-  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-  var max = r.maxPlayers || 4;
-  var isDone = r.status === 'done' || r.status === 'dispersado';
-  var isFull = joined >= max && !isDone;
-  var pct = Math.round((joined / max) * 100);
-  var cardClass = isDone ? 'reto-card done' : isFull ? 'reto-card full' : 'reto-card open';
-  var badge = isDone ? '<span class="bdg bd">TERMINADO</span>' : isFull ? '<span class="bdg bf">LLENO</span>' : '<span class="bdg bo">DISPONIBLE</span>';
-  var target = parseFloat(r.objetivo) || 5.0;
-  var chips = '';
-  var pkeys = Object.keys(players);
+// ══ UPDATE GAME UI ══
+function updateGameUI() {
+  if (!curFireUser) return;
+  var uid = curFireUser.uid;
+  var profile = profiles[uid] || {};
+  var max = getMaxAttempts(uid);
+  var used = getUsedAttempts(uid);
+  var remaining = getRemainingAttempts(uid);
+  var bonusCount = weekReferrals[uid] ? (weekReferrals[uid].count || 0) : 0;
+ 
+  // Nav
+  document.getElementById('navSub').textContent = '#' + getRank(uid) + ' esta semana';
+  document.getElementById('navAttN').textContent = remaining;
+ 
+  // Attempts bar
+  document.getElementById('attNum').textContent = used + '/' + max;
+  var dotsHtml = '';
   for (var i = 0; i < max; i++) {
-    if (pkeys[i]) {
-      var p = players[pkeys[i]];
-      var isLead = false;
-      if (p && p.time != null && played > 0 && played < max) {
-        var sortedChip = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
-        isLead = sortedChip.length > 0 && sortedChip[0].name === pkeys[i];
-      }
-      var cls = p && p.time != null ? (isLead ? 'chip lead' : 'chip played') : 'chip';
-      chips += '<div class="' + cls + '"><div class="cdot"></div>' + pkeys[i] + '</div>';
-    } else {
-      chips += '<div class="chip-empty">libre</div>';
-    }
+    if (i < used) dotsHtml += '<div class="ab-dot used"></div>';
+    else if (i < BASE_ATTEMPTS) dotsHtml += '<div class="ab-dot avail"></div>';
+    else dotsHtml += '<div class="ab-dot bonus"></div>';
   }
-  var winnerSection = '';
-  if (isDone && played > 0) {
-    var sw = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
-    if (sw.length > 0) winnerSection = '<div class="win-chip">🏆 <span class="wname">' + sw[0].name + '</span><span class="wtime"> — ' + sw[0].time.toFixed(3) + 's (±' + (sw[0].diff * 1000).toFixed(0) + 'ms)</span></div>';
-  }
-  var userSaldo = curUser ? ((curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0)) : 0;
-  var apuesta = r.apuesta || 0;
-  var hasSaldo = userSaldo >= apuesta;
-  var alreadyIn = curUser && players[curUser.alias];
-  var btnHtml = '';
-  if (!isDone && !isFull && !alreadyIn) {
-    if (!hasSaldo) {
-      btnHtml = '<button class="rc-btn disabled" disabled>Sin saldo suficiente</button><div class="no-saldo-msg">Necesitas $' + apuesta + ' — tienes $' + userSaldo + '</div>';
-    } else {
-      btnHtml = '<button class="rc-btn" onclick="openJoin(\'' + id + '\')">⚔️ UNIRME — $' + apuesta + '</button>';
-    }
-  } else if (alreadyIn && !isDone) {
-    btnHtml = '<button class="rc-btn" onclick="openReto(\'' + id + '\')">▶️ VER MI RETO</button>';
-  } else if (isDone) {
-    btnHtml = '<button class="rc-btn disabled" disabled>Finalizado</button>';
+  document.getElementById('attDots').innerHTML = dotsHtml;
+  var refEl = document.getElementById('attRef');
+  if (bonusCount > 0) refEl.innerHTML = '🎉 <span>' + bonusCount + ' referido(s)</span> esta semana = +' + (bonusCount * BONUS_PER_REFERRAL) + ' intentos extra';
+  else refEl.textContent = 'Invita amigos con tu código para ganar más intentos';
+ 
+  // Best score
+  var ws = weekScores[uid];
+  document.getElementById('myBest').textContent = ws && ws.bestTime ? ws.bestTime + 's' : '—';
+  document.getElementById('myPos').textContent = ws && ws.bestTime ? '#' + getRank(uid) : '—';
+ 
+  // Week label
+  document.getElementById('weekLabel').textContent = getWeekLabel();
+ 
+  // Show/hide clock vs no-attempts
+  var clockArea = document.getElementById('gameClockArea');
+  if (remaining <= 0) {
+    clockArea.innerHTML = '<div class="no-attempts">' +
+      '<div class="na-title">SIN INTENTOS</div>' +
+      '<div class="na-sub">Agotaste tus ' + max + ' intentos esta semana.<br>¡Invita amigos para ganar más!</div>' +
+      '<div class="ref-code-box">' +
+      '<div class="rcb-lbl">Tu código de referido</div>' +
+      '<div class="rcb-code">' + (profile.referralCode || '—') + '</div>' +
+      '<div class="rcb-hint">Cada persona que se registre con tu código te da +3 intentos esta semana</div>' +
+      '</div>' +
+      '<button class="share-btn" onclick="shareRef()">📤 COMPARTIR MI CÓDIGO</button>' +
+      '</div>';
   } else {
-    btnHtml = '<button class="rc-btn disabled" disabled>❌ Sin lugares</button>';
+    clockArea.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:16px">' +
+      '<div class="clock-ring" id="cRing"><svg class="svgr" viewBox="0 0 198 198"><circle class="rt" cx="99" cy="99" r="95"/><circle class="rfg" id="rfg" cx="99" cy="99" r="95"/></svg>' +
+      '<div class="cs" id="cS">0</div><div class="cm" id="cM">.000</div><div class="cl" id="cL">LISTO</div></div>' +
+      '<button class="big-btn btn-start" id="gBtn" onclick="handleBtn()">INICIAR</button></div>';
+    gState = 'idle';
   }
-  return '<div class="' + cardClass + '">' +
-    '<div class="rc-top"><div class="rc-title">' + (r.titulo || 'Reto') + '</div>' + badge + '</div>' +
-    '<div class="rc-meta"><div class="rcm">⏱️ <span>' + target.toFixed(3) + 's</span></div><div class="rcm">💰 <span style="color:var(--wn)">$' + apuesta + ' c/u</span></div><div class="rcm">🏆 <span style="color:var(--ac)">$' + (apuesta * max) + '</span></div><div class="rcm">👥 <span>' + joined + '/' + max + '</span></div></div>' +
-    '<div class="rc-bar"><div class="rc-fill' + (isFull ? ' ff' : '') + '" style="width:' + pct + '%"></div></div>' +
-    '<div class="rc-chips">' + chips + '</div>' +
-    winnerSection + btnHtml + '</div>';
 }
  
-// ══ JOIN ══
-function openJoin(id) {
-  var r = retos[id];
-  var apuesta = r.apuesta || 0;
-  var max = r.maxPlayers || 4;
-  var joined = Object.keys(r.players || {}).length;
-  var userSaldo = (curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0);
-  document.getElementById('modalBody').innerHTML =
-    '<div class="mt">⚔️ ' + (r.titulo || 'Reto') + '</div>' +
-    '<div class="ibox">' +
-    '<div class="ir"><span class="il">Objetivo</span><span class="iv">' + parseFloat(r.objetivo || 5).toFixed(3) + 's</span></div>' +
-    '<div class="ir"><span class="il">Apuesta</span><span class="iv" style="color:var(--wn)">$' + apuesta + ' MXN</span></div>' +
-    '<div class="ir"><span class="il">Lugares</span><span class="iv">' + joined + ' de ' + max + ' tomados</span></div>' +
-    '<div class="ir"><span class="il">Tu saldo</span><span class="iv" style="color:var(--ac)">$' + userSaldo + '</span></div>' +
-    '</div>' +
-    '<div style="font-size:13px;color:var(--tm);text-align:center;padding:10px;background:var(--sf2);border-radius:10px;margin-bottom:14px">' +
-    'Jugando como <strong style="color:var(--ac)">' + curUser.alias + '</strong><br>Se descontarán <strong style="color:var(--wn)">$' + apuesta + '</strong> de tu saldo</div>' +
-    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="confirmJoin(\'' + id + '\')" style="font-weight:700">✅ CONFIRMAR</button></div>';
-  document.getElementById('overlay').classList.add('show');
+// ══ WEEK TIMER ══
+function startWeekTimer() {
+  stopWeekTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+  updateTimer();
 }
  
-function confirmJoin(id) {
-  var r = retos[id];
-  var apuesta = r.apuesta || 0;
-  var players = r.players || {};
-  var max = r.maxPlayers || 4;
-  var uid = curUser.uid;
-  var alias = curUser.alias;
-  if (players[alias]) { toast('❌ Ya estás en este reto'); closeModal(); return; }
-  if (Object.keys(players).length >= max) { toast('❌ Reto lleno'); closeModal(); return; }
-  var saldoTotal = (curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0);
-  if (saldoTotal < apuesta) { toast('❌ Saldo insuficiente'); closeModal(); return; }
-  var nf = curUser.saldoFondo || 0, ng = curUser.saldoGanancia || 0, resta = apuesta;
-  if (nf >= resta) { nf -= resta; } else { resta -= nf; nf = 0; ng -= resta; }
-  var upd = {};
-  upd['users/' + uid + '/saldoFondo'] = nf;
-  upd['users/' + uid + '/saldoGanancia'] = ng;
-  upd['retos/' + id + '/players/' + alias] = { time: null, joinedAt: Date.now(), uid: uid };
-  if (r.status === 'waiting') upd['retos/' + id + '/status'] = 'playing';
-  db.ref().update(upd).then(function() {
-    curUser.saldoFondo = nf; curUser.saldoGanancia = ng;
-    localStorage.setItem('rival_user', JSON.stringify(curUser));
-    updateProfileUI();
-    myRetoId = id;
-    closeModal();
-    toast('✅ Inscrito — $' + apuesta + ' descontados');
-    showGameScreen(id, retos[id] || r);
-  }).catch(function() { toast('❌ Error — intenta de nuevo'); });
-}
+function stopWeekTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
  
-function openReto(id) { myRetoId = id; var r = retos[id]; if (r) showGameScreen(id, r); }
- 
-// ══ GAME ══
-function showGameScreen(id, r) {
-  if (!r) return;
-  var target = parseFloat(r.objetivo) || 5.0;
-  var players = r.players || {};
-  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-  var max = r.maxPlayers || 4;
-  var myEntry = players[curUser.alias];
-  if (myEntry && myEntry.time != null) { renderResult(id, r); showScreen('result'); return; }
-  document.getElementById('gRetoName').textContent = r.titulo || 'Reto';
-  document.getElementById('gSub').textContent = '#' + id.slice(-4).toUpperCase() + ' — ' + played + '/' + max + ' jugaron';
-  document.getElementById('pbAlias').textContent = curUser.alias;
-  document.getElementById('pbJugaron').textContent = played + '/' + max;
-  document.getElementById('tgtNum').textContent = target.toFixed(3);
-  document.getElementById('cS').textContent = '0';
-  document.getElementById('cM').textContent = '.000';
-  document.getElementById('cL').textContent = 'LISTO';
-  document.getElementById('cRing').className = 'cring';
-  document.getElementById('rfg').style.strokeDashoffset = '565';
-  document.getElementById('gBtn').className = 'gbtn gbs';
-  document.getElementById('gBtn').textContent = 'INICIAR';
-  gState = 'idle';
-  updateLeaderBanner(r);
-  showScreen('game');
-}
- 
-function updateGameInfo(r) {
-  if (!r) return;
-  var players = r.players || {};
-  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-  var max = r.maxPlayers || 4;
-  var sub = document.getElementById('gSub');
-  var pos = document.getElementById('pbJugaron');
-  if (sub) sub.textContent = '#' + myRetoId.slice(-4).toUpperCase() + ' — ' + played + '/' + max + ' jugaron';
-  if (pos) pos.textContent = played + '/' + max;
-  updateLeaderBanner(r);
-}
- 
-function updateLeaderBanner(r) {
-  var players = r.players || {};
-  var target = parseFloat(r.objetivo) || 5.0;
-  var max = r.maxPlayers || 4;
-  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-  var banner = document.getElementById('leadBanner');
-  if (!banner) return;
-  if (played > 0 && played < max) {
-    var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
-    if (sorted.length > 0) {
-      banner.classList.add('show');
-      document.getElementById('leadTxt').textContent = sorted[0].name + ' lleva el mejor tiempo — faltan ' + (max - played) + ' por jugar';
-      document.getElementById('leadTime').textContent = sorted[0].time.toFixed(3) + 's';
-    }
-  } else { banner.classList.remove('show'); }
+function updateTimer() {
+  var now = getCDMXDate();
+  var end = getWeekEnd();
+  var diff = end - now;
+  if (diff <= 0) { document.getElementById('weekTimer').textContent = '¡CERRADO!'; weekKey = getWeekKey(); return; }
+  var d = Math.floor(diff / 86400000);
+  var h = Math.floor((diff % 86400000) / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var s = Math.floor((diff % 60000) / 1000);
+  var str = '';
+  if (d > 0) str += d + 'd ';
+  str += String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  document.getElementById('weekTimer').textContent = str;
 }
  
 // ══ CLOCK ══
 function handleBtn() { if (gState === 'idle') startCD(); else if (gState === 'running') stopClock(); }
  
 function startCD() {
+  if (getRemainingAttempts(curFireUser.uid) <= 0) { toast('❌ Sin intentos esta semana'); return; }
   gState = 'countdown';
   var btn = document.getElementById('gBtn');
-  if (btn) { btn.className = 'gbtn gbo'; btn.textContent = '...'; }
+  if (btn) { btn.className = 'big-btn btn-off'; btn.textContent = '...'; }
   document.getElementById('cdWrap').classList.add('show');
   var num = document.getElementById('cdN'), n = 3;
   function tick() {
     n--;
-    if (n > 0) { num.style.animation = 'none'; num.offsetHeight; num.style.animation = 'cdp .8s ease-out'; num.style.color = 'var(--ac)'; num.textContent = n; setTimeout(tick, 800); }
-    else { num.textContent = '¡YA!'; setTimeout(function() { document.getElementById('cdWrap').classList.remove('show'); startRun(); }, 600); }
+    if (n > 0) { num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.style.color='var(--ac)';num.textContent=n;setTimeout(tick,800); }
+    else { num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');startRun();},600); }
   }
   setTimeout(tick, 800);
 }
  
 function startRun() {
-  gState = 'running'; t0 = performance.now(); elapsed = 0;
-  var btn = document.getElementById('gBtn');
-  if (btn) { btn.className = 'gbtn gbp'; btn.textContent = 'PARAR'; }
-  document.getElementById('cRing').className = 'cring run';
-  document.getElementById('cL').textContent = 'CORRIENDO';
-  raf = requestAnimationFrame(function loop() {
-    if (gState !== 'running') return;
-    elapsed = (performance.now() - t0) / 1000;
-    document.getElementById('cS').textContent = Math.floor(elapsed);
-    document.getElementById('cM').textContent = '.' + String(Math.floor((elapsed % 1) * 1000)).padStart(3, '0');
-    var rfg = document.getElementById('rfg');
-    if (rfg) rfg.style.strokeDashoffset = 565 - (565 * Math.min(elapsed / 10, 1));
-    if (elapsed >= 15) stopClock();
-    else raf = requestAnimationFrame(loop);
+  gState='running';t0=performance.now();elapsed=0;
+  var btn=document.getElementById('gBtn');
+  if(btn){btn.className='big-btn btn-stop';btn.textContent='PARAR';}
+  var ring=document.getElementById('cRing');
+  if(ring)ring.className='clock-ring run';
+  var cl=document.getElementById('cL');
+  if(cl)cl.textContent='CORRIENDO';
+  raf=requestAnimationFrame(function loop(){
+    if(gState!=='running')return;
+    elapsed=(performance.now()-t0)/1000;
+    var cS=document.getElementById('cS'),cM=document.getElementById('cM');
+    if(cS)cS.textContent=Math.floor(elapsed);
+    if(cM)cM.textContent='.'+String(Math.floor((elapsed%1)*1000)).padStart(3,'0');
+    var rfg=document.getElementById('rfg');
+    if(rfg)rfg.style.strokeDashoffset=565-(565*Math.min(elapsed/60,1));
+    if(elapsed>=60)stopClock();
+    else raf=requestAnimationFrame(loop);
   });
 }
  
 function stopClock() {
-  cancelAnimationFrame(raf); gState = 'stopped';
-  elapsed = (performance.now() - t0) / 1000;
-  var r = retos[myRetoId];
-  var target = parseFloat(r ? r.objetivo : 5) || 5.0;
-  var fmt = elapsed.toFixed(3);
-  var diff = Math.abs(elapsed - target);
-  document.getElementById('cS').textContent = fmt.split('.')[0];
-  document.getElementById('cM').textContent = '.' + fmt.split('.')[1];
-  document.getElementById('cL').textContent = 'PARADO';
-  document.getElementById('cRing').className = 'cring ' + (diff < 0.3 ? 'good' : 'bad');
-  var btn = document.getElementById('gBtn');
-  if (btn) { btn.className = 'gbtn gbo'; btn.textContent = '...'; }
-  setTimeout(function() {
-    var r2 = retos[myRetoId];
-    if (!r2) return;
-    var max = r2.maxPlayers || 4;
-    var players = r2.players || {};
-    var playedSoFar = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-    var allDone = (playedSoFar + 1) >= max;
-    db.ref('retos/' + myRetoId + '/players/' + curUser.alias).update({ time: fmt }).then(function() {
-      toast('✅ Tu tiempo: ' + fmt + 's');
-      if (allDone) {
-        var allP = Object.assign({}, players);
-        allP[curUser.alias] = { time: fmt };
-        var ob = parseFloat(r2.objetivo) || 5.0;
-        var sorted2 = Object.entries(allP).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - ob) }; }).sort(function(a, b) { return a.diff - b.diff; });
-        if (sorted2.length > 0) {
-          var winner = sorted2[0];
-          var premio = Math.round((r2.apuesta || 0) * max * 0.9);
-          db.ref('retos/' + myRetoId).update({ status: 'done', winner: winner.name });
-          var winUid = Object.keys(users).find(function(k) { return users[k].alias === winner.name; });
-          if (winUid) db.ref('users/' + winUid + '/saldoGanancia').set((users[winUid].saldoGanancia || 0) + premio);
-          Object.keys(allP).forEach(function(alias) {
-            var pUid = Object.keys(users).find(function(k) { return users[k].alias === alias; });
-            if (!pUid) return;
-            var pu = users[pUid];
-            var isW = alias === winner.name;
-            var upd2 = {};
-            upd2['users/' + pUid + '/ganadas'] = (pu.ganadas || 0) + (isW ? 1 : 0);
-            upd2['users/' + pUid + '/perdidas'] = (pu.perdidas || 0) + (isW ? 0 : 1);
-            upd2['users/' + pUid + '/racha'] = isW ? (pu.racha || 0) + 1 : 0;
-            var pt = parseFloat(allP[alias].time);
-            if (!pu.mejorTiempo || Math.abs(pt - ob) < Math.abs(parseFloat(pu.mejorTiempo) - ob)) upd2['users/' + pUid + '/mejorTiempo'] = allP[alias].time;
-            db.ref().update(upd2);
-          });
-        }
-      }
-      setTimeout(function() { var r3 = retos[myRetoId]; renderResult(myRetoId, r3); showScreen('result'); }, 800);
-    });
-  }, 600);
+  cancelAnimationFrame(raf);gState='stopped';
+  elapsed=(performance.now()-t0)/1000;
+  var fmt=elapsed.toFixed(3);
+  var diff=Math.abs(elapsed-TARGET);
+  var cS=document.getElementById('cS'),cM=document.getElementById('cM'),cL=document.getElementById('cL');
+  if(cS)cS.textContent=fmt.split('.')[0];
+  if(cM)cM.textContent='.'+fmt.split('.')[1];
+  if(cL)cL.textContent='PARADO';
+  var ring=document.getElementById('cRing');
+  if(ring)ring.className='clock-ring '+(diff<1?'good':'bad');
+  var btn=document.getElementById('gBtn');
+  if(btn){btn.className='big-btn btn-off';btn.textContent='...';}
+  setTimeout(function(){saveResult(fmt,diff);},700);
 }
  
-// ══ RESULT ══
-function renderResult(id, r) {
-  if (!r) return;
-  var players = r.players || {};
-  var target = parseFloat(r.objetivo) || 5.0;
-  var max = r.maxPlayers || 4;
-  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-  var allDone = played >= max;
-  document.getElementById('resRN').textContent = r.titulo || 'Reto';
-  document.getElementById('resTitle').textContent = allDone ? 'RESULTADO FINAL' : 'EN CURSO';
-  document.getElementById('resSub').textContent = allDone ? played + ' jugadores — resultado oficial' : 'Esperando ' + (max - played) + ' jugador(es) más';
-  var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
-  var pending = Object.entries(players).filter(function(e) { return !e[1] || e[1].time == null; });
-  var html = '';
-  sorted.forEach(function(p, i) {
-    var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '';
-    var isMe = p.name === curUser.alias;
-    var isWin = i === 0 && allDone;
-    var isLead = i === 0 && !allDone;
-    html += '<div class="rank-item' + (isWin ? ' winner' : '') + (isLead ? ' leader' : '') + (isMe ? ' me' : '') + '">' +
-      '<div class="rpos">' + medal + '</div>' +
-      '<div class="rinfo"><div class="rname">' + p.name + (isMe ? ' 👈' : '') + (isLead ? ' ⚡' : isWin ? ' 🏆' : '') + '</div>' +
-      '<div class="rdiff">±' + (p.diff * 1000).toFixed(0) + 'ms del objetivo' + (isLead ? ' — faltan ' + (max - played) + ' por jugar' : '') + '</div></div>' +
-      '<div class="rtime">' + p.time.toFixed(3) + 's</div></div>';
+function saveResult(fmt, diff) {
+  if(!curFireUser)return;
+  var uid=curFireUser.uid;
+  var ws=weekScores[uid]||{};
+  var isRecord=!ws.bestDiff||diff<ws.bestDiff;
+  var upd={
+    attempts:(ws.attempts||0)+1,
+    lastPlayed:Date.now()
+  };
+  if(isRecord){upd.bestTime=fmt;upd.bestDiff=diff;upd.name=(profiles[uid]||{}).name||'?';upd.photoURL=(profiles[uid]||{}).photoURL||null;}
+  db.ref('weekScores/'+weekKey+'/'+uid).update(upd).then(function(){
+    showResultScreen(fmt,diff,isRecord);
   });
-  pending.forEach(function(e) {
-    html += '<div class="pend-item"><div class="rpos">⏳</div><div class="rinfo"><div class="rname">' + e[0] + '</div><div class="rdiff">Jugando...</div></div><div class="rtime">—</div></div>';
+}
+ 
+function showResultScreen(fmt,diff,isRecord){
+  var uid=curFireUser.uid;
+  document.getElementById('resTime').textContent=fmt+'s';
+  document.getElementById('resDiff').textContent='±'+(diff*1000).toFixed(0)+'ms del objetivo (30.000s)';
+  var rank=getRank(uid);
+  var total=Object.values(weekScores).filter(function(w){return w.bestDiff!=null;}).length;
+  document.getElementById('resRank').innerHTML='Posición <span>#'+rank+'</span> de '+total+' esta semana';
+  document.getElementById('newRecord').classList.toggle('show',isRecord);
+  // Attempts left
+  var remaining=getRemainingAttempts(uid);
+  var al=document.getElementById('attLeft');
+  al.innerHTML=remaining>0?'Te quedan <strong>'+remaining+' intento(s)</strong> esta semana':'Sin más intentos esta semana — invita amigos para ganar más';
+  // Play again btn
+  var pab=document.getElementById('playAgainBtn');
+  if(remaining>0){pab.className='play-again-btn';pab.disabled=false;}
+  else{pab.className='play-again-btn disabled';pab.disabled=true;}
+  // Ref promo
+  var profile=profiles[uid]||{};
+  document.getElementById('refPromoCode').textContent=profile.referralCode||'—';
+  renderLeaderboard(uid);
+  goScreen('sResult');
+}
+ 
+function renderLeaderboard(highlightUid){
+  var sorted=Object.entries(weekScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;}).slice(0,10);
+  var html='';
+  var myInTop=sorted.some(function(e){return e[0]===highlightUid;});
+  sorted.forEach(function(e,i){
+    var uid2=e[0],w=e[1];
+    var isMe=uid2===highlightUid,isTop=i===0;
+    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+    var avHtml=w.photoURL?'<div class="lb-av"><img src="'+w.photoURL+'"></div>':'<div class="lb-av">'+(w.name||'?')[0].toUpperCase()+'</div>';
+    html+='<div class="lb-item'+(isTop?' top':'')+(isMe?' me':'')+'">'+
+      '<div class="lb-pos">'+medal+'</div>'+avHtml+
+      '<div class="lb-info"><div class="lb-name">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
+      '<div class="lb-diff">±'+(w.bestDiff*1000).toFixed(0)+'ms</div></div>'+
+      '<div class="lb-time">'+w.bestTime+'s</div></div>';
   });
-  document.getElementById('rankList').innerHTML = html;
-  var premio = Math.round((r.apuesta || 0) * max * 0.9);
-  var winner = sorted.length > 0 ? sorted[0].name : '—';
-  var credited = document.getElementById('creditedBox');
-  var prizeBox = document.getElementById('prizeBox');
-  var waitBox = document.getElementById('waitBox');
-  if (allDone && sorted.length > 0 && sorted[0].name === curUser.alias) {
-    credited.classList.add('show');
-    document.getElementById('creditedAmt').textContent = '+$' + premio + ' MXN';
-    prizeBox.style.display = 'block';
-    prizeBox.innerHTML = '<div class="pz-lbl">🏆 Ganaste</div><div class="pz-amt">$' + premio + '</div><div class="pz-to">Acreditado a tu ganancia</div>';
-    waitBox.style.display = 'none';
-  } else if (allDone) {
-    credited.classList.remove('show');
-    prizeBox.style.display = 'block';
-    prizeBox.innerHTML = '<div class="pz-lbl">🏆 Ganador</div><div class="pz-amt">$' + premio + '</div><div class="pz-to">→ ' + winner + '</div>';
-    waitBox.style.display = 'none';
-  } else {
-    credited.classList.remove('show');
-    prizeBox.style.display = 'none';
-    waitBox.style.display = 'block';
-    document.getElementById('waitTxt').textContent = 'Faltan ' + (max - played) + ' jugador(es). El resultado final aparece cuando todos jueguen.';
+  if(!myInTop&&highlightUid&&weekScores[highlightUid]&&weekScores[highlightUid].bestTime){
+    var rank=getRank(highlightUid);var me=weekScores[highlightUid];
+    html+='<div class="lb-sep">···</div>';
+    html+='<div class="lb-item me"><div class="lb-pos">'+rank+'</div><div class="lb-av">'+(me.name||'?')[0].toUpperCase()+'</div>'+
+      '<div class="lb-info"><div class="lb-name">'+(me.name||'?')+' 👈</div><div class="lb-diff">±'+(me.bestDiff*1000).toFixed(0)+'ms</div></div>'+
+      '<div class="lb-time">'+me.bestTime+'s</div></div>';
   }
+  document.getElementById('lbList').innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:20px;font-size:13px">Sé el primero en jugar esta semana</div>';
 }
  
-// ══ ADMIN LOGIN ══
-function doAdminLogin() {
-  var u = document.getElementById('alu').value;
-  var p = document.getElementById('alp').value;
-  if ((u === 'admin' || u === 'socio') && p === 'rival2024') {
-    adminLoggedIn = true;
-    document.getElementById('loginBox').style.display = 'none';
+function getRank(uid){
+  var sorted=Object.entries(weekScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+  var idx=sorted.findIndex(function(e){return e[0]===uid;});
+  return idx>=0?idx+1:'—';
+}
+ 
+function resetClock(){
+  gState='idle';cancelAnimationFrame(raf);
+}
+ 
+function playAgain(){resetClock();goScreen('sGame');updateGameUI();}
+ 
+function shareRef(){
+  var uid=curFireUser?curFireUser.uid:null;
+  if(!uid)return;
+  var profile=profiles[uid]||{};
+  var code=profile.referralCode||'—';
+  var txt='¡Juega RIVAL conmigo! Para el reloj exactamente en 30 segundos. Úsate mi código '+code+' al registrarte y ambos ganamos intentos extra 🎯\n\nEntra en: rival-app-eight.vercel.app';
+  if(navigator.share){navigator.share({title:'RIVAL',text:txt,url:'https://rival-app-eight.vercel.app'}).catch(function(){});}
+  else{navigator.clipboard.writeText(txt).then(function(){toast('✅ Mensaje copiado — pégalo donde quieras');}).catch(function(){toast('Tu código: '+code);});}
+}
+ 
+// ══ ADMIN ══
+function doAdminLogin(){
+  var u=document.getElementById('alu').value,p=document.getElementById('alp').value;
+  if((u==='admin'||u==='socio')&&p==='rival2024'){
+    document.getElementById('admLoginCard').style.display='none';
     document.getElementById('admPanel').classList.add('show');
-    renderUsersTable(); renderRetosTable(); updateAdminStats();
-    toast('✅ Bienvenido ' + u);
-  } else { toast('❌ Credenciales incorrectas'); }
+    updateAdminTable();updateAdminStats();updateWinnerCard();
+    document.getElementById('weekLblAdm').textContent=getWeekLabel();
+    toast('✅ Bienvenido '+u);
+  } else {toast('❌ Credenciales incorrectas');}
 }
  
-// ══ USERS TABLE ══
-function renderUsersTable() {
-  var tbody = document.getElementById('usersTable');
-  var keys = Object.keys(users);
-  if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:28px">Sin jugadores registrados</td></tr>'; return; }
-  tbody.innerHTML = keys.map(function(uid) {
-    var u = users[uid];
-    var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
-    return '<tr>' +
-      '<td><strong>' + u.alias + '</strong></td>' +
-      '<td style="font-size:12px;color:var(--tm)">' + u.name + '</td>' +
-      '<td class="mono" style="color:var(--ac)">$' + total + '</td>' +
-      '<td class="mono" style="color:var(--tm)">$' + (u.saldoFondo || 0) + '</td>' +
-      '<td class="mono" style="color:var(--wn)">$' + (u.saldoGanancia || 0) + '</td>' +
-      '<td style="font-size:11px;color:var(--tm)">🏆' + (u.ganadas || 0) + ' 💀' + (u.perdidas || 0) + ' 🔥' + (u.racha || 0) + '</td>' +
-      '<td><div class="btn-row">' +
-        '<button class="btn btn-g" onclick="openSaldo(\'' + uid + '\',false)">+ Saldo</button>' +
-        '<button class="btn btn-r" onclick="openSaldo(\'' + uid + '\',true)">- Saldo</button>' +
-        '<button class="btn btn-b" onclick="verJugador(\'' + uid + '\')">Ver</button>' +
-      '</div></td>' +
+function updateAdminStats(){
+  var allP=Object.values(profiles);
+  var allW=Object.values(weekScores);
+  var allRef=Object.values(weekReferrals);
+  document.getElementById('stU').textContent=allP.length;
+  document.getElementById('stP').textContent=allW.reduce(function(a,w){return a+(w.attempts||0);},0);
+  document.getElementById('stRef').textContent=allRef.reduce(function(a,r){return a+(r.count||0);},0);
+  var best=allW.filter(function(w){return w.bestDiff!=null;}).sort(function(a,b){return a.bestDiff-b.bestDiff;});
+  document.getElementById('stB').textContent=best.length>0?best[0].bestTime+'s':'—';
+}
+ 
+function updateWinnerCard(){
+  var card=document.getElementById('winnerCard');
+  var sorted=Object.entries(weekScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+  if(sorted.length===0){card.style.display='none';return;}
+  var winner=sorted[0][1];var winnerUid=sorted[0][0];
+  var profile=profiles[winnerUid]||{};
+  card.style.display='block';
+  document.getElementById('winnerInfo').innerHTML=
+    '<div class="wc-row"><span class="wc-l">Nombre</span><span class="wc-v">'+winner.name+'</span></div>'+
+    '<div class="wc-row"><span class="wc-l">Email</span><span class="wc-v">'+( profile.email||'—')+'</span></div>'+
+    '<div class="wc-row"><span class="wc-l">Mejor tiempo</span><span class="wc-v" style="color:var(--ac)">'+winner.bestTime+'s</span></div>'+
+    '<div class="wc-row"><span class="wc-l">Diferencia</span><span class="wc-v">±'+(winner.bestDiff*1000).toFixed(0)+'ms</span></div>'+
+    '<div class="wc-row"><span class="wc-l">Semana</span><span class="wc-v">'+getWeekLabel()+'</span></div>'+
+    '<div style="margin-top:12px;padding:10px;background:var(--sf2);border-radius:8px;font-size:12px;color:var(--tm)">'+
+    '📧 Contacta a <strong style="color:var(--tx)">'+winner.name+'</strong> en <strong style="color:var(--ac)">'+(profile.email||'—')+'</strong> para enviarle su premio.</div>';
+}
+ 
+function updateAdminTable(){
+  var tbody=document.getElementById('admTable');
+  if(!tbody||!document.getElementById('admPanel').classList.contains('show'))return;
+  var sorted=Object.entries(weekScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+  if(sorted.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:24px">Sin partidas esta semana</td></tr>';return;}
+  tbody.innerHTML=sorted.map(function(e,i){
+    var uid=e[0],w=e[1],p=profiles[uid]||{};
+    var refCount=weekReferrals[uid]?(weekReferrals[uid].count||0):0;
+    return '<tr>'+
+      '<td class="mono" style="color:var(--tm)">'+(i+1)+'</td>'+
+      '<td><strong>'+(w.name||'—')+'</strong></td>'+
+      '<td style="font-size:12px;color:var(--tm)">'+(p.email||'—')+'</td>'+
+      '<td class="mono" style="color:var(--ac)">'+(w.bestTime||'—')+'s</td>'+
+      '<td class="mono">±'+(w.bestDiff*1000).toFixed(0)+'ms</td>'+
+      '<td class="mono">'+( w.attempts||0)+'/'+getMaxAttempts(uid)+'</td>'+
+      '<td class="mono" style="color:var(--wn)">'+(refCount>0?'+'+refCount:'0')+'</td>'+
     '</tr>';
   }).join('');
 }
  
-// ══ CARGAR / RESTAR SALDO ══
-function openSaldo(uid, isRestar) {
-  var u = users[uid];
-  var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
-  var titulo = isRestar ? '➖ RESTAR SALDO' : '💰 CARGAR SALDO';
-  var btnClass = isRestar ? 'btn btn-r' : 'btn btn-g';
-  var btnTxt = isRestar ? '➖ RESTAR' : '✅ CARGAR';
-  document.getElementById('modalBody').innerHTML =
-    '<div class="mt">' + titulo + '</div>' +
-    '<div class="ibox">' +
-    '<div class="ir"><span class="il">Jugador</span><span class="iv">' + u.alias + '</span></div>' +
-    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$' + total + '</span></div>' +
-    '<div class="ir"><span class="il">Fondo</span><span class="iv">$' + (u.saldoFondo || 0) + '</span></div>' +
-    '<div class="ir"><span class="il">Ganancia</span><span class="iv">$' + (u.saldoGanancia || 0) + '</span></div>' +
-    '</div>' +
-    '<div class="ff" style="margin-bottom:14px">' +
-    '<label>Monto ($MXN)</label>' +
-    '<input id="montoInput" type="number" placeholder="200" style="height:46px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:DM Mono,monospace;font-size:16px;padding:0 14px;outline:none">' +
-    '</div>' +
-    '<div class="mbtns">' +
-    '<button class="btn btn-gh" onclick="closeModal()">Cancelar</button>' +
-    '<button class="' + btnClass + '" id="saldoBtn" style="font-weight:700">' + btnTxt + '</button>' +
-    '</div>';
-  document.getElementById('saldoBtn').onclick = function() { doSaldo(uid, isRestar); };
+function confirmReset(){
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:12px">🗑️ RESETEAR SEMANA</div>'+
+    '<p style="font-size:13px;color:var(--tm);margin-bottom:6px">Esto borra todos los tiempos y partidas de la semana actual.</p>'+
+    '<p style="font-size:12px;color:var(--dg);margin-bottom:16px">⚠️ Los perfiles y cuentas no se borran.</p>'+
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px;border-radius:10px">Cancelar</button>'+
+    '<button class="btn btn-r" onclick="doReset()" style="height:42px;border-radius:10px;font-weight:700">🗑️ RESETEAR</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function doSaldo(uid, isRestar) {
-  var monto = parseInt(document.getElementById('montoInput').value) || 0;
-  if (!monto || monto <= 0) { toast('❌ Ingresa un monto válido'); return; }
-  var u = users[uid];
-  if (isRestar) {
-    var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
-    if (monto > total) { toast('❌ Solo tiene $' + total + ' disponibles'); return; }
-    var nf = u.saldoFondo || 0, ng = u.saldoGanancia || 0, r = monto;
-    if (nf >= r) { nf -= r; } else { r -= nf; nf = 0; ng = Math.max(0, ng - r); }
-    db.ref('users/' + uid).update({ saldoFondo: nf, saldoGanancia: ng }).then(function() { closeModal(); toast('➖ -$' + monto + ' restados a ' + u.alias); });
-  } else {
-    db.ref('users/' + uid + '/saldoFondo').set((u.saldoFondo || 0) + monto).then(function() { closeModal(); toast('✅ +$' + monto + ' cargados a ' + u.alias); });
-  }
-}
- 
-// ══ VER JUGADOR (con PIN) ══
-function verJugador(uid) {
-  var u = users[uid];
-  var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
-  document.getElementById('modalBody').innerHTML =
-    '<div class="mt">👤 ' + u.alias + '</div>' +
-    '<div class="ibox">' +
-    '<div class="ir"><span class="il">Nombre</span><span class="iv">' + u.name + '</span></div>' +
-    '<div class="ir"><span class="il">PIN</span><span class="iv mono" style="color:var(--wn);letter-spacing:6px;font-size:20px">' + u.pin + '</span></div>' +
-    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$' + total + '</span></div>' +
-    '<div class="ir"><span class="il">Fondo</span><span class="iv">$' + (u.saldoFondo || 0) + '</span></div>' +
-    '<div class="ir"><span class="il">Ganancia</span><span class="iv" style="color:var(--wn)">$' + (u.saldoGanancia || 0) + '</span></div>' +
-    '<div class="ir"><span class="il">Ganadas</span><span class="iv" style="color:var(--ac)">' + (u.ganadas || 0) + '</span></div>' +
-    '<div class="ir"><span class="il">Perdidas</span><span class="iv" style="color:var(--dg)">' + (u.perdidas || 0) + '</span></div>' +
-    '<div class="ir"><span class="il">Mejor tiempo</span><span class="iv mono">' + (u.mejorTiempo || '—') + '</span></div>' +
-    '<div class="ir"><span class="il">Racha actual</span><span class="iv">' + (u.racha || 0) + ' victorias</span></div>' +
-    '</div>' +
-    '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:42px;border-radius:10px">Cerrar</button>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-// ══ RETOS TABLE ══
-function renderRetosTable() {
-  var tbody = document.getElementById('retosTable');
-  var keys = Object.keys(retos);
-  if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:28px">Sin retos</td></tr>'; return; }
-  var active = keys.filter(function(k) { var s = retos[k].status; return s !== 'done' && s !== 'dispersado'; });
-  var inactive = keys.filter(function(k) { var s = retos[k].status; return s === 'done' || s === 'dispersado'; });
-  var sorted = active.concat(inactive);
-  tbody.innerHTML = sorted.map(function(id) {
-    var r = retos[id];
-    var players = r.players || {};
-    var joined = Object.keys(players).length;
-    var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
-    var max = r.maxPlayers || 4;
-    var isDone = r.status === 'done' || r.status === 'dispersado';
-    var bc = isDone ? 'bd' : 'bo';
-    var bt = r.status === 'dispersado' ? '✅ DISP' : isDone ? 'TERMINADO' : r.status === 'playing' ? 'EN JUEGO' : 'ABIERTO';
-    var plist = Object.entries(players).map(function(e) { return '<span style="font-size:11px;color:' + (e[1] && e[1].time ? 'var(--ac)' : 'var(--tm)') + '">' + (e[1] && e[1].time ? '✅ ' : '⏳ ') + e[0] + (e[1] && e[1].time ? ' (' + e[1].time + 's)' : '') + '</span>'; }).join('<br>');
-    var acts = '<div class="btn-row">';
-    if (isDone && r.status !== 'dispersado') acts += '<button class="btn btn-y" onclick="showWinner(\'' + id + '\')">🏆</button><button class="btn btn-g" onclick="showDispersar(\'' + id + '\')">💸</button>';
-    acts += '<button class="btn btn-r" onclick="confirmDel(\'' + id + '\')">🗑️</button></div>';
-    return '<tr>' +
-      '<td><strong>' + (r.titulo || '—') + '</strong></td>' +
-      '<td class="mono">' + parseFloat(r.objetivo || 5).toFixed(3) + 's</td>' +
-      '<td>' + (plist || '<span style="color:var(--td);font-size:11px">Sin jugadores</span>') + '</td>' +
-      '<td class="mono" style="color:var(--wn)">$' + ((r.apuesta || 0) * max) + '<br><span style="font-size:11px;color:var(--tm)">' + played + '/' + joined + '/' + max + '</span></td>' +
-      '<td><span class="bdg ' + bc + '">' + bt + '</span></td>' +
-      '<td>' + acts + '</td>' +
-    '</tr>';
-  }).join('');
-}
- 
-// ══ ADMIN ACTIONS ══
-function genCode() {
-  var code = 'RIVAL-' + Math.random().toString(36).slice(2, 6).toUpperCase();
-  db.ref('invCodes/' + code).set({ used: false, createdAt: Date.now() }).then(function() {
-    document.getElementById('modalBody').innerHTML =
-      '<div class="mt">🎟️ CÓDIGO CREADO</div>' +
-      '<div class="ibox"><div style="text-align:center;padding:10px">' +
-      '<div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Código de invitación</div>' +
-      '<div style="font-family:Bebas Neue,sans-serif;font-size:40px;letter-spacing:6px;color:var(--ac)">' + code + '</div>' +
-      '<div style="font-size:12px;color:var(--tm);margin-top:8px">Un solo uso — compártelo por Telegram</div>' +
-      '</div></div>' +
-      '<button class="btn btn-g" onclick="copyText(\'' + code + '\')" style="width:100%;height:44px;border-radius:10px;margin-bottom:8px">📋 Copiar código</button>' +
-      '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:10px">Cerrar</button>';
-    document.getElementById('overlay').classList.add('show');
+function doReset(){
+  db.ref('weekScores/'+weekKey).remove().then(function(){
+    db.ref('weekReferrals/'+weekKey).remove().then(function(){
+      closeModal();toast('✅ Semana reseteada');
+      weekScores={};weekReferrals={};
+      if(curFireUser)updateGameUI();
+    });
   });
 }
  
-function openCreateReto() {
-  document.getElementById('modalBody').innerHTML =
-    '<div class="mt">➕ NUEVO RETO</div>' +
-    '<div class="fgrid">' +
-    '<div class="ff full"><label>Título del reto</label><input id="fti" placeholder="Reto del Viernes 🔥"></div>' +
-    '<div class="ff"><label>Jugadores</label><input id="fmax" type="number" value="4" min="2" max="20"></div>' +
-    '<div class="ff"><label>Apuesta ($MXN)</label><input id="fap" type="number" placeholder="200"></div>' +
-    '<div class="ff"><label>Objetivo (segundos)</label><input id="fob" type="number" step="0.001" value="5.000"></div>' +
-    '<div class="ff"><label>Tipo</label><select id="ftp"><option>⏱️ Para el reloj</option><option>⚡ Reacción</option><option>🎯 Precisión</option></select></div>' +
-    '</div>' +
-    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="doCreateReto()" style="font-weight:700">✅ CREAR</button></div>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function doCreateReto() {
-  var ti = document.getElementById('fti').value.trim();
-  var max = parseInt(document.getElementById('fmax').value) || 4;
-  var ap = parseInt(document.getElementById('fap').value);
-  var ob = parseFloat(document.getElementById('fob').value) || 5.0;
-  var tp = document.getElementById('ftp').value;
-  if (!ti) { toast('❌ Ponle un título'); return; }
-  if (!ap) { toast('❌ Define la apuesta'); return; }
-  db.ref('retos').push({ titulo: ti, maxPlayers: max, apuesta: ap, objetivo: ob, tipo: tp, status: 'waiting', players: {}, createdAt: Date.now() }).then(function() { closeModal(); toast('✅ Reto "' + ti + '" creado'); }).catch(function() { toast('❌ Error'); });
-}
- 
-function showWinner(id) {
-  var r = retos[id];
-  var players = r.players || {};
-  var target = parseFloat(r.objetivo) || 5.0;
-  var max = r.maxPlayers || 4;
-  var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
-  var html = '<div class="mt">🏆 ' + (r.titulo || 'RETO') + '</div>';
-  sorted.forEach(function(p, i) {
-    var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '';
-    html += '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bo)">' +
-      '<span style="font-size:20px;width:28px">' + medal + '</span>' +
-      '<span style="flex:1;font-weight:600">' + p.name + '</span>' +
-      '<span class="mono" style="color:' + (i === 0 ? 'var(--ac)' : 'var(--tm)') + '">' + p.time.toFixed(3) + 's</span>' +
-      '<span style="font-size:11px;color:' + (i === 0 ? 'var(--ac)' : 'var(--tm)') + ';margin-left:5px">±' + (p.diff * 1000).toFixed(0) + 'ms</span></div>';
-  });
-  var premio = Math.round((r.apuesta || 0) * max * 0.9);
-  var winner = sorted.length > 0 ? sorted[0].name : '—';
-  html += '<div class="pbox"><div class="pl2">💸 Premio acreditado automáticamente</div><div class="pa">$' + premio + '</div><div class="pt">→ ' + winner + '</div></div>';
-  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button><button class="btn btn-g" onclick="closeModal();showDispersar(\'' + id + '\')" style="font-size:13px">💸 Dispersar</button></div>';
-  document.getElementById('modalBody').innerHTML = html;
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function showDispersar(id) {
-  var r = retos[id];
-  var players = r.players || {};
-  var target = parseFloat(r.objetivo) || 5.0;
-  var max = r.maxPlayers || 4;
-  var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
-  var winner = sorted.length > 0 ? sorted[0].name : '—';
-  var pozo = (r.apuesta || 0) * max;
-  var premio = Math.round(pozo * 0.9);
-  var com = pozo - premio;
-  document.getElementById('modalBody').innerHTML =
-    '<div class="mt">💸 DISPERSAR COMISIÓN</div>' +
-    '<div class="ibox">' +
-    '<div class="ir"><span class="il">Reto</span><span class="iv">' + (r.titulo || '—') + '</span></div>' +
-    '<div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--ac)">🏆 ' + winner + '</span></div>' +
-    '<div class="ir"><span class="il">Premio (ya en su saldo)</span><span class="iv" style="color:var(--tm)">$' + premio + ' ✅</span></div>' +
-    '<div class="ir"><span class="il">Tu comisión (10%)</span><span class="iv" style="color:var(--wn);font-size:16px;font-weight:700">$' + com + ' MXN</span></div>' +
-    '</div>' +
-    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doDispersar(\'' + id + '\')" style="font-weight:700">✅ MARCAR DISPERSADO</button></div>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function doDispersar(id) {
-  db.ref('retos/' + id).update({ status: 'dispersado', dispersadoAt: Date.now() }).then(function() { closeModal(); toast('✅ Reto marcado como dispersado'); });
-}
- 
-function confirmDel(id) {
-  var r = retos[id];
-  document.getElementById('modalBody').innerHTML =
-    '<div class="mt">🗑️ BORRAR RETO</div>' +
-    '<div class="ibox"><div class="ir"><span class="il">Título</span><span class="iv">' + (r.titulo || '—') + '</span></div></div>' +
-    '<p style="font-size:13px;color:var(--dg);margin-bottom:16px">⚠️ Esta acción no se puede deshacer.</p>' +
-    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-r" onclick="doDel(\'' + id + '\')" style="font-weight:700">🗑️ BORRAR</button></div>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function doDel(id) { db.ref('retos/' + id).remove().then(function() { closeModal(); toast('🗑️ Reto eliminado'); }); }
- 
-function updateAdminStats() {
-  var us = Object.keys(users).length;
-  var rs = Object.values(retos).filter(function(r) { return r.status !== 'done' && r.status !== 'dispersado'; }).length;
-  var ds = Object.values(retos).filter(function(r) { return r.status === 'done'; }).length;
-  var vs = Object.values(users).reduce(function(a, u) { return a + (u.saldoFondo || 0) + (u.saldoGanancia || 0); }, 0);
-  document.getElementById('stU').textContent = us;
-  document.getElementById('stR').textContent = rs;
-  document.getElementById('stD').textContent = ds;
-  document.getElementById('stV').textContent = '$' + vs;
+// ══ SCREENS ══
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});
+  var el=document.getElementById(id);
+  el.classList.add('on');el.style.display='flex';
 }
  
 // ══ UTILS ══
-function copyText(t) { navigator.clipboard.writeText(t).then(function() { toast('✅ Copiado: ' + t); }).catch(function() { toast('Copia manualmente: ' + t); }); }
-function closeModal() { document.getElementById('overlay').classList.remove('show'); }
-document.getElementById('overlay').addEventListener('click', function(e) { if (e.target === document.getElementById('overlay')) closeModal(); });
+function showMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='auth-msg '+(type||'');}
+function errMsg(code){
+  var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña muy corta (mínimo 6)','auth/too-many-requests':'Demasiados intentos — espera un momento','auth/operation-not-allowed':'Método no activado en Firebase'};
+  return m[code]||('Error: '+code);
+}
+function closeModal(){document.getElementById('overlay').classList.remove('show');}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
 var tt;
-function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function() { t.classList.remove('show'); }, 3500); }
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-  if (e.code === 'Space' && curScreen === 'game' && gState !== 'countdown') { e.preventDefault(); handleBtn(); }
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},3500);}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeModal();
+  if(e.code==='Space'&&document.getElementById('sGame').classList.contains('on')&&gState!=='countdown'){e.preventDefault();handleBtn();}
 });
 </script>
 </body>
