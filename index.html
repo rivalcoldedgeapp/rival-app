@@ -530,11 +530,11 @@ body.playing{overflow:hidden}
     <div class="rank-title" id="rankTitle">RANKING DE HOY</div>
     <div class="rank-sub" id="rankSub">TOP 50 · Esta semana</div>
     <div class="rg-tabs">
-      <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 5s</button>
-      <button class="rgt" id="rgt10" onclick="setRankGame(10)">🔵 10s</button>
-      <button class="rgt" id="rgt15" onclick="setRankGame(15)">🟣 15s</button>
+      <button class="rgt" id="rgtG" onclick="setRankGame('global')">🏅 Global</button>
+      <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 Reto 1</button>
+      <button class="rgt" id="rgt10" onclick="setRankGame(10)">🔵 Reto 2</button>
+      <button class="rgt" id="rgt15" onclick="setRankGame(15)">🟣 Reto 3</button>
       <button class="rgt" id="rgtr" onclick="setRankGame('r')">⚡ Reacción</button>
-      <button class="rgt" id="rgtG" onclick="setRankGame('global')" style="background:var(--wn);color:#000;border-color:var(--wn)">🏅 Global</button>
     </div>
     <div id="rankList"></div>
     <div class="rank-my" id="rankMy">
@@ -551,7 +551,7 @@ body.playing{overflow:hidden}
       <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px">SEMANA</div>
       <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="weekRangeLbl"></div>
     </div>
-    <div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Top 3 por día · Tu posición</div><div style="font-size:11px;color:var(--td);margin-bottom:14px">🥇+10pts &nbsp; 🥈+7pts &nbsp; 🥉+5pts &nbsp; 4to+3pts &nbsp; 5to-10mo+1pt</div>
+    <div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Días anteriores · Top 3 · Tu posición</div><div style="font-size:11px;color:var(--td);margin-bottom:14px">🥇+10pts &nbsp; 🥈+7pts &nbsp; 🥉+5pts &nbsp; 4to+3pts &nbsp; 5to-10mo+1pt</div>
     <!-- Game filter tabs -->
     <div style="display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap" id="weekGameTabs">
       <button class="rgt" id="wgt5" onclick="setWeekGame(5)">🟢 Reto 1</button>
@@ -1488,8 +1488,7 @@ function goTab(t) {
       var el=document.getElementById(id);
       if(el){el.style.background='';el.style.color='';el.style.borderColor='';}
     });
-    document.getElementById('rankTitle').textContent = 'RANKING DE HOY';
-    setRankGame(5);
+    setRankGame('global');
     showScreen('sRanking');
   } else if (t === 'week') {
     document.getElementById('weekRangeLbl').textContent = getWeekLabel();
@@ -2036,8 +2035,9 @@ function renderWeekDays(g) {
       var isFuture = r.day.key > today;
       var hasScores = Object.keys(r.scores).length > 0;
  
-      // Skip past days with no data
-      if (!isToday && !isFuture && !hasScores) return;
+      // Only show past days that have scores — hide today and future
+      if (isFuture || isToday) return;
+      if (!hasScores) return;
  
       var sorted = Object.entries(r.scores)
         .filter(function(e) { return e[1].bestDiff != null; })
@@ -2049,24 +2049,17 @@ function renderWeekDays(g) {
       var myRank = uid ? sorted.findIndex(function(e) { return e[0] === uid; }) : -1;
       var myScore = uid ? r.scores[uid] : null;
  
-      html += '<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:12px;padding:14px;margin-bottom:8px">';
-      // Header
+      html += '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:8px">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
-      html += '<div style="font-size:13px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+r.day.label+(isToday?' · Hoy':'')+'</div>';
-      if (isFuture) {
-        html += '<div style="font-size:10px;color:var(--td)">Por jugar</div>';
-      } else if (isToday && sorted.length === 0) {
-        html += '<div style="font-size:11px;color:'+cfg.stroke+'">Jugando 🔴</div>';
-      } else if (myRank >= 0) {
+      html += '<div style="font-size:13px;font-weight:700;color:var(--tm)">'+r.day.label+'</div>';
+      if (myRank >= 0) {
         html += '<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>';
       } else {
         html += '<div style="font-size:10px;color:var(--td)">No jugaste</div>';
       }
       html += '</div>';
  
-      if (isFuture) {
-        // nothing extra
-      } else if (sorted.length === 0) {
+      if (sorted.length === 0) {
         html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:4px 0">Sin partidas aún</div>';
       } else {
         var medals = ['🥇','🥈','🥉'];
