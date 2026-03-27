@@ -122,7 +122,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .g5 .gc-rank{color:var(--c5)}.g10 .gc-rank{color:var(--c10)}
 .g15 .gc-rank{color:var(--c15)}.g4b .gc-rank{color:var(--c4b)}.gr .gc-rank{color:var(--cr)}
  
-/* BLIND CLOCK overlay — oculta los dígitos en Reto 4 */
+/* BLIND CLOCK overlay */
 .blind-overlay{position:absolute;inset:0;background:var(--sf);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;z-index:2}
 .blind-question{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--c4b);text-shadow:0 0 30px var(--c4bm);line-height:1}
 .blind-lbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase}
@@ -339,7 +339,7 @@ body.playing{overflow:hidden}
     <div class="auth-logo">RIVAL</div>
     <div class="auth-tag">Para el reloj · Gana cada semana</div>
     <button class="g-btn" onclick="googleLogin()">
-      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.09 1.18 5.38l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar con Google
     </button>
     <div class="divrow"><div class="divline"></div><div class="divtxt">o con email</div><div class="divline"></div></div>
@@ -392,7 +392,6 @@ body.playing{overflow:hidden}
     </div>
     <div class="home-sub">Para el reloj en el tiempo objetivo</div>
     <div class="game-cards">
- 
       <!-- RETO 1 -->
       <div class="gc g5" onclick="startGame(5)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -414,7 +413,6 @@ body.playing{overflow:hidden}
         </div>
         <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld5">—</div>
       </div>
- 
       <!-- RETO 2 -->
       <div class="gc g10" onclick="startGame(10)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -436,7 +434,6 @@ body.playing{overflow:hidden}
         </div>
         <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld10">—</div>
       </div>
- 
       <!-- RETO 3 -->
       <div class="gc g15" onclick="startGame(15)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -458,7 +455,6 @@ body.playing{overflow:hidden}
         </div>
         <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld15">—</div>
       </div>
- 
       <!-- RETO 4 — CIEGO -->
       <div class="gc g4b" onclick="startGame(4)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -481,7 +477,6 @@ body.playing{overflow:hidden}
         </div>
         <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld4">—</div>
       </div>
- 
       <!-- REACCIÓN -->
       <div class="gc gr" onclick="startReaction()">
         <div class="gc-top">
@@ -497,7 +492,6 @@ body.playing{overflow:hidden}
         </div>
         <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bo)" id="hldr">—</div>
       </div>
- 
     </div>
   </div>
 </div>
@@ -524,11 +518,9 @@ body.playing{overflow:hidden}
         <circle class="rt" cx="99" cy="99" r="95"/>
         <circle class="rfg" id="rfg" cx="99" cy="99" r="95"/>
       </svg>
-      <!-- Dígitos normales -->
       <div class="cs" id="cS">0</div>
       <div class="cm" id="cM">.000</div>
       <div class="cl" id="cL">LISTO</div>
-      <!-- Overlay ciego (solo visible en Reto 4 corriendo) -->
       <div class="blind-overlay" id="blindOverlay" style="display:none">
         <div class="blind-question">?</div>
         <div class="blind-lbl">CORRIENDO</div>
@@ -649,7 +641,6 @@ body.playing{overflow:hidden}
         <div class="ast"><div class="asl">Mejor 5s</div><div class="asv g" id="stB5">—</div></div>
         <div class="ast"><div class="asl">Mejor ⚡</div><div class="asv r" id="stBr">—</div></div>
       </div>
-      <!-- Targets -->
       <div class="sec-hdr">
         <div class="sec-lbl">🎲 Tiempos objetivo de hoy</div>
         <button class="btn btn-g" onclick="genTargets()">🎲 Generar aleatorios</button>
@@ -672,7 +663,6 @@ body.playing{overflow:hidden}
           <div style="font-family:DM Mono,monospace;font-size:16px;color:var(--c4b)" id="admT4">—</div>
         </div>
       </div>
-      <!-- Week by day -->
       <div class="sec-hdr">
         <div class="sec-lbl">📅 Vista semanal por día</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap" id="admWeekGameTabs">
@@ -686,10 +676,8 @@ body.playing{overflow:hidden}
       <div id="admWeekWrap" style="margin-bottom:20px">
         <div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Selecciona un reto para ver el historial semanal</div>
       </div>
-      <!-- Winners -->
       <div class="sec-hdr"><div class="sec-lbl">🏆 Líderes actuales</div></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px" id="winnersWrap"></div>
-      <!-- Table -->
       <div class="ap-tabs">
         <button class="apt" id="apt5" onclick="setAdmTab(5)">🟢 Reto 1</button>
         <button class="apt" id="apt10" onclick="setAdmTab(10)">🔵 Reto 2</button>
@@ -1051,14 +1039,12 @@ function updateConfigUI() {
   var dateEl = document.getElementById('homeDate');
   if (titleEl) titleEl.textContent = getTodayLabel();
   if (dateEl) dateEl.textContent = getTodayDate();
-  // Targets numéricos en las cards
   var t5 = document.getElementById('tgt5');
   var t10 = document.getElementById('tgt10');
   var t15 = document.getElementById('tgt15');
   if (t5)  t5.textContent  = GCFG[5].toFixed(3);
   if (t10) t10.textContent = GCFG[10].toFixed(3);
   if (t15) t15.textContent = GCFG[15].toFixed(3);
-  // Admin targets
   var a5  = document.getElementById('admT5');
   var a10 = document.getElementById('admT10');
   var a15 = document.getElementById('admT15');
@@ -1101,8 +1087,6 @@ function startGame(g) {
   var gameLabels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', 4:'RETO 4 · CIEGO'};
   document.getElementById('ghTitle').textContent = gameLabels[g] || 'RETO';
   document.getElementById('ghTitle').style.color = cfg.color;
- 
-  // Sub: para Reto 4 no mostramos el objetivo
   if (g === 4) {
     document.getElementById('ghSub').textContent = 'Para sin ver el reloj — confía en tu instinto';
     document.getElementById('tgtLbl').textContent = 'Objetivo';
@@ -1119,13 +1103,11 @@ function startGame(g) {
   document.getElementById('tNum').style.textShadow = '0 0 30px ' + cfg.glow;
   document.getElementById('rfg').style.stroke = cfg.stroke;
   document.getElementById('cRing').style.setProperty('--gc-glow', cfg.glow);
- 
   var uid = curUser ? curUser.uid : null;
   var ws = uid ? wScores[g][uid] : null;
-  document.getElementById('srBest').textContent = ws && ws.bestTime ? ws.bestTime + (g===4?'s':'s') : '—';
+  document.getElementById('srBest').textContent = ws && ws.bestTime ? ws.bestTime + 's' : '—';
   document.getElementById('srBest').style.color = cfg.color;
   document.getElementById('srPos').textContent = ws && ws.bestTime ? '#' + getRank(uid, g) : '—';
- 
   resetClock();
   showScreen('sGame');
 }
@@ -1154,7 +1136,6 @@ function startRun() {
   var btn = document.getElementById('gBtn');
   var cfg = GCOLORS[curGame];
   var isBlind = curGame === 4;
- 
   if (btn) {
     btn.className = 'gbtn gbp';
     btn.textContent = 'PARAR';
@@ -1166,15 +1147,12 @@ function startRun() {
   if (ring) { ring.className = 'cring run'; ring.style.borderColor = cfg.stroke; }
   document.getElementById('cL').textContent = 'CORRIENDO';
   document.body.classList.add('playing');
- 
-  // Reto 4: mostrar overlay ciego, ocultar dígitos
   if (isBlind) {
     document.getElementById('cS').style.display = 'none';
     document.getElementById('cM').style.display = 'none';
     document.getElementById('cL').style.display = 'none';
     document.getElementById('blindOverlay').style.display = 'flex';
   }
- 
   var maxT = GMAXTIME[curGame];
   raf = requestAnimationFrame(function loop() {
     if (gState !== 'running') return;
@@ -1197,25 +1175,20 @@ function stopClock() {
   var target = GCFG[curGame];
   var fmt = elapsed.toFixed(3);
   var diff = Math.abs(elapsed - target);
- 
-  // Restablecer visibilidad si era ciego
   var isBlind = curGame === 4;
   if (isBlind) {
     document.getElementById('blindOverlay').style.display = 'none';
     document.getElementById('cS').style.display = '';
     document.getElementById('cM').style.display = '';
     document.getElementById('cL').style.display = '';
-    // Animar la revelación del tiempo
     document.getElementById('rfg').style.stroke = GCOLORS[4].stroke;
     document.getElementById('rfg').style.strokeDashoffset = 565 - (565 * Math.min(elapsed/GMAXTIME[4], 1));
   }
- 
   document.getElementById('cS').textContent = fmt.split('.')[0];
   document.getElementById('cM').textContent = '.' + fmt.split('.')[1];
   document.getElementById('cL').textContent = isBlind ? 'REVELADO' : 'PARADO';
   document.getElementById('tNum').textContent = isBlind ? GCFG[4].toFixed(3) : GCFG[curGame].toFixed(3);
   document.getElementById('tUnit').textContent = 'SEGUNDOS';
- 
   var ring = document.getElementById('cRing');
   var cfg = GCOLORS[curGame];
   if (ring) { ring.className = 'cring ' + (diff < target * 0.1 ? 'good' : 'bad'); if (diff < target*0.1) ring.style.borderColor=cfg.stroke; }
@@ -1227,7 +1200,6 @@ function stopClock() {
 function resetClock() {
   gState = 'idle'; cancelAnimationFrame(raf);
   document.body.classList.remove('playing');
-  // Restablecer visibilidad de dígitos
   document.getElementById('cS').style.display = '';
   document.getElementById('cM').style.display = '';
   document.getElementById('cL').style.display = '';
@@ -1309,11 +1281,12 @@ function reactTap() {
 }
  
 // ══ SAVE SCORE ══
+// FIX v3: usar == null en lugar de ! para no sobreescribir scores perfectos (bestDiff === 0)
 function saveScore(fmt, diff, g) {
   if (!curUser) return;
   var uid = curUser.uid;
   var ws = wScores[g][uid] || {};
-  var isRec = !ws.bestDiff || diff < ws.bestDiff;
+  var isRec = ws.bestDiff == null || diff < ws.bestDiff;  // ← FIX: !ws.bestDiff fallaba cuando bestDiff era 0
   var pname = (profiles[uid] || {}).name || '?';
   var pphoto = (profiles[uid] || {}).photoURL || null;
   var upd = { attempts: (ws.attempts || 0) + 1, lastPlayed: Date.now() };
@@ -2079,7 +2052,6 @@ function showHowPlay(g) {
   var labels = { 5:'RETO 1', 10:'RETO 2', 15:'RETO 3', 4:'RETO 4 · CIEGO', r:'REACCIÓN' };
   var icons  = { 5:'🟢',    10:'🔵',    15:'🟣',    4:'🟡',              r:'⚡'        };
   var target = (!isR && !is4b) ? GCFG[g].toFixed(3) + 's' : '';
- 
   var content;
   if (isR) {
     content =
@@ -2106,7 +2078,6 @@ function showHowPlay(g) {
       '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día — todos compiten con el mismo número</div></div></div>'+
       '</div>';
   }
- 
   document.getElementById('modalBody').innerHTML =
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
       '<span style="font-size:20px">'+icons[g]+'</span>'+
@@ -2117,27 +2088,16 @@ function showHowPlay(g) {
   document.getElementById('overlay').classList.add('show');
 }
  
-// ★ CAMBIO 2: showHowPoints actualizado a 5 retos por día ★
 function showHowPoints() {
   document.getElementById('modalBody').innerHTML =
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px">🏅 CÓMO SE GANAN PUNTOS</div>'+
     '<div style="font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.7">Cada día, los mejores tiempos de <strong style="color:var(--tx)">cada reto</strong> suman puntos al ranking semanal:</div>'+
     '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
-        '<span style="font-size:16px">🥇</span><span style="font-size:13px;color:var(--tx)">1er lugar</span>'+
-        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div>'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
-        '<span style="font-size:16px">🥈</span><span style="font-size:13px;color:var(--tx)">2do lugar</span>'+
-        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div>'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
-        '<span style="font-size:16px">🥉</span><span style="font-size:13px;color:var(--tx)">3er lugar</span>'+
-        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">5 pts</span></div>'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
-        '<span style="font-size:13px">4to lugar</span>'+
-        '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">3 pts</span></div>'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
-        '<span style="font-size:13px">5to – 10mo lugar</span>'+
-        '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">1 pt</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span style="font-size:16px">🥇</span><span style="font-size:13px;color:var(--tx)">1er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span style="font-size:16px">🥈</span><span style="font-size:13px;color:var(--tx)">2do lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span style="font-size:16px">🥉</span><span style="font-size:13px;color:var(--tx)">3er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">5 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span style="font-size:13px">4to lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">3 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span style="font-size:13px">5to – 10mo lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">1 pt</span></div>'+
     '</div>'+
     '<div style="font-size:11px;color:var(--td);background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">'+
       '💡 Hay <strong style="color:var(--tm)">5 retos por día</strong> — Reto 1, Reto 2, Reto 3, Reto 4 Ciego y Reacción.<br>'+
