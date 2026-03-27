@@ -1290,12 +1290,15 @@ function renderAdmTable() {
       '<td class="mono" style="color:'+cfg.color+'">'+(w.bestTime||'—')+(isR?'ms':'s')+'</td>'+
       '<td class="mono">±'+(w.bestDiff*1000).toFixed(0)+'ms</td>'+
       '<td class="mono">'+(w.attempts||0)+'</td>'+
-      '<td><button class="btn btn-gh" onclick="admShowUserHistory(''+uid+'',''+w.name+'')" style="padding:4px 8px;font-size:10px">📅 Semana</button></td>'+
+      '<td><button class="btn btn-gh" onclick="admUserHist(this)" data-uid="'+uid+'" style="padding:4px 8px;font-size:10px">📅 Semana</button></td>'+
     '</tr>';
   }).join('');
 }
  
-function admShowUserHistory(uid, name) {
+function admUserHist(btn) {
+  var uid = btn.getAttribute('data-uid');
+  var p = profiles[uid] || {};
+  var name = p.name || uid;
   var d = getCDMX();
   var day = d.getDay();
   var diff = day === 0 ? -6 : 1 - day;
