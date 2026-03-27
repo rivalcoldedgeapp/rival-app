@@ -255,6 +255,8 @@ tr:hover td{background:var(--sf2)}
   nav{padding:8px 12px;flex-wrap:wrap;gap:6px}
   .logo{font-size:20px}
   .nav-name{display:none}
+  #navPts{padding:2px 7px}
+  #navPtsNum{font-size:14px}
   .nav-tabs{flex:1;justify-content:center}
   .ntab{padding:5px 8px;font-size:11px}
   .out-btn{padding:3px 7px;font-size:10px}
@@ -326,6 +328,11 @@ body.playing{overflow:hidden}
   <div class="nav-right" id="navRight">
     <div class="nav-av" id="navAv">R</div>
     <div class="nav-name" id="navName">—</div>
+    <div id="navPts" style="display:none;align-items:center;gap:4px;background:var(--sf);border:1px solid var(--wn);border-radius:20px;padding:3px 10px">
+      <span style="font-size:12px">🏅</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--wn);line-height:1" id="navPtsNum">0</span>
+      <span style="font-size:10px;color:var(--tm)">pts</span>
+    </div>
     <button class="out-btn" onclick="doLogout()">Salir</button>
   </div>
 </nav>
@@ -510,6 +517,7 @@ body.playing{overflow:hidden}
       <div class="rh-rank" id="rhRank">Posición <span id="rhRankSpan" style="color:var(--ac)">#1</span></div>
     </div>
     <div class="nr" id="nrBox">🎉 ¡Nuevo récord personal!</div>
+    <div id="resPts" style="display:none;text-align:center;padding:8px;background:var(--sf);border:1px solid var(--wn);border-radius:9px;font-size:12px;margin-bottom:10px"></div>
     <div class="lb-hdr" id="lbHdr">🏆 TOP 10 — RETO 5s</div>
     <div id="lbList"></div>
     <button class="pa-btn" onclick="playAgain()">▶️ JUGAR DE NUEVO</button>
@@ -526,6 +534,7 @@ body.playing{overflow:hidden}
       <button class="rgt" id="rgt10" onclick="setRankGame(10)">🔵 10s</button>
       <button class="rgt" id="rgt15" onclick="setRankGame(15)">🟣 15s</button>
       <button class="rgt" id="rgtr" onclick="setRankGame('r')">⚡ Reacción</button>
+      <button class="rgt" id="rgtG" onclick="setRankGame('global')" style="background:var(--wn);color:#000;border-color:var(--wn)">🏅 Global</button>
     </div>
     <div id="rankList"></div>
     <div class="rank-my" id="rankMy">
@@ -542,7 +551,7 @@ body.playing{overflow:hidden}
       <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px">SEMANA</div>
       <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="weekRangeLbl"></div>
     </div>
-    <div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">Top 3 por día · Tu posición</div>
+    <div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Top 3 por día · Tu posición</div><div style="font-size:11px;color:var(--td);margin-bottom:14px">🥇+10pts &nbsp; 🥈+7pts &nbsp; 🥉+5pts &nbsp; 4to+3pts &nbsp; 5to-10mo+1pt</div>
     <!-- Game filter tabs -->
     <div style="display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap" id="weekGameTabs">
       <button class="rgt" id="wgt5" onclick="setWeekGame(5)">🟢 Reto 1</button>
@@ -629,7 +638,7 @@ body.playing{overflow:hidden}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>#</th><th>Jugador</th><th>Email</th><th>Mejor hoy</th><th>±ms</th><th>Partidas</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Jugador</th><th>Email</th><th>Mejor hoy</th><th>±ms</th><th>Partidas</th><th>Pts semana</th><th></th></tr></thead>
           <tbody id="admTbl"></tbody>
         </table>
       </div>
@@ -665,6 +674,8 @@ var GCOLORS = {
  
 // ══ STATE ══
 var profiles = {};
+var POINTS = [10, 7, 5, 3, 1, 1, 1, 1, 1, 1]; // by position (0-indexed, pos 10+ = 0)
+var weekPoints = {}; // uid → {total, name, photoURL}
 var wScores = { 5:{}, 10:{}, 15:{}, r:{} };
 var curUser = null;
 var curGame = 5;
@@ -706,6 +717,85 @@ function getWeekLabel() {
 }
  
 // ══ AUTO DAILY RESET — generates new targets at 00:00 CDMX ══
+function backfillLegacyPoints() {
+  // Check if Thursday (legacy) points have been calculated
+  var legacyDayFlag = 'legacyPointsDone_' + weekKey;
+  db.ref('system/' + legacyDayFlag).once('value').then(function(s) {
+    if (s.val()) return; // Already done
+ 
+    // Load all 4 game legacy scores
+    var games = [
+      {g:5,  key:'g5'},
+      {g:10, key:'g10'},
+      {g:15, key:'g15'},
+      {g:'r',key:'gr'}
+    ];
+ 
+    var fetches = games.map(function(gObj) {
+      return db.ref('weekScores/' + weekKey + '/' + gObj.key).once('value').then(function(s) {
+        return { game: gObj, scores: s.val() || {} };
+      });
+    });
+ 
+    Promise.all(fetches).then(function(results) {
+      // Find launch day (earliest lastPlayed)
+      var earliest = null;
+      results.forEach(function(r) {
+        Object.values(r.scores).forEach(function(w) {
+          if (w && w.lastPlayed && (!earliest || w.lastPlayed < earliest)) earliest = w.lastPlayed;
+        });
+      });
+      if (!earliest) return;
+      var launchDay = dayKeyFromTimestamp(earliest);
+      if (!launchDay) return;
+ 
+      var updates = {};
+      var userTotals = {};
+ 
+      results.forEach(function(r) {
+        var sorted = Object.entries(r.scores)
+          .filter(function(e) { return e[1] && e[1].bestDiff != null; })
+          .sort(function(a, b) {
+            if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
+            return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
+          });
+ 
+        sorted.forEach(function(e, i) {
+          var uid2 = e[0], w = e[1];
+          var pts = i < POINTS.length ? POINTS[i] : 0;
+          if (pts === 0) return;
+          updates['weekPoints/'+weekKey+'/'+uid2+'/days/'+launchDay+'/'+r.game.key] = pts;
+          updates['weekPoints/'+weekKey+'/'+uid2+'/name'] = w.name || '?';
+          updates['weekPoints/'+weekKey+'/'+uid2+'/photoURL'] = w.photoURL || null;
+          userTotals[uid2] = (userTotals[uid2] || 0) + pts;
+        });
+      });
+ 
+      // Write points
+      if (Object.keys(updates).length > 0) {
+        db.ref().update(updates).then(function() {
+          // Update totals — need to merge with any existing points
+          var totalFetches = Object.keys(userTotals).map(function(uid2) {
+            return db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds) {
+              var days = ds.val() || {};
+              var total = 0;
+              Object.values(days).forEach(function(dayGames) {
+                Object.values(dayGames).forEach(function(p) { total += (p||0); });
+              });
+              return db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);
+            });
+          });
+          Promise.all(totalFetches).then(function() {
+            db.ref('system/' + legacyDayFlag).set(true);
+          });
+        });
+      } else {
+        db.ref('system/' + legacyDayFlag).set(true);
+      }
+    });
+  });
+}
+ 
 function checkDailyReset() {
   var currentDay = getTodayKey();
   db.ref('gameConfig').once('value').then(function(s) {
@@ -769,6 +859,30 @@ function getHistoryPath(g, dayK) {
 function getWeekPath(g) {
   var key = g === 'r' ? 'gr' : 'g' + g;
   return 'scores/' + weekKey;
+}
+ 
+// Listen to weekly points
+db.ref('weekPoints/' + weekKey).on('value', function(s) {
+  weekPoints = s.val() || {};
+  if (document.getElementById('sRanking').classList.contains('on') &&
+      document.getElementById('rankTitle') &&
+      document.getElementById('rankTitle').textContent.indexOf('GLOBAL') >= 0) {
+    renderGlobalRank();
+  }
+  updateNavPoints();
+});
+ 
+function updateNavPoints() {
+  if (!curUser) return;
+  var uid = curUser.uid;
+  var wp = weekPoints[uid];
+  var total = wp ? (wp.total || 0) : 0;
+  var navPts = document.getElementById('navPts');
+  var navPtsNum = document.getElementById('navPtsNum');
+  if (navPts && navPtsNum) {
+    navPtsNum.textContent = total;
+    navPts.style.display = total > 0 ? 'flex' : 'none';
+  }
 }
  
 function listenWeekScore(g) {
@@ -867,7 +981,8 @@ function resendV() {
 function doLogout() { gState = 'idle'; cancelAnimationFrame(raf); clearTimeout(reactTO); auth.signOut(); }
  
 function loadAndEnter(fu) {
-  checkDailyReset(); // Check if we need new targets
+  checkDailyReset();
+  backfillLegacyPoints(); // Recover Thursday points
   db.ref('profiles/' + fu.uid).once('value').then(function(s) {
     var p = s.val();
     if (!p) {
@@ -890,6 +1005,7 @@ function showApp(fu, profile) {
   document.getElementById('navTabs').classList.add('show');
   updateConfigUI();
   updateHomecards();
+  updateNavPoints();
   goTab('home');
 }
  
@@ -1111,6 +1227,51 @@ function saveScore(fmt, diff, g) {
   if (isRec) { upd.bestTime = fmt; upd.bestDiff = diff; upd.name = pname; upd.photoURL = pphoto; }
   db.ref(getScorePath(g) + '/' + uid).update(upd).then(function() {
     showResult(fmt, diff, isRec, g);
+    // Recalculate points for today's scores in this game
+    recalcPoints(g);
+  });
+}
+ 
+function recalcPoints(g) {
+  // Read today's scores for this game and recalculate everyone's points
+  var key = g === 'r' ? 'gr' : 'g' + g;
+  db.ref('scores/' + weekKey + '/' + todayKey + '/' + key).once('value').then(function(s) {
+    var dayScores = s.val() || {};
+    var sorted = Object.entries(dayScores)
+      .filter(function(e) { return e[1].bestDiff != null; })
+      .sort(function(a, b) {
+        if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
+        return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
+      });
+ 
+    // Award points to each player
+    var updates = {};
+    sorted.forEach(function(e, i) {
+      var uid2 = e[0], w = e[1];
+      var pts = i < POINTS.length ? POINTS[i] : 0;
+      var p = profiles[uid2] || {};
+      // Store points for this day + game
+      updates['weekPoints/' + weekKey + '/' + uid2 + '/days/' + todayKey + '/' + key] = pts;
+      updates['weekPoints/' + weekKey + '/' + uid2 + '/name'] = w.name || p.name || '?';
+      updates['weekPoints/' + weekKey + '/' + uid2 + '/photoURL'] = w.photoURL || p.photoURL || null;
+    });
+ 
+    if (Object.keys(updates).length > 0) {
+      db.ref().update(updates).then(function() {
+        // Now recalculate total for each affected user
+        var affectedUids = sorted.map(function(e) { return e[0]; });
+        affectedUids.forEach(function(uid2) {
+          db.ref('weekPoints/' + weekKey + '/' + uid2 + '/days').once('value').then(function(ds) {
+            var days = ds.val() || {};
+            var total = 0;
+            Object.values(days).forEach(function(dayGames) {
+              Object.values(dayGames).forEach(function(pts) { total += (pts || 0); });
+            });
+            db.ref('weekPoints/' + weekKey + '/' + uid2 + '/total').set(total);
+          });
+        });
+      });
+    }
   });
 }
  
@@ -1133,6 +1294,19 @@ function showResult(fmt, diff, isRec, g) {
   document.getElementById('nrBox').style.borderColor = cfg.color;
   document.getElementById('nrBox').style.background = cfg.glow;
   document.getElementById('lbHdr').textContent = '🏆 TOP 10 — ' + (isR ? 'REACCIÓN' : 'RETO ' + g + 's');
+  // Show points earned
+  var rank = getRank(uid, g);
+  var ptsEarned = rank > 0 && rank <= POINTS.length ? POINTS[rank-1] : (rank > 0 ? 0 : 0);
+  var totalPts = weekPoints[uid] ? (weekPoints[uid].total || 0) : 0;
+  var ptsEl = document.getElementById('resPts');
+  if (ptsEl) {
+    if (ptsEarned > 0) {
+      ptsEl.innerHTML = '<span style="color:var(--wn)">+' + ptsEarned + ' pts 🏅</span> &nbsp;·&nbsp; Total semana: <strong style="color:var(--wn)">' + totalPts + ' pts</strong>';
+      ptsEl.style.display = 'block';
+    } else {
+      ptsEl.style.display = 'none';
+    }
+  }
   renderLB(uid, g);
   showScreen('sResult');
 }
@@ -1174,15 +1348,74 @@ function renderLB(hUid, g) {
 // ══ RANKING FULL ══
 function setRankGame(g) {
   rankGame = g;
-  [5, 10, 15, 'r'].forEach(function(x) {
-    var el = document.getElementById('rgt' + (x==='r'?'r':x));
+  [5, 10, 15, 'r', 'global'].forEach(function(x) {
+    var id = 'rgt' + (x==='r'?'r':x==='global'?'G':x);
+    var el = document.getElementById(id);
     if (!el) return;
     el.style.background = ''; el.style.color = ''; el.style.borderColor = '';
     el.className = 'rgt';
   });
+  if (g === 'global') {
+    var gEl = document.getElementById('rgtG');
+    if (gEl) { gEl.style.background='var(--wn)'; gEl.style.color='#000'; gEl.style.borderColor='var(--wn)'; }
+    document.getElementById('rankTitle').textContent = 'RANKING GLOBAL';
+    document.getElementById('rankSub').textContent = 'Puntos acumulados · ' + getWeekLabel();
+    renderGlobalRank();
+    return;
+  }
   var active = document.getElementById('rgt' + (g==='r'?'r':g));
   if (active) { var cfg = GCOLORS[g]; active.style.background=cfg.stroke; active.style.color='#000'; active.style.borderColor=cfg.stroke; }
+  document.getElementById('rankTitle').textContent = 'RANKING DE HOY';
+  document.getElementById('rankSub').textContent = 'TOP 50 · Reto '+(g==='r'?'Reacción':g+'s')+' · '+getWeekLabel();
   renderFullRank(g);
+}
+ 
+function renderGlobalRank() {
+  var sorted = Object.entries(weekPoints)
+    .filter(function(e) { return e[1] && e[1].total > 0; })
+    .sort(function(a, b) { return (b[1].total||0) - (a[1].total||0); })
+    .slice(0, 50);
+ 
+  var uid = curUser ? curUser.uid : null;
+  var html = '';
+ 
+  if (sorted.length === 0) {
+    html = '<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Aún no hay puntos acumulados esta semana.<br>¡Juega para aparecer aquí!</div>';
+  } else {
+    sorted.forEach(function(e, i) {
+      var uid2 = e[0], p = e[1];
+      var isMe = uid && uid2 === uid;
+      var isTop3 = i < 3;
+      var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      var pos = i + 1;
+      var avHtml = p.photoURL
+        ? '<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+p.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>'
+        : '<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>';
+ 
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?'var(--wn)':'var(--bo)')+';border-radius:11px;margin-bottom:5px">' +
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>' +
+        avHtml +
+        '<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</div>' +
+        '<div style="font-size:10px;color:var(--tm);margin-top:1px">puntos esta semana</div></div>' +
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'22':'16')+'px;color:'+(isTop3?'var(--wn)':'var(--tx)')+'">'+( p.total||0)+'</div>' +
+      '</div>';
+    });
+  }
+ 
+  // My position if not in top 50
+  if (uid && weekPoints[uid] && weekPoints[uid].total > 0) {
+    var myRank = sorted.findIndex(function(e) { return e[0] === uid; });
+    var myData = document.getElementById('rankMy');
+    if (myData) {
+      myData.classList.add('show');
+      myData.style.borderColor = 'var(--wn)';
+      document.getElementById('rmyPos').textContent = '#'+(myRank+1)+' de '+sorted.length;
+      document.getElementById('rmyPos').style.color = 'var(--wn)';
+      document.getElementById('rmyTime').textContent = (weekPoints[uid].total||0)+' puntos esta semana';
+    }
+  }
+ 
+  document.getElementById('rankList').innerHTML = html;
 }
  
 function renderFullRank(g) {
@@ -1250,10 +1483,12 @@ function goTab(t) {
   if (t === 'home') {
     showScreen('sHome'); updateHomecards(); updateConfigUI();
   } else if (t === 'rank') {
-    [5,10,15,'r'].forEach(function(x){
-      var el=document.getElementById('rgt'+(x==='r'?'r':x));
+    [5,10,15,'r','global'].forEach(function(x){
+      var id='rgt'+(x==='r'?'r':x==='global'?'G':x);
+      var el=document.getElementById(id);
       if(el){el.style.background='';el.style.color='';el.style.borderColor='';}
     });
+    document.getElementById('rankTitle').textContent = 'RANKING DE HOY';
     setRankGame(5);
     showScreen('sRanking');
   } else if (t === 'week') {
@@ -1505,6 +1740,7 @@ function renderAdmTable() {
       '<td class="mono" style="color:'+cfg.color+'">'+(w.bestTime||'—')+(isR?'ms':'s')+'</td>'+
       '<td class="mono">±'+(w.bestDiff*1000).toFixed(0)+'ms</td>'+
       '<td class="mono">'+(w.attempts||0)+'</td>'+
+      '<td class="mono" style="color:var(--wn)">'+(weekPoints[uid]&&weekPoints[uid].total?weekPoints[uid].total:'0')+'</td>'+
       '<td><button class="btn btn-gh" onclick="admUserHist(this)" data-uid="'+uid+'" style="padding:4px 8px;font-size:10px">📅 Semana</button></td>'+
     '</tr>';
   }).join('');
@@ -1859,6 +2095,15 @@ function renderWeekDays(g) {
       html += '</div>';
     });
  
+    // Total points footer
+    if (curUser && weekPoints[curUser.uid] && weekPoints[curUser.uid].total > 0) {
+      var myTotalPts = weekPoints[curUser.uid].total || 0;
+      html += '<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div><div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Tu total esta semana</div>' +
+        '<div style="font-size:11px;color:var(--td)">Suma de todos los juegos y dias</div></div>' +
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:var(--wn);line-height:1">' + myTotalPts + ' <span style="font-size:14px">pts</span></div>' +
+      '</div>';
+    }
     wrap.innerHTML = html || '<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Sin datos esta semana</div>';
   });
 }
