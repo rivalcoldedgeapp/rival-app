@@ -11,7 +11,6 @@
 :root{--bg:#080808;--sf:#0f0f0f;--sf2:#161616;--bo:#222;--ac:#00e87a;--adim:#00e87a15;--amid:#00e87a40;--dg:#ff3d5a;--wn:#ffb800;--bl:#3d9bff;--tx:#f0f0f0;--tm:#666;--td:#333}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
-/* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bo);position:sticky;top:0;background:rgba(8,8,8,.95);backdrop-filter:blur(10px);z-index:100}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--ac)}
 .tabs{display:flex;gap:4px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:4px}
@@ -20,50 +19,77 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .nbadge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tm)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-/* VIEWS */
 .view{display:none}.view.on{display:block}
-/* LOBBY — player join screen */
-.lobby-wrap{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:24px;position:relative}
-.lobby-wrap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.25;pointer-events:none}
-.lobby-box{width:100%;max-width:440px;position:relative;z-index:1}
-.lb-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;text-align:center;line-height:1;margin-bottom:6px}
-.lb-sub{font-size:11px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;text-align:center;margin-bottom:24px}
-.lb-info{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:16px;margin-bottom:20px}
-.lb-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bo);font-size:13px}
-.lb-row:last-child{border:none}
-.lb-lbl{color:var(--tm)}.lb-val{font-weight:600}
-.players-list{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:16px;margin-bottom:20px}
-.pl-title{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:12px}
-.pl-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bo);font-size:14px}
-.pl-item:last-child{border:none}
-.pl-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--tm);width:20px}
-.pl-name{font-weight:500;flex:1}
-.pl-time{font-family:'DM Mono',monospace;font-size:13px;color:var(--tm)}
-.pl-time.done{color:var(--ac)}
-.pl-slot{color:var(--td);font-style:italic;font-size:12px}
-.join-box{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:20px;margin-bottom:16px}
-.jb-label{font-size:11px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:10px}
-.jb-input{width:100%;height:48px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px;padding:0 16px;outline:none;transition:border-color .2s;margin-bottom:12px}
-.jb-input:focus{border-color:var(--ac)}
-.jb-input::placeholder{color:var(--tm)}
-.jb-btn{width:100%;height:52px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;cursor:pointer;transition:opacity .2s}
-.jb-btn:hover{opacity:.9}.jb-btn:active{opacity:.7}
-.jb-btn:disabled{background:var(--bo);color:var(--td);cursor:not-allowed}
-/* GAME screen */
-.game-wrap{min-height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;position:relative}
-.game-wrap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.25;pointer-events:none}
-.game-box{width:100%;max-width:440px;position:relative;z-index:1}
-.g-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;text-align:center;line-height:1}
-.g-sub{font-size:11px;color:var(--tm);letter-spacing:3px;text-transform:uppercase;text-align:center;margin:6px 0 20px}
-.my-badge{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
-.my-lbl{font-size:11px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
-.my-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--ac)}
-.clock-section{display:flex;flex-direction:column;align-items:center;gap:20px}
+ 
+/* ── LOBBY — lista de retos ── */
+.lobby{padding:24px;max-width:600px;margin:0 auto}
+.lobby-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;margin-bottom:6px}
+.lobby-sub{font-size:12px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.reto-card{background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:20px;margin-bottom:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.reto-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--bo);transition:background .2s}
+.reto-card.open::before{background:var(--ac)}
+.reto-card.full::before{background:var(--dg)}
+.reto-card.done::before{background:var(--tm)}
+.reto-card:hover:not(.full):not(.done){border-color:var(--ac);transform:translateY(-1px)}
+.rc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.rc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;line-height:1}
+.rc-badge{font-size:10px;padding:4px 10px;border-radius:5px;font-weight:700;letter-spacing:1px;white-space:nowrap}
+.b-open{background:#00e87a20;color:var(--ac)}
+.b-full{background:#ff3d5a20;color:var(--dg)}
+.b-done{background:#ffffff10;color:var(--tm)}
+.b-disp{background:#3d9bff20;color:var(--bl)}
+.rc-meta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.rc-m{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tm)}
+.rc-m span{font-weight:600;color:var(--tx)}
+.rc-progress{background:var(--bo);border-radius:4px;height:6px;margin-bottom:14px;overflow:hidden}
+.rc-fill{height:100%;border-radius:4px;background:var(--ac);transition:width .4s}
+.rc-fill.full-fill{background:var(--dg)}
+.rc-players{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.player-chip{background:var(--sf2);border:1px solid var(--bo);border-radius:20px;padding:4px 12px;font-size:12px;display:flex;align-items:center;gap:5px}
+.player-chip.played{border-color:var(--ac);color:var(--ac)}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--tm)}
+.player-chip.played .chip-dot{background:var(--ac)}
+.slot-chip{background:transparent;border:1px dashed var(--td);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--td)}
+.rc-btn{width:100%;height:46px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;transition:opacity .2s}
+.rc-btn:hover{opacity:.9}.rc-btn:active{opacity:.7}
+.rc-btn.full-btn{background:var(--sf2);color:var(--dg);cursor:not-allowed;border:1px solid var(--dg)}
+.rc-btn.done-btn{background:var(--sf2);color:var(--tm);cursor:not-allowed}
+.empty-state{text-align:center;padding:60px 20px;color:var(--tm);font-size:14px;line-height:2}
+ 
+/* ── JOIN MODAL ── */
+.join-header{margin-bottom:20px}
+.join-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:4px}
+.join-sub{font-size:12px;color:var(--tm);letter-spacing:2px;text-transform:uppercase}
+.join-info{background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:14px;margin-bottom:16px}
+.ji-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bo);font-size:13px}
+.ji-row:last-child{border:none}
+.ji-l{color:var(--tm)}.ji-v{font-weight:600}
+.name-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.name-field label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
+.name-input{width:100%;height:48px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px;padding:0 16px;outline:none;transition:border-color .2s}
+.name-input:focus{border-color:var(--ac)}
+.name-input::placeholder{color:var(--tm)}
+.join-btn{width:100%;height:50px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
+.join-btn:hover{opacity:.9}.join-btn:disabled{background:var(--bo);color:var(--td);cursor:not-allowed}
+ 
+/* ── GAME ── */
+.game-screen{min-height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;position:relative}
+.game-screen::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.25;pointer-events:none}
+.game-box{width:100%;max-width:420px;position:relative;z-index:1}
+.g-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:4px;text-align:center;line-height:1}
+.g-reto-name{font-size:13px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;text-align:center;margin:4px 0 6px;font-weight:600}
+.g-sub{font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:20px}
+.player-badge{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.pb-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
+.pb-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--ac)}
+.pb-pos{text-align:right}
+.pb-pos-num{font-size:18px;font-weight:700;color:var(--tm)}
+.clock-section{display:flex;flex-direction:column;align-items:center;gap:18px}
 .tgt{text-align:center}
-.tgt-lbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:6px}
-.tgt-num{font-family:'Bebas Neue',sans-serif;font-size:76px;color:var(--ac);line-height:1;text-shadow:0 0 40px var(--amid)}
+.tgt-lbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px}
+.tgt-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--ac);line-height:1;text-shadow:0 0 40px var(--amid)}
 .tgt-unit{font-size:11px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
-.clock-ring{width:190px;height:190px;border-radius:50%;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
+.clock-ring{width:185px;height:185px;border-radius:50%;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
 .clock-ring.run{border-color:var(--ac);box-shadow:0 0 30px var(--adim)}
 .clock-ring.good{border-color:var(--ac);box-shadow:0 0 60px var(--amid);animation:gp .4s}
 .clock-ring.bad{border-color:var(--dg);box-shadow:0 0 40px #ff3d5a30;animation:bs .4s}
@@ -72,35 +98,43 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .svg-r{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);transform:rotate(-90deg)}
 .rt{fill:none;stroke:var(--bo);stroke-width:3}
 .rp{fill:none;stroke:var(--ac);stroke-width:3;stroke-linecap:round;stroke-dasharray:597;stroke-dashoffset:597;transition:stroke-dashoffset .1s linear}
-.cs{font-family:'Bebas Neue',sans-serif;font-size:50px;line-height:1}
-.cm{font-family:'DM Mono',monospace;font-size:17px;color:var(--tm)}
-.cl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:5px}
-.g-btn{width:100%;max-width:270px;height:58px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px;cursor:pointer;transition:all .15s}
+.cs{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1}
+.cm{font-family:'DM Mono',monospace;font-size:16px;color:var(--tm)}
+.cl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:4px}
+.g-btn{width:100%;max-width:260px;height:56px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;cursor:pointer;transition:all .15s}
 .gb-s{background:var(--ac);color:#000}.gb-s:active{transform:scale(.97)}
 .gb-p{background:transparent;border:2px solid var(--ac);color:var(--ac);animation:sp 1s ease-in-out infinite}
 .gb-p:active{transform:scale(.97);background:var(--adim)}
 .gb-off{background:var(--bo);color:var(--td);cursor:not-allowed}
 @keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--amid)}50%{box-shadow:0 0 0 10px transparent}}
-/* RESULT screen */
-.result-wrap{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:24px}
+ 
+/* ── RESULT ── */
+.result-screen{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:24px}
 .result-box{width:100%;max-width:440px}
-.res-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:4px;text-align:center;margin-bottom:6px}
+.res-reto{font-size:13px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;text-align:center;font-weight:600;margin-bottom:4px}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;text-align:center;margin-bottom:6px}
 .res-sub{font-size:11px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;text-align:center;margin-bottom:20px}
-.ranking-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:8px;transition:all .3s}
-.ranking-item.winner{border-color:var(--ac);background:var(--adim)}
-.rank-pos{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--td);width:32px;text-align:center}
-.ranking-item.winner .rank-pos{color:var(--wn)}
-.rank-name{flex:1;font-size:15px;font-weight:600}
-.rank-time{font-family:'DM Mono',monospace;font-size:14px;color:var(--tm)}
+.rank-item{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:8px}
+.rank-item.me{border-color:var(--bl)}
+.rank-item.win{border-color:var(--ac);background:var(--adim)}
+.rank-pos{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--td);width:30px;text-align:center}
+.rank-item.win .rank-pos{color:var(--wn)}
+.rank-info{flex:1}
+.rank-name{font-size:14px;font-weight:600}
 .rank-diff{font-size:11px;color:var(--tm);margin-top:2px}
-.rank-time.best{color:var(--ac)}.rank-diff.best{color:var(--ac)}
-.prize-card{background:var(--adim);border:1px solid var(--amid);border-radius:12px;padding:20px;margin:16px 0;text-align:center}
-.pc-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:8px;font-weight:700}
-.pc-amt{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--ac);letter-spacing:2px}
-.pc-to{font-size:14px;color:var(--tm);margin-top:4px}
-.waiting-msg{text-align:center;padding:40px 20px;color:var(--tm);font-size:14px;line-height:2}
-/* ADMIN */
-.adm-wrap{padding:22px}
+.rank-item.win .rank-diff{color:var(--ac)}
+.rank-time{font-family:'DM Mono',monospace;font-size:14px;color:var(--tm)}
+.rank-item.win .rank-time{color:var(--ac)}
+.rank-pending{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--sf);border:1px dashed var(--bo);border-radius:12px;margin-bottom:8px;opacity:.5}
+.prize-box{background:var(--adim);border:1px solid var(--amid);border-radius:12px;padding:20px;margin:16px 0;text-align:center}
+.pz-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:8px;font-weight:700}
+.pz-amt{font-family:'Bebas Neue',sans-serif;font-size:46px;color:var(--ac);letter-spacing:2px}
+.pz-to{font-size:14px;color:var(--tm);margin-top:4px}
+.back-btn{width:100%;height:46px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;color:var(--tm);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.back-btn:hover{border-color:var(--ac);color:var(--ac)}
+ 
+/* ── ADMIN ── */
+.adm-wrap{padding:22px;max-width:900px;margin:0 auto}
 .login-box{max-width:360px;margin:60px auto;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:34px}
 .lt{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;text-align:center;margin-bottom:6px}
 .ls{font-size:11px;letter-spacing:2px;color:var(--tm);text-align:center;margin-bottom:26px;text-transform:uppercase}
@@ -130,19 +164,10 @@ td{padding:13px;border-bottom:1px solid var(--bo);font-size:13px;vertical-align:
 tr:hover td{background:var(--sf2)}
 .mono{font-family:'DM Mono',monospace}
 .btn-row{display:flex;gap:5px;flex-wrap:wrap}
-/* LINKS panel in admin */
-.links-panel{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:16px;margin-bottom:16px}
-.link-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bo)}
-.link-item:last-child{border:none}
-.link-name{font-weight:600;font-size:14px;flex:1}
-.link-url{font-family:'DM Mono',monospace;font-size:11px;color:var(--tm);flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.copy-btn{background:var(--sf2);border:1px solid var(--bo);border-radius:7px;color:var(--tm);padding:5px 10px;cursor:pointer;font-size:12px;white-space:nowrap;transition:all .2s}
-.copy-btn:hover{border-color:var(--ac);color:var(--ac)}
-.copy-btn.copied{border-color:var(--ac);color:var(--ac);background:var(--adim)}
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
 .overlay.show{display:flex}
-.modal{background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;margin:12px;animation:mi .2s ease-out}
+.modal{background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;margin:12px;animation:mi .2s ease-out}
 @keyframes mi{from{transform:scale(.95) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
 .mt{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin-bottom:20px}
 .ir{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--bo);font-size:13px}
@@ -172,13 +197,13 @@ tr:hover td{background:var(--sf2)}
 .cd-n{font-family:'Bebas Neue',sans-serif;font-size:190px;color:var(--ac);text-shadow:0 0 80px var(--amid);animation:cdp .8s ease-out;line-height:1}
 @keyframes cdp{from{transform:scale(1.4);opacity:0}30%{transform:scale(.95);opacity:1}to{transform:scale(1);opacity:1}}
 .cd-s{font-size:13px;letter-spacing:4px;color:var(--tm);text-transform:uppercase}
-@media(max-width:768px){
+@media(max-width:680px){
   .stats{grid-template-columns:1fr 1fr}
   .fgrid{grid-template-columns:1fr}
-  .game-wrap{padding:20px 16px}
-  .lobby-wrap{padding:16px}
-  .g-title,.lb-title,.res-title{font-size:34px}
-  .tgt-num{font-size:62px}
+  .game-screen,.result-screen{padding:16px}
+  .lobby{padding:16px}
+  .g-title{font-size:34px}
+  .tgt-num{font-size:60px}
   .clock-ring{width:170px;height:170px}
   .cs{font-size:44px}
   nav{padding:11px 14px}
@@ -186,6 +211,7 @@ tr:hover td{background:var(--sf2)}
   .tab{padding:7px 12px;font-size:12px}
   .adm-wrap{padding:14px}
   .modal{padding:22px 14px;margin:8px}
+  .rc-meta{gap:10px}
 }
 </style>
 </head>
@@ -203,25 +229,28 @@ tr:hover td{background:var(--sf2)}
   <div class="nbadge"><div class="dot"></div><span id="onlineTxt">Cargando...</span></div>
 </nav>
  
-<!-- GAME VIEW -->
+<!-- ══ GAME VIEW ══ -->
 <div id="view-game" class="view on">
-  <div id="screenLobby" class="lobby-wrap">
-    <div class="lobby-box">
-      <div class="lb-title">RIVAL</div>
-      <div class="lb-sub">Juegos de habilidad</div>
-      <div style="text-align:center;color:var(--tm);font-size:13px;padding:40px 20px;line-height:2">
-        Abre este link desde<br>el mensaje que recibiste en Telegram
-      </div>
+ 
+  <!-- SCREEN 1: Lista de retos -->
+  <div id="sLobby">
+    <div class="lobby">
+      <div class="lobby-title">RETOS ACTIVOS</div>
+      <div class="lobby-sub">Elige tu reto y únete</div>
+      <div id="retosList"></div>
     </div>
   </div>
-  <div id="screenGame" style="display:none">
-    <div class="game-wrap">
+ 
+  <!-- SCREEN 2: Juego -->
+  <div id="sGame" style="display:none">
+    <div class="game-screen">
       <div class="game-box">
         <div class="g-title">PARA EL RELOJ</div>
-        <div class="g-sub" id="gameSub">Cargando...</div>
-        <div class="my-badge">
-          <div><div class="my-lbl">Jugando como</div><div class="my-name" id="myName">—</div></div>
-          <div style="text-align:right"><div class="my-lbl">Posición</div><div style="font-size:18px;font-weight:700;color:var(--tm)" id="myPos">—</div></div>
+        <div class="g-reto-name" id="gRetoName">—</div>
+        <div class="g-sub" id="gSub">Cargando...</div>
+        <div class="player-badge">
+          <div><div class="pb-lbl">Jugando como</div><div class="pb-name" id="pbName">—</div></div>
+          <div class="pb-pos"><div class="pb-lbl">Jugaron</div><div class="pb-pos-num" id="pbPos">0/0</div></div>
         </div>
         <div class="clock-section">
           <div class="tgt">
@@ -243,19 +272,23 @@ tr:hover td{background:var(--sf2)}
       </div>
     </div>
   </div>
-  <div id="screenResult" style="display:none">
-    <div class="result-wrap">
+ 
+  <!-- SCREEN 3: Resultado -->
+  <div id="sResult" style="display:none">
+    <div class="result-screen">
       <div class="result-box">
+        <div class="res-reto" id="resRetoName">—</div>
         <div class="res-title">RESULTADO</div>
-        <div class="res-sub" id="resSub">Reto finalizado</div>
+        <div class="res-sub" id="resSub">—</div>
         <div id="rankingList"></div>
-        <div class="prize-card" id="prizeCard"></div>
+        <div class="prize-box" id="prizeBox"></div>
+        <button class="back-btn" onclick="goBack()">← Ver todos los retos</button>
       </div>
     </div>
   </div>
 </div>
  
-<!-- ADMIN VIEW -->
+<!-- ══ ADMIN VIEW ══ -->
 <div id="view-admin" class="view">
   <div class="adm-wrap">
     <div id="loginBox" class="login-box">
@@ -264,12 +297,12 @@ tr:hover td{background:var(--sf2)}
       <div class="fld"><label>Usuario</label><input id="lu" type="text" placeholder="admin"></div>
       <div class="fld"><label>Contraseña</label><input id="lp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn-login" onclick="doLogin()">ENTRAR</button>
-      <div class="hint">Demo: admin / rival2024</div>
+      <div class="hint">admin / rival2024</div>
     </div>
     <div id="admPanel" class="adm-panel">
       <div class="stats">
-        <div class="stat"><div class="sl">Total</div><div class="sv g" id="stT">0</div></div>
-        <div class="stat"><div class="sl">En juego</div><div class="sv y" id="stP">0</div></div>
+        <div class="stat"><div class="sl">Total retos</div><div class="sv g" id="stT">0</div></div>
+        <div class="stat"><div class="sl">Abiertos</div><div class="sv y" id="stP">0</div></div>
         <div class="stat"><div class="sl">Por dispersar</div><div class="sv r" id="stD">0</div></div>
         <div class="stat"><div class="sl">Volumen</div><div class="sv b" id="stV">$0</div></div>
       </div>
@@ -278,8 +311,10 @@ tr:hover td{background:var(--sf2)}
         <button class="btn btn-g" onclick="openCreate()">+ Nuevo reto</button>
       </div>
       <div class="tbl-wrap">
-        <table><thead><tr><th>ID</th><th>Tipo</th><th>Jugadores</th><th>Cupo</th><th>Apuesta</th><th>Estado</th><th>Acciones</th></tr></thead>
-        <tbody id="admTable"></tbody></table>
+        <table>
+          <thead><tr><th>Título</th><th>Objetivo</th><th>Jugadores</th><th>Apuesta</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="admTable"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -287,7 +322,7 @@ tr:hover td{background:var(--sf2)}
  
 <script>
 // ══ FIREBASE ══
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "AIzaSyB2cpU5WtMZ3DgaZv6viTDCXPvj8VHrTwE",
   authDomain: "rival-app-82470.firebaseapp.com",
   databaseURL: "https://rival-app-82470-default-rtdb.firebaseio.com",
@@ -309,196 +344,196 @@ var gState = 'idle';
 var t0 = null;
 var raf = null;
 var elapsed = 0;
+var currentScreen = 'lobby';
  
-// ══ URL PARAMS ══
-function getParam(k) {
-  return new URLSearchParams(window.location.search).get(k);
-}
- 
-// ══ INIT ══
-window.addEventListener('load', function() {
-  var retoId = getParam('r');
-  if (retoId) {
-    myRetoId = retoId;
-    db.ref('retos/' + retoId).on('value', function(snap) {
-      var r = snap.val();
-      if (!r) { showScreen('lobby'); return; }
-      // Store in local cache
-      retos[retoId] = r;
-      if (myName) {
-        // Already joined — show game or result
-        var p = r.players ? r.players[myName] : null;
-        if (p && p.time != null) {
-          showResultScreen(retoId, r);
-        } else {
-          showGameScreen(retoId, r);
-        }
-      } else {
-        // Not joined yet — show lobby/join
-        showJoinScreen(retoId, r);
-      }
-    });
-  } else {
-    showScreen('lobby');
+// ══ REALTIME ══
+db.ref('retos').on('value', function(snap) {
+  retos = snap.val() || {};
+  renderLobby();
+  updateStats();
+  updateOnline();
+  if (loggedIn) renderTable();
+  // If in game/result, refresh
+  if (myRetoId && myName) {
+    var r = retos[myRetoId];
+    if (r && currentScreen === 'result') {
+      renderResult(myRetoId, r);
+    } else if (r && currentScreen === 'game') {
+      updateGameStatus(r);
+    }
   }
- 
-  // Admin listener
-  db.ref('retos').on('value', function(snap) {
-    retos = snap.val() || {};
-    updateStats();
-    updateOnline();
-    if (loggedIn) renderTable();
-  });
 });
  
-// ══ SCREENS ══
-function showScreen(s) {
-  document.getElementById('screenLobby').style.display = s === 'lobby' ? 'flex' : 'none';
-  document.getElementById('screenGame').style.display = s === 'game' ? 'block' : 'none';
-  document.getElementById('screenResult').style.display = s === 'result' ? 'flex' : 'none';
+// ══ NAV ══
+function goTo(v) {
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('on'); });
+  document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('on'); });
+  document.getElementById('view-'+v).classList.add('on');
+  document.getElementById('tab-'+v).classList.add('on');
 }
  
-function showJoinScreen(id, r) {
+function goBack() {
+  myRetoId = null; myName = null; gState = 'idle';
+  cancelAnimationFrame(raf);
+  showScreen('lobby');
+}
+ 
+function showScreen(s) {
+  currentScreen = s;
+  document.getElementById('sLobby').style.display = s==='lobby' ? 'block' : 'none';
+  document.getElementById('sGame').style.display = s==='game' ? 'block' : 'none';
+  document.getElementById('sResult').style.display = s==='result' ? 'block' : 'none';
+}
+ 
+// ══ LOBBY ══
+function renderLobby() {
+  var list = document.getElementById('retosList');
+  var keys = Object.keys(retos);
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="empty-state">Sin retos activos aún<br><span style="font-size:12px;color:var(--td)">El admin creará uno pronto</span></div>';
+    return;
+  }
+  var html = '';
+  keys.forEach(function(id) {
+    var r = retos[id];
+    var players = r.players || {};
+    var joined = Object.keys(players).length;
+    var played = Object.values(players).filter(function(p){ return p&&p.time!=null; }).length;
+    var max = r.maxPlayers || 4;
+    var isFull = joined >= max;
+    var isDone = r.status === 'done' || r.status === 'dispersado';
+    var pct = Math.round((joined/max)*100);
+ 
+    var cardClass = isDone ? 'reto-card done' : isFull ? 'reto-card full' : 'reto-card open';
+    var badgeClass = isDone ? 'rc-badge b-done' : isFull ? 'rc-badge b-full' : 'rc-badge b-open';
+    var badgeText = isDone ? 'TERMINADO' : r.status==='dispersado' ? 'DISPERSADO' : isFull ? 'LLENO ❌' : 'DISPONIBLE';
+    var btnClass = isDone ? 'rc-btn done-btn' : isFull ? 'rc-btn full-btn' : 'rc-btn';
+    var btnText = isDone ? 'Reto finalizado' : isFull ? '❌ Sin lugares' : '⚔️ UNIRME AL RETO';
+    var btnAction = (!isFull && !isDone) ? 'openJoin(\'' + id + '\')' : '';
+ 
+    // Players chips
+    var chips = '';
+    for (var i = 0; i < max; i++) {
+      var pnames = Object.keys(players);
+      if (pnames[i]) {
+        var p = players[pnames[i]];
+        chips += '<div class="player-chip' + (p&&p.time!=null?' played':'') + '"><div class="chip-dot"></div>' + pnames[i] + '</div>';
+      } else {
+        chips += '<div class="slot-chip">Lugar libre</div>';
+      }
+    }
+ 
+    html += '<div class="' + cardClass + '">';
+    html += '<div class="rc-top"><div class="rc-title">' + (r.titulo || 'Reto sin título') + '</div><span class="' + badgeClass + '">' + badgeText + '</span></div>';
+    html += '<div class="rc-meta">';
+    html += '<div class="rc-m">⏱️ <span>' + parseFloat(r.objetivo||5).toFixed(3) + 's</span></div>';
+    html += '<div class="rc-m">💰 <span style="color:var(--wn)">$' + (r.apuesta||0) + ' c/u</span></div>';
+    html += '<div class="rc-m">🏆 <span style="color:var(--ac)">Pozo: $' + ((r.apuesta||0)*max) + '</span></div>';
+    html += '<div class="rc-m">👥 <span>' + joined + '/' + max + ' jugadores</span></div>';
+    html += '</div>';
+    html += '<div class="rc-progress"><div class="rc-fill' + (isFull?' full-fill':'') + '" style="width:' + pct + '%"></div></div>';
+    html += '<div class="rc-players">' + chips + '</div>';
+    html += '<button class="' + btnClass + '" ' + (btnAction?'onclick="'+btnAction+'"':'disabled') + '>' + btnText + '</button>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+ 
+// ══ JOIN ══
+function openJoin(id) {
+  var r = retos[id];
   var players = r.players || {};
   var joined = Object.keys(players).length;
   var max = r.maxPlayers || 4;
-  var isFull = joined >= max;
  
-  var pList = '';
-  for (var i = 1; i <= max; i++) {
-    var names = Object.keys(players);
-    if (names[i-1]) {
-      var p = players[names[i-1]];
-      pList += '<div class="pl-item"><span class="pl-num">' + i + '</span><span class="pl-name">' + names[i-1] + '</span><span class="pl-time' + (p.time != null ? ' done' : '') + '">' + (p.time != null ? p.time + 's' : '⏳') + '</span></div>';
-    } else {
-      pList += '<div class="pl-item"><span class="pl-num">' + i + '</span><span class="pl-slot">Lugar disponible</span></div>';
-    }
-  }
- 
-  var joinHtml = isFull ? '<div style="text-align:center;color:var(--dg);font-size:14px;padding:16px">❌ Reto lleno — ya no hay lugares</div>' :
-    '<div class="join-box"><div class="jb-label">¿Cuál es tu nombre?</div><input class="jb-input" id="joinName" placeholder="Escribe tu nombre" maxlength="20" onkeydown="if(event.key===\'Enter\')doJoin()"><button class="jb-btn" id="joinBtn" onclick="doJoin()">UNIRME AL RETO</button></div>';
- 
-  document.getElementById('screenLobby').innerHTML = '<div class="lobby-box">' +
-    '<div class="lb-title">PARA EL RELOJ</div>' +
-    '<div class="lb-sub">#' + id.slice(-4).toUpperCase() + ' — ' + (r.tipo || 'Reto de habilidad') + '</div>' +
-    '<div class="lb-info">' +
-    '<div class="lb-row"><span class="lb-lbl">Objetivo</span><span class="lb-val">' + (r.objetivo || 5).toFixed ? parseFloat(r.objetivo || 5).toFixed(3) + ' segundos' : r.objetivo + ' segundos' + '</span></div>' +
-    '<div class="lb-row"><span class="lb-lbl">Apuesta</span><span class="lb-val" style="color:var(--wn)">$' + (r.apuesta || 0) + ' MXN c/u</span></div>' +
-    '<div class="lb-row"><span class="lb-lbl">Cupo</span><span class="lb-val">' + joined + ' / ' + max + ' jugadores</span></div>' +
-    '<div class="lb-row"><span class="lb-lbl">Pozo total</span><span class="lb-val" style="color:var(--ac)">$' + ((r.apuesta || 0) * max) + ' MXN</span></div>' +
+  document.getElementById('modalBody').innerHTML =
+    '<div class="join-header"><div class="join-title">' + (r.titulo||'Reto') + '</div><div class="join-sub">Únete al reto</div></div>' +
+    '<div class="join-info">' +
+    '<div class="ji-row"><span class="ji-l">Objetivo</span><span class="ji-v">' + parseFloat(r.objetivo||5).toFixed(3) + ' segundos</span></div>' +
+    '<div class="ji-row"><span class="ji-l">Apuesta</span><span class="ji-v" style="color:var(--wn)">$' + (r.apuesta||0) + ' MXN</span></div>' +
+    '<div class="ji-row"><span class="ji-l">Lugares</span><span class="ji-v">' + joined + ' de ' + max + ' tomados</span></div>' +
+    '<div class="ji-row"><span class="ji-l">Pozo total</span><span class="ji-v" style="color:var(--ac)">$' + ((r.apuesta||0)*max) + ' MXN</span></div>' +
     '</div>' +
-    '<div class="players-list"><div class="pl-title">Jugadores registrados</div>' + pList + '</div>' +
-    joinHtml + '</div>';
+    '<div class="name-field"><label>¿Cuál es tu nombre?</label>' +
+    '<input class="name-input" id="joinNameInp" placeholder="Escribe tu nombre" maxlength="20" onkeydown="if(event.key===\'Enter\')doJoin(\'' + id + '\')">' +
+    '</div>' +
+    '<button class="join-btn" id="joinBtn" onclick="doJoin(\'' + id + '\')">⚔️ UNIRME</button>' +
+    '<button class="btn btn-gh" style="width:100%;height:40px;border-radius:10px" onclick="closeModal()">Cancelar</button>';
  
-  document.getElementById('screenLobby').style.display = 'flex';
-  document.getElementById('screenGame').style.display = 'none';
-  document.getElementById('screenResult').style.display = 'none';
+  document.getElementById('overlay').classList.add('show');
+  setTimeout(function(){ var i=document.getElementById('joinNameInp'); if(i) i.focus(); }, 300);
 }
  
-function doJoin() {
-  var nameInput = document.getElementById('joinName');
-  if (!nameInput) return;
-  var name = nameInput.value.trim();
-  if (!name) { toast('❌ Escribe tu nombre'); return; }
-  if (name.length < 2) { toast('❌ Nombre muy corto'); return; }
+function doJoin(id) {
+  var inp = document.getElementById('joinNameInp');
+  if (!inp) return;
+  var name = inp.value.trim();
+  if (!name || name.length < 2) { toast('❌ Escribe tu nombre (mínimo 2 caracteres)'); return; }
  
-  var r = retos[myRetoId];
+  var r = retos[id];
   if (!r) return;
   var players = r.players || {};
- 
-  // Check if name taken
-  if (players[name]) { toast('❌ Ese nombre ya está tomado en este reto'); return; }
- 
   var max = r.maxPlayers || 4;
+ 
+  if (players[name]) { toast('❌ "' + name + '" ya está en este reto'); return; }
   if (Object.keys(players).length >= max) { toast('❌ Reto lleno'); return; }
  
-  // Join
   var btn = document.getElementById('joinBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Uniéndome...'; }
  
-  db.ref('retos/' + myRetoId + '/players/' + name).set({
-    time: null,
-    joinedAt: Date.now()
-  }).then(function() {
-    myName = name;
-    showGameScreen(myRetoId, retos[myRetoId]);
-    toast('✅ Te uniste como ' + name);
-  }).catch(function() {
-    toast('❌ Error — intenta de nuevo');
-    if (btn) { btn.disabled = false; btn.textContent = 'UNIRME AL RETO'; }
-  });
+  db.ref('retos/' + id + '/players/' + name).set({ time: null, joinedAt: Date.now() })
+    .then(function() {
+      myRetoId = id; myName = name;
+      // Update status to playing if was waiting
+      if (r.status === 'waiting') {
+        db.ref('retos/' + id).update({ status: 'playing' });
+      }
+      closeModal();
+      toast('✅ Bienvenido, ' + name);
+      var fresh = retos[id];
+      showGameScreen(id, fresh || r);
+    })
+    .catch(function() {
+      toast('❌ Error — intenta de nuevo');
+      if (btn) { btn.disabled = false; btn.textContent = '⚔️ UNIRME'; }
+    });
 }
  
+// ══ GAME SCREEN ══
 function showGameScreen(id, r) {
   var target = parseFloat(r.objetivo) || 5.0;
   var players = r.players || {};
-  var myPlayer = players[myName];
+  var played = Object.values(players).filter(function(p){ return p&&p.time!=null; }).length;
   var joined = Object.keys(players).length;
-  var played = Object.values(players).filter(function(p){ return p.time != null; }).length;
  
-  document.getElementById('gameSub').textContent = '#' + id.slice(-4).toUpperCase() + ' — ' + played + '/' + joined + ' jugaron';
-  document.getElementById('myName').textContent = myName;
+  document.getElementById('gRetoName').textContent = r.titulo || 'Reto';
+  document.getElementById('gSub').textContent = '#' + id.slice(-4).toUpperCase() + ' — ' + played + '/' + joined + ' jugaron';
+  document.getElementById('pbName').textContent = myName;
+  document.getElementById('pbPos').textContent = played + '/' + joined;
   document.getElementById('tgtNum').textContent = target.toFixed(3);
  
-  // Check if already played
-  if (myPlayer && myPlayer.time != null) {
-    showResultScreen(id, r);
-    return;
-  }
- 
-  // Check if all played
-  if (played === joined && joined > 0) {
-    showResultScreen(id, r);
-    return;
-  }
+  // Reset clock
+  document.getElementById('cS').textContent = '0';
+  document.getElementById('cM').textContent = '.000';
+  document.getElementById('cL').textContent = 'LISTO';
+  document.getElementById('cRing').className = 'clock-ring';
+  document.getElementById('rp').style.strokeDashoffset = '597';
+  document.getElementById('gBtn').className = 'g-btn gb-s';
+  document.getElementById('gBtn').textContent = 'INICIAR';
+  gState = 'idle';
  
   showScreen('game');
 }
  
-function showResultScreen(id, r) {
+function updateGameStatus(r) {
+  if (!r) return;
   var players = r.players || {};
-  var target = parseFloat(r.objetivo) || 5.0;
-  var max = r.maxPlayers || 4;
+  var played = Object.values(players).filter(function(p){ return p&&p.time!=null; }).length;
   var joined = Object.keys(players).length;
-  var played = Object.values(players).filter(function(p){ return p && p.time != null; }).length;
- 
-  // Sort by proximity
-  var sorted = Object.entries(players)
-    .filter(function(e){ return e[1] && e[1].time != null; })
-    .map(function(e){ return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; })
-    .sort(function(a,b){ return a.diff - b.diff; });
- 
-  var waiting = played < joined;
- 
-  document.getElementById('resSub').textContent = waiting ?
-    'Esperando ' + (joined - played) + ' jugador(es) más...' :
-    '#' + id.slice(-4).toUpperCase() + ' — Resultado final';
- 
-  var rankHtml = sorted.map(function(p, i) {
-    var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1)+'';
-    var isMe = p.name === myName;
-    return '<div class="ranking-item' + (i===0?' winner':'') + '" style="' + (isMe?'border-color:var(--bl);':'') + '">' +
-      '<div class="rank-pos">' + medal + '</div>' +
-      '<div><div class="rank-name">' + p.name + (isMe?' 👈':'') + '</div><div class="rank-diff' + (i===0?' best':'') + '">±' + (p.diff*1000).toFixed(0) + 'ms</div></div>' +
-      '<div class="rank-time' + (i===0?' best':'') + '">' + p.time.toFixed(3) + 's</div>' +
-      '</div>';
-  }).join('');
- 
-  // Add pending slots
-  var pending = Object.entries(players).filter(function(e){ return e[1] && e[1].time == null; });
-  pending.forEach(function(e) {
-    rankHtml += '<div class="ranking-item" style="opacity:.5"><div class="rank-pos">⏳</div><div><div class="rank-name">' + e[0] + '</div><div class="rank-diff">Jugando...</div></div><div class="rank-time">—</div></div>';
-  });
- 
-  document.getElementById('rankingList').innerHTML = rankHtml;
- 
-  var premio = Math.round((r.apuesta || 0) * max * 0.9);
-  var winner = sorted.length > 0 ? sorted[0].name : '—';
-  document.getElementById('prizeCard').innerHTML = waiting ?
-    '<div class="pc-lbl">Pozo</div><div class="pa">$' + ((r.apuesta||0)*max) + ' MXN</div><div class="pc-to">Esperando resultado final...</div>' :
-    '<div class="pc-lbl">🏆 Premio</div><div class="pa">$' + premio + ' MXN</div><div class="pc-to">→ ' + winner + '</div>';
- 
-  showScreen('result');
+  var sub = document.getElementById('gSub');
+  var pos = document.getElementById('pbPos');
+  if (sub) sub.textContent = '#' + myRetoId.slice(-4).toUpperCase() + ' — ' + played + '/' + joined + ' jugaron';
+  if (pos) pos.textContent = played + '/' + joined;
 }
  
 // ══ CLOCK ══
@@ -517,269 +552,286 @@ function startCD() {
   function tick() {
     n--;
     if (n > 0) {
-      num.style.animation = 'none'; num.offsetHeight;
-      num.style.animation = 'cdp .8s ease-out';
-      num.style.color = 'var(--ac)';
-      num.textContent = n;
-      setTimeout(tick, 800);
+      num.style.animation='none'; num.offsetHeight;
+      num.style.animation='cdp .8s ease-out';
+      num.style.color='var(--ac)'; num.textContent=n;
+      setTimeout(tick,800);
     } else {
-      num.textContent = '¡YA!';
-      setTimeout(function() {
-        document.getElementById('cdWrap').classList.remove('show');
-        startRun();
-      }, 600);
+      num.textContent='¡YA!';
+      setTimeout(function(){ document.getElementById('cdWrap').classList.remove('show'); startRun(); },600);
     }
   }
-  setTimeout(tick, 800);
+  setTimeout(tick,800);
 }
  
 function startRun() {
-  gState = 'running';
-  t0 = performance.now();
-  elapsed = 0;
+  gState = 'running'; t0 = performance.now(); elapsed = 0;
   var btn = document.getElementById('gBtn');
-  if (btn) { btn.className = 'g-btn gb-p'; btn.textContent = 'PARAR'; }
-  document.getElementById('cRing').className = 'clock-ring run';
-  document.getElementById('cL').textContent = 'CORRIENDO';
-  raf = requestAnimationFrame(function loop() {
-    if (gState !== 'running') return;
-    elapsed = (performance.now() - t0) / 1000;
+  if (btn) { btn.className='g-btn gb-p'; btn.textContent='PARAR'; }
+  document.getElementById('cRing').className='clock-ring run';
+  document.getElementById('cL').textContent='CORRIENDO';
+  raf = requestAnimationFrame(function loop(){
+    if (gState!=='running') return;
+    elapsed = (performance.now()-t0)/1000;
     document.getElementById('cS').textContent = Math.floor(elapsed);
-    document.getElementById('cM').textContent = '.' + String(Math.floor((elapsed%1)*1000)).padStart(3,'0');
-    var rp = document.getElementById('rp');
-    if (rp) rp.style.strokeDashoffset = 597 - (597 * Math.min(elapsed/10, 1));
-    if (elapsed >= 15) stopClock();
-    else raf = requestAnimationFrame(loop);
+    document.getElementById('cM').textContent = '.'+String(Math.floor((elapsed%1)*1000)).padStart(3,'0');
+    var rp=document.getElementById('rp');
+    if(rp) rp.style.strokeDashoffset = 597-(597*Math.min(elapsed/10,1));
+    if(elapsed>=15) stopClock();
+    else raf=requestAnimationFrame(loop);
   });
 }
  
 function stopClock() {
   cancelAnimationFrame(raf);
-  gState = 'stopped';
-  elapsed = (performance.now() - t0) / 1000;
-  var r = retos[myRetoId];
-  var target = parseFloat(r ? r.objetivo : 5) || 5.0;
-  var fmt = elapsed.toFixed(3);
-  var diff = Math.abs(elapsed - target);
-  document.getElementById('cS').textContent = fmt.split('.')[0];
-  document.getElementById('cM').textContent = '.' + fmt.split('.')[1];
-  document.getElementById('cL').textContent = 'PARADO';
-  document.getElementById('cRing').className = 'clock-ring ' + (diff < 0.3 ? 'good' : 'bad');
-  var btn = document.getElementById('gBtn');
-  if (btn) { btn.className = 'g-btn gb-off'; btn.textContent = '...'; }
-  setTimeout(function() {
-    db.ref('retos/' + myRetoId + '/players/' + myName).update({ time: fmt }).then(function() {
-      toast('✅ Tu tiempo: ' + fmt + 's guardado');
-      setTimeout(function() {
-        var r2 = retos[myRetoId];
-        showResultScreen(myRetoId, r2);
-      }, 1000);
+  gState='stopped';
+  elapsed=(performance.now()-t0)/1000;
+  var r=retos[myRetoId];
+  var target=parseFloat(r?r.objetivo:5)||5.0;
+  var fmt=elapsed.toFixed(3);
+  var diff=Math.abs(elapsed-target);
+  document.getElementById('cS').textContent=fmt.split('.')[0];
+  document.getElementById('cM').textContent='.'+fmt.split('.')[1];
+  document.getElementById('cL').textContent='PARADO';
+  document.getElementById('cRing').className='clock-ring '+(diff<0.3?'good':'bad');
+  var btn=document.getElementById('gBtn');
+  if(btn){btn.className='g-btn gb-off';btn.textContent='...';}
+  setTimeout(function(){
+    db.ref('retos/'+myRetoId+'/players/'+myName).update({time:fmt}).then(function(){
+      toast('✅ Tu tiempo: '+fmt+'s');
+      setTimeout(function(){
+        var r2=retos[myRetoId];
+        renderResult(myRetoId,r2);
+        showScreen('result');
+      },1000);
     });
-  }, 600);
+  },600);
 }
  
-// ══ ADMIN ══
-function goTo(v) {
-  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('on'); });
-  document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('on'); });
-  document.getElementById('view-'+v).classList.add('on');
-  document.getElementById('tab-'+v).classList.add('on');
-}
- 
-function doLogin() {
-  var u = document.getElementById('lu').value;
-  var p = document.getElementById('lp').value;
-  if ((u==='admin'||u==='socio') && p==='rival2024') {
-    loggedIn = true;
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('admPanel').classList.add('show');
-    renderTable();
-    toast('✅ Bienvenido ' + u);
-  } else { toast('❌ Credenciales incorrectas'); }
-}
- 
-function renderTable() {
-  var tbody = document.getElementById('admTable');
-  var keys = Object.keys(retos);
-  if (keys.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:32px">Sin retos — crea el primero</td></tr>';
-    return;
-  }
-  var html = '';
-  keys.forEach(function(id) {
-    var r = retos[id];
-    var sid = id.slice(-4).toUpperCase();
-    var players = r.players || {};
-    var joined = Object.keys(players).length;
-    var played = Object.values(players).filter(function(p){ return p&&p.time!=null; }).length;
-    var max = r.maxPlayers || 4;
-    var bc = r.status==='waiting'?'bw':r.status==='playing'?'bp':r.status==='done'?'bd':'bx';
-    var bt = r.status==='waiting'?'ABIERTO':r.status==='playing'?'EN JUEGO':r.status==='done'?'TERMINADO':'✅ DISPERSADO';
-    var acts = '<div class="btn-row"><button class="btn btn-g" onclick="showLinks(\''+id+'\')">🔗 Links</button>';
-    if (r.status==='done') { acts += '<button class="btn btn-y" onclick="showWinner(\''+id+'\')">🏆</button><button class="btn btn-g" onclick="showDispersar(\''+id+'\')">💸</button>'; }
-    acts += '<button class="btn btn-r" onclick="confirmDel(\''+id+'\')">🗑️</button></div>';
-    html += '<tr><td class="mono" style="color:var(--tm)">#'+sid+'</td><td style="font-size:12px">'+(r.tipo||'⏱️ Reloj')+'</td><td style="font-size:12px">';
-    // Show player names and times
-    var pnames = Object.keys(players);
-    if (pnames.length > 0) {
-      pnames.forEach(function(n) {
-        var p = players[n];
-        html += '<span style="font-size:11px;color:'+(p&&p.time!=null?'var(--ac)':'var(--tm)')+'">'+(p&&p.time!=null?'✅ ':'⏳ ')+n+(p&&p.time?' ('+p.time+'s)':'')+'</span><br>';
-      });
-    } else { html += '<span style="color:var(--td);font-size:11px">Sin jugadores</span>'; }
-    html += '</td><td class="mono" style="color:'+(joined>=max?'var(--ac)':'var(--wn)')+'">'+joined+'/'+max+'</td><td class="mono" style="color:var(--wn)">$'+((r.apuesta||0)*max)+'</td><td><span class="bdg '+bc+'">'+bt+'</span></td><td>'+acts+'</td></tr>';
-  });
-  tbody.innerHTML = html;
-}
- 
-// ══ SHOW LINKS ══
-function showLinks(id) {
-  var r = retos[id];
-  var base = window.location.origin + window.location.pathname;
-  var link = base + '?r=' + id;
- 
-  var html = '<div class="mt">🔗 LINK DEL RETO</div>';
-  html += '<div class="ibox"><div class="ir"><span class="il">Reto</span><span class="iv">#' + id.slice(-4).toUpperCase() + '</span></div>';
-  html += '<div class="ir"><span class="il">Cupo</span><span class="iv">' + (r.maxPlayers||4) + ' jugadores</span></div>';
-  html += '<div class="ir"><span class="il">Apuesta</span><span class="iv" style="color:var(--wn)">$' + (r.apuesta||0) + ' MXN c/u</span></div></div>';
- 
-  html += '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:14px;margin-bottom:16px">';
-  html += '<div style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:8px">Link único para todos</div>';
-  html += '<div style="font-family:DM Mono,monospace;font-size:12px;color:var(--ac);word-break:break-all;margin-bottom:10px">' + link + '</div>';
-  html += '<button class="btn btn-g" style="width:100%" onclick="copyLink(\'' + link + '\', this)">📋 COPIAR LINK</button></div>';
- 
-  html += '<div style="background:#17212b;border-radius:10px;padding:14px;margin-bottom:16px;font-family:DM Mono,monospace;font-size:12px;line-height:1.8;color:#aaa">';
-  html += '⚔️ <strong style="color:#fff">RIVAL — Nuevo reto</strong>\n\n';
-  html += '<span style="color:#4cd964">Tipo: ' + (r.tipo||'Para el reloj') + '</span>\n';
-  html += '<span style="color:#ffcc00">Apuesta: $' + (r.apuesta||0) + ' MXN cada uno</span>\n';
-  html += 'Objetivo: ' + parseFloat(r.objetivo||5).toFixed(3) + ' segundos\n';
-  html += 'Cupo: ' + (r.maxPlayers||4) + ' jugadores\n\n';
-  html += '👇 Entra aquí:\n' + link + '</div>';
- 
-  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button></div>';
- 
-  document.getElementById('modalBody').innerHTML = html;
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function copyLink(link, btn) {
-  navigator.clipboard.writeText(link).then(function() {
-    btn.textContent = '✅ COPIADO';
-    btn.style.background = 'var(--sf2)';
-    btn.style.color = 'var(--ac)';
-    setTimeout(function() { btn.textContent = '📋 COPIAR LINK'; btn.style.background=''; btn.style.color=''; }, 2000);
-    toast('✅ Link copiado al portapapeles');
-  }).catch(function() {
-    toast('❌ No se pudo copiar — copia manualmente');
-  });
-}
- 
-// ══ CREATE ══
-function openCreate() {
-  document.getElementById('modalBody').innerHTML = '<div class="mt">➕ NUEVO RETO</div><div class="fgrid"><div class="ff"><label>Cuántos jugadores</label><input id="fmax" type="number" placeholder="4" value="4" min="2" max="20"></div><div class="ff"><label>Apuesta por jugador ($MXN)</label><input id="fap" type="number" placeholder="200"></div><div class="ff"><label>Objetivo (segundos)</label><input id="fob" type="number" step="0.001" placeholder="5.000" value="5.000"></div><div class="ff"><label>Tipo de reto</label><select id="fti"><option>⏱️ Para el reloj</option><option>⚡ Reacción pura</option><option>🎯 Precisión</option></select></div><div class="ff full"><label>Cuenta para cobrar (tuya)</label><input id="fcu" placeholder="Mercado Pago / CLABE"></div></div><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="doCreate()" style="font-weight:700">✅ CREAR Y OBTENER LINK</button></div>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function doCreate() {
-  var max = parseInt(document.getElementById('fmax').value) || 4;
-  var ap = parseInt(document.getElementById('fap').value);
-  var ob = parseFloat(document.getElementById('fob').value) || 5.0;
-  var ti = document.getElementById('fti').value;
-  var cu = document.getElementById('fcu').value.trim();
-  if (!ap) { toast('❌ Ingresa la apuesta'); return; }
-  db.ref('retos').push({
-    maxPlayers: max, apuesta: ap, objetivo: ob, tipo: ti, cuenta: cu,
-    status: 'waiting', players: {}, createdAt: Date.now()
-  }).then(function(ref) {
-    closeModal();
-    toast('✅ Reto creado');
-    setTimeout(function() { showLinks(ref.key); }, 300);
-  }).catch(function() { toast('❌ Error — revisa Firebase'); });
-}
- 
-// ══ WINNER ══
-function showWinner(id) {
-  var r = retos[id];
+// ══ RESULT ══
+function renderResult(id, r) {
+  if (!r) return;
   var players = r.players || {};
   var target = parseFloat(r.objetivo) || 5.0;
   var max = r.maxPlayers || 4;
+  var joined = Object.keys(players).length;
+  var played = Object.values(players).filter(function(p){ return p&&p.time!=null; }).length;
+  var waiting = played < joined;
+ 
+  document.getElementById('resRetoName').textContent = r.titulo || 'Reto';
+  document.getElementById('resSub').textContent = waiting ?
+    'Esperando ' + (joined-played) + ' jugador(es)...' :
+    'Resultado final — ' + played + ' jugadores';
+ 
   var sorted = Object.entries(players)
     .filter(function(e){ return e[1]&&e[1].time!=null; })
     .map(function(e){ return {name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)}; })
     .sort(function(a,b){ return a.diff-b.diff; });
  
-  var html = '<div class="mt">🏆 RANKING — #' + id.slice(-4).toUpperCase() + '</div>';
-  sorted.forEach(function(p,i) {
+  var pending = Object.entries(players).filter(function(e){ return e[1]&&e[1].time==null; });
+ 
+  var html = '';
+  sorted.forEach(function(p,i){
     var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
-    html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bo)"><span style="font-size:22px;width:32px">'+medal+'</span><span style="flex:1;font-weight:600">'+p.name+'</span><span class="mono" style="color:'+(i===0?'var(--ac)':'var(--tm)')+'">'+p.time.toFixed(3)+'s</span><span style="font-size:12px;color:'+(i===0?'var(--ac)':'var(--tm)')+'"> ±'+(p.diff*1000).toFixed(0)+'ms</span></div>';
+    var isMe = p.name===myName;
+    var isWin = i===0;
+    html += '<div class="rank-item'+(isWin?' win':'')+(isMe?' me':'')+'">'+
+      '<div class="rank-pos">'+medal+'</div>'+
+      '<div class="rank-info">'+
+        '<div class="rank-name">'+p.name+(isMe?' 👈':'')+'</div>'+
+        '<div class="rank-diff">±'+(p.diff*1000).toFixed(0)+'ms del objetivo</div>'+
+      '</div>'+
+      '<div class="rank-time">'+p.time.toFixed(3)+'s</div>'+
+    '</div>';
   });
  
-  var premio = Math.round((r.apuesta||0)*max*.9);
+  pending.forEach(function(e){
+    html += '<div class="rank-pending">'+
+      '<div class="rank-pos">⏳</div>'+
+      '<div class="rank-info"><div class="rank-name">'+e[0]+'</div><div class="rank-diff">Jugando...</div></div>'+
+      '<div class="rank-time">—</div>'+
+    '</div>';
+  });
+ 
+  document.getElementById('rankingList').innerHTML = html;
+ 
+  var premio = Math.round((r.apuesta||0)*max*0.9);
   var winner = sorted.length>0?sorted[0].name:'—';
-  html += '<div class="pbox"><div class="pl2">💸 Dispersar al ganador</div><div class="pa">$'+premio+' MXN</div><div class="pt">→ '+winner+'</div>'+(r.cuenta?'<div style="font-size:11px;color:var(--ac);margin-top:4px;opacity:.8">'+r.cuenta+'</div>':'')+'</div>';
-  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button><button class="btn btn-g" onclick="closeModal();showDispersar(\''+id+'\')" style="font-size:13px">💸 Dispersar</button></div>';
+  document.getElementById('prizeBox').innerHTML = waiting ?
+    '<div class="pz-lbl">Pozo acumulado</div><div class="pz-amt">$'+((r.apuesta||0)*max)+'</div><div class="pz-to">Esperando resultado final...</div>' :
+    '<div class="pz-lbl">🏆 Premio al ganador</div><div class="pz-amt">$'+premio+'</div><div class="pz-to">→ '+winner+'</div>';
+}
  
-  document.getElementById('modalBody').innerHTML = html;
+// ══ ADMIN ══
+function doLogin(){
+  var u=document.getElementById('lu').value;
+  var p=document.getElementById('lp').value;
+  if((u==='admin'||u==='socio')&&p==='rival2024'){
+    loggedIn=true;
+    document.getElementById('loginBox').style.display='none';
+    document.getElementById('admPanel').classList.add('show');
+    renderTable(); toast('✅ Bienvenido '+u);
+  } else { toast('❌ Credenciales incorrectas'); }
+}
+ 
+function renderTable(){
+  var tbody=document.getElementById('admTable');
+  var keys=Object.keys(retos);
+  if(keys.length===0){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:32px">Sin retos — crea el primero</td></tr>';return;}
+  var html='';
+  keys.forEach(function(id){
+    var r=retos[id];
+    var players=r.players||{};
+    var joined=Object.keys(players).length;
+    var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
+    var max=r.maxPlayers||4;
+    var isFull=joined>=max;
+    var isDone=r.status==='done'||r.status==='dispersado';
+    var bc=isDone?'b-done':isFull?'b-full':'b-open';
+    var bt=isDone?'TERMINADO':r.status==='dispersado'?'✅ DISP':isFull?'LLENO':'ABIERTO';
+    var plist='';
+    Object.entries(players).forEach(function(e){
+      plist+='<span style="font-size:11px;color:'+(e[1]&&e[1].time!=null?'var(--ac)':'var(--tm)')+'">'+(e[1]&&e[1].time!=null?'✅ ':'⏳ ')+e[0]+(e[1]&&e[1].time?' ('+e[1].time+'s)':'')+'</span><br>';
+    });
+    var acts='<div class="btn-row">';
+    if(r.status==='done'){acts+='<button class="btn btn-y" onclick="showWinner(\''+id+'\')">🏆</button><button class="btn btn-g" onclick="showDispersar(\''+id+'\')">💸</button>';}
+    acts+='<button class="btn btn-r" onclick="confirmDel(\''+id+'\')">🗑️</button></div>';
+    html+='<tr>'+
+      '<td><strong>'+(r.titulo||'Sin título')+'</strong></td>'+
+      '<td class="mono">'+parseFloat(r.objetivo||5).toFixed(3)+'s</td>'+
+      '<td>'+(plist||'<span style="color:var(--td);font-size:11px">Sin jugadores</span>')+'</td>'+
+      '<td class="mono" style="color:var(--wn)">$'+((r.apuesta||0)*max)+'<br><span style="font-size:11px;color:var(--tm)">'+joined+'/'+max+' jugadores</span></td>'+
+      '<td><span class="bdg '+bc+'">'+bt+'</span></td>'+
+      '<td>'+acts+'</td>'+
+    '</tr>';
+  });
+  tbody.innerHTML=html;
+}
+ 
+function openCreate(){
+  document.getElementById('modalBody').innerHTML=
+    '<div class="mt">➕ NUEVO RETO</div>'+
+    '<div class="fgrid">'+
+    '<div class="ff full"><label>Título del reto</label><input id="fti" placeholder="Ej: Reto del Viernes 🔥" type="text"></div>'+
+    '<div class="ff"><label>Cuántos jugadores</label><input id="fmax" type="number" placeholder="4" value="4" min="2" max="20"></div>'+
+    '<div class="ff"><label>Apuesta por jugador ($MXN)</label><input id="fap" type="number" placeholder="200"></div>'+
+    '<div class="ff"><label>Objetivo (segundos)</label><input id="fob" type="number" step="0.001" placeholder="5.000" value="5.000"></div>'+
+    '<div class="ff"><label>Tipo de reto</label><select id="ftp"><option>⏱️ Para el reloj</option><option>⚡ Reacción pura</option><option>🎯 Precisión</option></select></div>'+
+    '<div class="ff full"><label>Tu cuenta para cobrar</label><input id="fcu" placeholder="Mercado Pago / CLABE"></div>'+
+    '</div>'+
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="doCreate()" style="font-weight:700">✅ CREAR RETO</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-// ══ DISPERSAR ══
-function showDispersar(id) {
-  var r = retos[id];
-  var players = r.players || {};
-  var target = parseFloat(r.objetivo) || 5.0;
-  var max = r.maxPlayers || 4;
-  var sorted = Object.entries(players)
-    .filter(function(e){ return e[1]&&e[1].time!=null; })
-    .map(function(e){ return {name:e[0],diff:Math.abs(parseFloat(e[1].time)-target)}; })
-    .sort(function(a,b){ return a.diff-b.diff; });
-  var winner = sorted.length>0?sorted[0].name:'—';
-  var premio = Math.round((r.apuesta||0)*max*.9);
-  var com = (r.apuesta||0)*max - premio;
-  var html = '<div class="mt">💸 DISPERSAR</div><div class="ibox"><div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--ac)">🏆 '+winner+'</span></div><div class="ir"><span class="il">Premio (90%)</span><span class="iv" style="color:var(--wn);font-size:17px;font-weight:700">$'+premio+' MXN</span></div><div class="ir"><span class="il">Tu comisión (10%)</span><span class="iv" style="color:var(--bl)">$'+com+' MXN</span></div><div class="ir"><span class="il">Cuenta</span><span class="iv">'+(r.cuenta||'No especificada')+'</span></div></div>';
-  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doDispersar(\''+id+'\')" style="font-weight:700">✅ CONFIRMAR</button></div>';
-  document.getElementById('modalBody').innerHTML = html;
+function doCreate(){
+  var ti=document.getElementById('fti').value.trim();
+  var max=parseInt(document.getElementById('fmax').value)||4;
+  var ap=parseInt(document.getElementById('fap').value);
+  var ob=parseFloat(document.getElementById('fob').value)||5.0;
+  var tp=document.getElementById('ftp').value;
+  var cu=document.getElementById('fcu').value.trim();
+  if(!ti){toast('❌ Ponle un título al reto');return;}
+  if(!ap){toast('❌ Define la apuesta');return;}
+  db.ref('retos').push({titulo:ti,maxPlayers:max,apuesta:ap,objetivo:ob,tipo:tp,cuenta:cu,status:'waiting',players:{},createdAt:Date.now()})
+    .then(function(){closeModal();toast('✅ Reto "'+ti+'" creado');})
+    .catch(function(){toast('❌ Error — revisa Firebase');});
+}
+ 
+function showWinner(id){
+  var r=retos[id];
+  var players=r.players||{};
+  var target=parseFloat(r.objetivo)||5.0;
+  var max=r.maxPlayers||4;
+  var sorted=Object.entries(players)
+    .filter(function(e){return e[1]&&e[1].time!=null;})
+    .map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};})
+    .sort(function(a,b){return a.diff-b.diff;});
+  var html='<div class="mt">🏆 '+( r.titulo||'RETO')+'</div>';
+  sorted.forEach(function(p,i){
+    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+    html+='<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bo)">'+
+      '<span style="font-size:22px;width:32px">'+medal+'</span>'+
+      '<span style="flex:1;font-weight:600">'+p.name+'</span>'+
+      '<span class="mono" style="color:'+(i===0?'var(--ac)':'var(--tm)')+'">'+p.time.toFixed(3)+'s</span>'+
+      '<span style="font-size:12px;color:'+(i===0?'var(--ac)':'var(--tm)')+';margin-left:6px">±'+(p.diff*1000).toFixed(0)+'ms</span>'+
+    '</div>';
+  });
+  var premio=Math.round((r.apuesta||0)*max*.9);
+  var winner=sorted.length>0?sorted[0].name:'—';
+  html+='<div class="pbox"><div class="pl2">💸 Transferir al ganador</div><div class="pa">$'+premio+' MXN</div><div class="pt">→ '+winner+'</div>'+(r.cuenta?'<div style="font-size:11px;color:var(--ac);margin-top:4px;opacity:.8">'+r.cuenta+'</div>':'')+'</div>';
+  html+='<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button><button class="btn btn-g" onclick="closeModal();showDispersar(\''+id+'\')" style="font-size:13px">💸 Dispersar</button></div>';
+  document.getElementById('modalBody').innerHTML=html;
   document.getElementById('overlay').classList.add('show');
 }
  
-function doDispersar(id) {
-  db.ref('retos/'+id).update({status:'dispersado',dispersado:true,dispersadoAt:Date.now()}).then(function(){ closeModal(); toast('✅ Dispersión confirmada'); });
-}
- 
-// ══ DELETE ══
-function confirmDel(id) {
-  var r = retos[id];
-  var max = r.maxPlayers||4;
-  document.getElementById('modalBody').innerHTML = '<div class="mt">🗑️ CONFIRMAR</div><div class="ibox"><div class="ir"><span class="il">Reto</span><span class="iv mono">#'+id.slice(-4).toUpperCase()+'</span></div><div class="ir"><span class="il">Apuesta total</span><span class="iv" style="color:var(--wn)">$'+((r.apuesta||0)*max)+' MXN</span></div></div><p style="font-size:13px;color:var(--dg);margin-bottom:18px">⚠️ Esta acción no se puede deshacer.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-r" onclick="doDel(\''+id+'\')" style="font-weight:700">🗑️ BORRAR</button></div>';
+function showDispersar(id){
+  var r=retos[id];
+  var players=r.players||{};
+  var target=parseFloat(r.objetivo)||5.0;
+  var max=r.maxPlayers||4;
+  var sorted=Object.entries(players)
+    .filter(function(e){return e[1]&&e[1].time!=null;})
+    .map(function(e){return{name:e[0],diff:Math.abs(parseFloat(e[1].time)-target)};})
+    .sort(function(a,b){return a.diff-b.diff;});
+  var winner=sorted.length>0?sorted[0].name:'—';
+  var premio=Math.round((r.apuesta||0)*max*.9);
+  var com=(r.apuesta||0)*max-premio;
+  var html='<div class="mt">💸 DISPERSAR</div>'+
+    '<div class="ibox">'+
+    '<div class="ir"><span class="il">Reto</span><span class="iv">'+(r.titulo||'—')+'</span></div>'+
+    '<div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--ac)">🏆 '+winner+'</span></div>'+
+    '<div class="ir"><span class="il">Premio (90%)</span><span class="iv" style="color:var(--wn);font-size:17px;font-weight:700">$'+premio+' MXN</span></div>'+
+    '<div class="ir"><span class="il">Tu comisión (10%)</span><span class="iv" style="color:var(--bl)">$'+com+' MXN</span></div>'+
+    '<div class="ir"><span class="il">Cuenta</span><span class="iv">'+(r.cuenta||'No especificada')+'</span></div>'+
+    '</div>'+
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doDispersar(\''+id+'\')" style="font-weight:700">✅ CONFIRMAR</button></div>';
+  document.getElementById('modalBody').innerHTML=html;
   document.getElementById('overlay').classList.add('show');
 }
  
-function doDel(id) {
-  db.ref('retos/'+id).remove().then(function(){ closeModal(); toast('🗑️ Reto eliminado'); });
+function doDispersar(id){
+  db.ref('retos/'+id).update({status:'dispersado',dispersado:true,dispersadoAt:Date.now()})
+    .then(function(){closeModal();toast('✅ Dispersión confirmada');});
 }
  
-// ══ STATS ══
-function updateStats() {
-  var vals = Object.values(retos);
-  document.getElementById('stT').textContent = vals.length;
-  document.getElementById('stP').textContent = vals.filter(function(r){ return r.status==='playing'||r.status==='waiting'; }).length;
-  document.getElementById('stD').textContent = vals.filter(function(r){ return r.status==='done'; }).length;
-  document.getElementById('stV').textContent = '$'+vals.reduce(function(a,r){ return a+((r.apuesta||0)*(r.maxPlayers||4)); },0).toLocaleString();
+function confirmDel(id){
+  var r=retos[id];
+  var max=r.maxPlayers||4;
+  document.getElementById('modalBody').innerHTML=
+    '<div class="mt">🗑️ BORRAR RETO</div>'+
+    '<div class="ibox">'+
+    '<div class="ir"><span class="il">Título</span><span class="iv">'+(r.titulo||'Sin título')+'</span></div>'+
+    '<div class="ir"><span class="il">Apuesta total</span><span class="iv" style="color:var(--wn)">$'+((r.apuesta||0)*max)+' MXN</span></div>'+
+    '</div>'+
+    '<p style="font-size:13px;color:var(--dg);margin-bottom:18px">⚠️ Esta acción no se puede deshacer.</p>'+
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-r" onclick="doDel(\''+id+'\')" style="font-weight:700">🗑️ BORRAR</button></div>';
+  document.getElementById('overlay').classList.add('show');
 }
  
-function updateOnline() {
-  var n = Object.values(retos).filter(function(r){ return r.status==='playing'||r.status==='waiting'; }).length;
-  document.getElementById('onlineTxt').textContent = n>0?n+' retos activos':'Sin retos activos';
+function doDel(id){
+  db.ref('retos/'+id).remove().then(function(){closeModal();toast('🗑️ Reto eliminado');});
 }
  
-// ══ MODAL / TOAST / KEYS ══
-function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
-document.getElementById('overlay').addEventListener('click',function(e){ if(e.target===document.getElementById('overlay')) closeModal(); });
+function updateStats(){
+  var vals=Object.values(retos);
+  document.getElementById('stT').textContent=vals.length;
+  document.getElementById('stP').textContent=vals.filter(function(r){return r.status==='waiting'||r.status==='playing';}).length;
+  document.getElementById('stD').textContent=vals.filter(function(r){return r.status==='done';}).length;
+  document.getElementById('stV').textContent='$'+vals.reduce(function(a,r){return a+((r.apuesta||0)*(r.maxPlayers||4));},0).toLocaleString();
+}
+ 
+function updateOnline(){
+  var n=Object.values(retos).filter(function(r){return r.status==='playing'||r.status==='waiting';}).length;
+  document.getElementById('onlineTxt').textContent=n>0?n+' retos activos':'Sin retos activos';
+}
+ 
+function closeModal(){document.getElementById('overlay').classList.remove('show');}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
 var toastTimer;
-function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove('show'); },3500); }
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show');},3500);}
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape') closeModal();
-  if(e.code==='Space'&&document.getElementById('screenGame').style.display!=='none'&&gState!=='countdown'){ e.preventDefault(); handleBtn(); }
+  if(e.code==='Space'&&currentScreen==='game'&&gState!=='countdown'){e.preventDefault();handleBtn();}
 });
 </script>
 </body>
