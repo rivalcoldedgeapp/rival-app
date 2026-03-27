@@ -132,19 +132,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .sr-val{font-family:DM Mono,monospace;font-size:14px;font-weight:700}
 .tgt-wrap{text-align:center}
 .tlbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px}
-.tnum{font-family:'Bebas Neue',sans-serif;font-size:66px;line-height:1}
+.tnum{font-family:'Bebas Neue',sans-serif;font-size:96px;line-height:1}
 .tunit{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
-.cring{width:178px;height:178px;border-radius:50%;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
+.cring{width:220px;height:220px;border-radius:50%;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
 .cring.run{box-shadow:0 0 40px var(--gc-glow)}
 .cring.good{animation:gp .4s}.cring.bad{border-color:var(--dg)!important;box-shadow:0 0 40px #ff3d5a30!important;animation:bs .4s}
 @keyframes gp{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes bs{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 .svgr{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);transform:rotate(-90deg)}
 .rt{fill:none;stroke:var(--bo);stroke-width:3}
-.rfg{fill:none;stroke-width:3;stroke-linecap:round;stroke-dasharray:565;stroke-dashoffset:565;transition:stroke-dashoffset .1s linear}
-.cs{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1}
-.cm{font-family:DM Mono,monospace;font-size:14px;color:var(--tm)}
-.cl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:3px}
+.rfg{fill:none;stroke-width:3;stroke-linecap:round;stroke-dasharray:691;stroke-dashoffset:691;transition:stroke-dashoffset .1s linear}
+.cs{font-family:'Bebas Neue',sans-serif;font-size:58px;line-height:1}
+.cm{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--tm);line-height:1}
+.cl{font-size:10px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-top:6px}
 .gbtn{width:100%;max-width:240px;height:54px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:5px;cursor:pointer;transition:all .15s}
 .gbs{background:var(--ac);color:#000}.gbs:active{transform:scale(.97)}
 .gbp{background:transparent;color:var(--ac);border:3px solid var(--ac);animation:spp 1s ease-in-out infinite}
@@ -163,18 +163,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .rz-icon{font-size:48px;margin-bottom:8px}
 .rz-t{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px}
 .rz-s{font-size:12px;color:var(--tm);margin-top:4px;text-align:center;padding:0 20px;line-height:1.6}
-.react-ms-big{font-family:'Bebas Neue',sans-serif;font-size:62px;color:var(--cr);line-height:1;text-shadow:0 0 30px var(--crm)}
+.react-ms-big{font-family:'Bebas Neue',sans-serif;font-size:90px;color:var(--cr);line-height:1;text-shadow:0 0 30px var(--crm)}
 .react-ms-lbl{font-size:12px;color:var(--tm);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
  
 /* RESULT */
 #sResult{padding:18px}
 .res-inner{width:100%;max-width:400px}
 .rh{text-align:center;margin-bottom:14px}
-.rh-time{font-family:'Bebas Neue',sans-serif;font-size:54px;line-height:1}
+.rh-time{font-family:'Bebas Neue',sans-serif;font-size:82px;line-height:1}
 .rh-diff{font-size:12px;color:var(--tm);margin-top:4px}
 .rh-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-top:5px}
 .nr{text-align:center;padding:8px;background:var(--adim);border:1px solid var(--amid);border-radius:9px;margin-bottom:10px;font-size:12px;color:var(--ac);display:none}
-.nr.show{display:block}
+.nr.show{display:block;animation:recAnim .5s ease-out}
+@keyframes recAnim{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.pts-pop{animation:ptsPop .6s ease-out}
+@keyframes ptsPop{0%{transform:translateY(10px);opacity:0}60%{transform:translateY(-4px)}100%{transform:translateY(0);opacity:1}}
+.rh-time.anim{animation:timePop .4s ease-out}
+@keyframes timePop{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
 .lb-hdr{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--bo)}
 .li{display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--sf);border:1px solid var(--bo);border-radius:11px;margin-bottom:5px}
 .li.me{border-color:var(--bl)}.li.top1{background:var(--adim)}
@@ -273,7 +278,7 @@ tr:hover td{background:var(--sf2)}
   /* Game clock */
   .gi{gap:10px;padding:0 12px 16px}
   .cring{width:160px;height:160px}
-  .cs{font-size:38px}.cm{font-size:13px}
+  .cs{font-size:34px}.cm{font-size:26px}
   .tnum{font-size:54px}
   .gbtn{height:50px;font-size:18px;max-width:100%}
   .score-row{padding:8px 12px}
@@ -287,12 +292,12 @@ tr:hover td{background:var(--sf2)}
  
   /* Result */
   .res-inner{padding:0 12px 20px}
-  .rh-time{font-size:44px}
+  .rh-time{font-size:64px}
  
   /* Reaction */
   .ri{padding:0 12px 16px}
   .rzone{height:180px}
-  .react-ms-big{font-size:50px}
+  .react-ms-big{font-size:72px}
  
   /* Admin */
   .ap-stats{grid-template-columns:1fr 1fr}
@@ -399,9 +404,12 @@ body.playing{overflow:hidden}
       <div class="gc g5" onclick="startGame(5)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
           <div><div class="gc-title">RETO 1</div><div class="gc-sub" id="obj5">Cargando objetivo...</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c5);text-shadow:0 0 20px var(--c5m);line-height:1" id="tgt5">5.000</div>
-            <div style="font-size:9px;color:var(--c5);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c5);text-shadow:0 0 20px var(--c5m);line-height:1" id="tgt5">5.000</div>
+              <div style="font-size:9px;color:var(--c5);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+            </div>
+            <button onclick="event.stopPropagation();showHowPlay(5)" style="background:transparent;border:1px solid var(--c5);border-radius:50%;width:22px;height:22px;color:var(--c5);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
           </div>
         </div>
         <div class="gc-stats">
@@ -413,9 +421,12 @@ body.playing{overflow:hidden}
       <div class="gc g10" onclick="startGame(10)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
           <div><div class="gc-title">RETO 2</div><div class="gc-sub" id="obj10">Cargando objetivo...</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c10);text-shadow:0 0 20px var(--c10m);line-height:1" id="tgt10">10.000</div>
-            <div style="font-size:9px;color:var(--c10);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c10);text-shadow:0 0 20px var(--c10m);line-height:1" id="tgt10">10.000</div>
+              <div style="font-size:9px;color:var(--c10);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+            </div>
+            <button onclick="event.stopPropagation();showHowPlay(10)" style="background:transparent;border:1px solid var(--c10);border-radius:50%;width:22px;height:22px;color:var(--c10);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
           </div>
         </div>
         <div class="gc-stats">
@@ -427,9 +438,12 @@ body.playing{overflow:hidden}
       <div class="gc g15" onclick="startGame(15)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
           <div><div class="gc-title">RETO 3</div><div class="gc-sub" id="obj15">Cargando objetivo...</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c15);text-shadow:0 0 20px var(--c15m);line-height:1" id="tgt15">15.000</div>
-            <div style="font-size:9px;color:var(--c15);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c15);text-shadow:0 0 20px var(--c15m);line-height:1" id="tgt15">15.000</div>
+              <div style="font-size:9px;color:var(--c15);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+            </div>
+            <button onclick="event.stopPropagation();showHowPlay(15)" style="background:transparent;border:1px solid var(--c15);border-radius:50%;width:22px;height:22px;color:var(--c15);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
           </div>
         </div>
         <div class="gc-stats">
@@ -441,7 +455,10 @@ body.playing{overflow:hidden}
       <div class="gc gr" onclick="startReaction()">
         <div class="gc-top">
           <div><div class="gc-title">REACCIÓN</div><div class="gc-sub">Toca en cuanto veas el flash</div><div class="gc-objective" style="color:var(--cr)">Promedio mundial: ~250ms</div></div>
-          <div class="gc-tgt">⚡</div>
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <div class="gc-tgt">⚡</div>
+            <button onclick="event.stopPropagation();showHowPlay('r')" style="background:transparent;border:1px solid var(--cr);border-radius:50%;width:22px;height:22px;color:var(--cr);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
+          </div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hbr">—</span></div>
@@ -529,6 +546,8 @@ body.playing{overflow:hidden}
   <div class="rank-inner" style="padding-top:18px">
     <div class="rank-title" id="rankTitle">RANKING DE HOY</div>
     <div class="rank-sub" id="rankSub">TOP 50 · Esta semana</div>
+    <button id="btnHowPts" onclick="showHowPoints()" style="display:none;background:transparent;border:1px solid var(--bo);border-radius:7px;color:var(--tm);font-size:11px;padding:4px 10px;cursor:pointer;margin-bottom:12px">🏅 ¿Cómo se ganan puntos?</button>
+    <!-- Explicación de puntos — ahora en modal via botón -->
     <div class="rg-tabs">
       <button class="rgt" id="rgtG" onclick="setRankGame('global')">🏅 Global</button>
       <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 Reto 1</button>
@@ -663,7 +682,7 @@ var db = firebase.database();
 // ══ CONFIG ══
 var DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 var MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-var GCFG = { 5: 5.0, 10: 10.0, 15: 15.0 }; // Dynamic game targets
+var GCFG = { 5: 5.0, 10: 10.0, 15: 15.0 };
 var GMAXTIME = { 5: 20, 10: 30, 15: 40 };
 var GCOLORS = {
   5:  { color:'var(--c5)',  stroke:'#00e87a', glow:'#00e87a40' },
@@ -674,8 +693,8 @@ var GCOLORS = {
  
 // ══ STATE ══
 var profiles = {};
-var POINTS = [10, 7, 5, 3, 1, 1, 1, 1, 1, 1]; // by position (0-indexed, pos 10+ = 0)
-var weekPoints = {}; // uid → {total, name, photoURL}
+var POINTS = [10, 7, 5, 3, 1, 1, 1, 1, 1, 1];
+var weekPoints = {};
 var wScores = { 5:{}, 10:{}, 15:{}, r:{} };
 var curUser = null;
 var curGame = 5;
@@ -716,29 +735,23 @@ function getWeekLabel() {
   return m.getDate()+' '+MONTHS[m.getMonth()]+' – '+s.getDate()+' '+MONTHS[s.getMonth()];
 }
  
-// ══ AUTO DAILY RESET — generates new targets at 00:00 CDMX ══
+// ══ AUTO DAILY RESET ══
 function backfillLegacyPoints() {
-  // Check if Thursday (legacy) points have been calculated
   var legacyDayFlag = 'legacyPointsDone_' + weekKey;
   db.ref('system/' + legacyDayFlag).once('value').then(function(s) {
-    if (s.val()) return; // Already done
- 
-    // Load all 4 game legacy scores
+    if (s.val()) return;
     var games = [
       {g:5,  key:'g5'},
       {g:10, key:'g10'},
       {g:15, key:'g15'},
       {g:'r',key:'gr'}
     ];
- 
     var fetches = games.map(function(gObj) {
       return db.ref('weekScores/' + weekKey + '/' + gObj.key).once('value').then(function(s) {
         return { game: gObj, scores: s.val() || {} };
       });
     });
- 
     Promise.all(fetches).then(function(results) {
-      // Find launch day (earliest lastPlayed)
       var earliest = null;
       results.forEach(function(r) {
         Object.values(r.scores).forEach(function(w) {
@@ -748,10 +761,8 @@ function backfillLegacyPoints() {
       if (!earliest) return;
       var launchDay = dayKeyFromTimestamp(earliest);
       if (!launchDay) return;
- 
       var updates = {};
       var userTotals = {};
- 
       results.forEach(function(r) {
         var sorted = Object.entries(r.scores)
           .filter(function(e) { return e[1] && e[1].bestDiff != null; })
@@ -759,7 +770,6 @@ function backfillLegacyPoints() {
             if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
             return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
           });
- 
         sorted.forEach(function(e, i) {
           var uid2 = e[0], w = e[1];
           var pts = i < POINTS.length ? POINTS[i] : 0;
@@ -770,11 +780,8 @@ function backfillLegacyPoints() {
           userTotals[uid2] = (userTotals[uid2] || 0) + pts;
         });
       });
- 
-      // Write points
       if (Object.keys(updates).length > 0) {
         db.ref().update(updates).then(function() {
-          // Update totals — need to merge with any existing points
           var totalFetches = Object.keys(userTotals).map(function(uid2) {
             return db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds) {
               var days = ds.val() || {};
@@ -800,7 +807,6 @@ function checkDailyReset() {
   var currentDay = getTodayKey();
   db.ref('gameConfig').once('value').then(function(s) {
     var cfg = s.val();
-    // Generate if: no config exists OR it's a new day
     if (!cfg || !cfg.t5 || cfg.lastDay !== currentDay) {
       var t5  = Math.round((3.0 + Math.random() * 4.0) * 1000) / 1000;
       var t10 = Math.round((7.0 + Math.random() * 6.0) * 1000) / 1000;
@@ -810,13 +816,11 @@ function checkDailyReset() {
   });
 }
  
-// Check reset every minute
 setInterval(function() {
   var newDay = getTodayKey();
   if (newDay !== todayKey) {
     todayKey = newDay;
     checkDailyReset();
-    // Re-attach listeners for new day
     [5, 10, 15, 'r'].forEach(function(g) { listenWeekScore(g); });
     wScores = {5:{},10:{},15:{},'r':{}};
   }
@@ -840,7 +844,6 @@ db.ref('profiles').on('value', function(s) {
 function dayKeyFromTimestamp(ts) {
   if (!ts) return null;
   var d = new Date(ts);
-  // Convert to CDMX
   var cdmx = new Date(d.getTime() + d.getTimezoneOffset()*60000 + (-6*3600000));
   return cdmx.getFullYear()+'-'+String(cdmx.getMonth()+1).padStart(2,'0')+'-'+String(cdmx.getDate()).padStart(2,'0');
 }
@@ -855,13 +858,11 @@ function getHistoryPath(g, dayK) {
   return 'scores/' + weekKey + '/' + dayK + '/' + key;
 }
  
-// Get all paths for a game across the week (for admin/history views)
 function getWeekPath(g) {
   var key = g === 'r' ? 'gr' : 'g' + g;
   return 'scores/' + weekKey;
 }
  
-// Listen to weekly points
 db.ref('weekPoints/' + weekKey).on('value', function(s) {
   weekPoints = s.val() || {};
   if (document.getElementById('sRanking').classList.contains('on') &&
@@ -982,7 +983,7 @@ function doLogout() { gState = 'idle'; cancelAnimationFrame(raf); clearTimeout(r
  
 function loadAndEnter(fu) {
   checkDailyReset();
-  backfillLegacyPoints(); // Recover Thursday points
+  backfillLegacyPoints();
   db.ref('profiles/' + fu.uid).once('value').then(function(s) {
     var p = s.val();
     if (!p) {
@@ -1015,21 +1016,18 @@ function updateConfigUI() {
   var dateEl = document.getElementById('homeDate');
   if (titleEl) titleEl.textContent = getTodayLabel();
   if (dateEl) dateEl.textContent = getTodayDate();
-  // Small objective text
   var obj5 = document.getElementById('obj5');
   var obj10 = document.getElementById('obj10');
   var obj15 = document.getElementById('obj15');
   if (obj5) obj5.textContent = 'Para exactamente en ' + GCFG[5].toFixed(3) + 's';
   if (obj10) obj10.textContent = 'Para exactamente en ' + GCFG[10].toFixed(3) + 's';
   if (obj15) obj15.textContent = 'Para exactamente en ' + GCFG[15].toFixed(3) + 's';
-  // BIG target number on card
   var t5 = document.getElementById('tgt5');
   var t10 = document.getElementById('tgt10');
   var t15 = document.getElementById('tgt15');
   if (t5) t5.textContent = GCFG[5].toFixed(3);
   if (t10) t10.textContent = GCFG[10].toFixed(3);
   if (t15) t15.textContent = GCFG[15].toFixed(3);
-  // Admin display
   var a5 = document.getElementById('admT5');
   var a10 = document.getElementById('admT10');
   var a15 = document.getElementById('admT15');
@@ -1045,12 +1043,10 @@ function updateHomecards() {
   [5, 10, 15, 'r'].forEach(function(g) {
     var ws = wScores[g][uid];
     var isR = g === 'r';
-    // My best & rank
     var bEl = document.getElementById('hb' + g);
     var rEl = document.getElementById('hr' + g);
     if (bEl) bEl.textContent = ws && ws.bestTime ? ws.bestTime + (isR ? 'ms' : 's') : '—';
     if (rEl) rEl.textContent = ws && ws.bestTime ? '#' + getRank(uid, g) : '—';
-    // Leader info
     var ldEl = document.getElementById('hld' + g);
     if (ldEl) {
       var sorted = getSorted(g, 1);
@@ -1079,7 +1075,6 @@ function startGame(g) {
   document.getElementById('tNum').style.textShadow = '0 0 30px ' + cfg.glow;
   document.getElementById('rfg').style.stroke = cfg.stroke;
   document.getElementById('cRing').style.setProperty('--gc-glow', cfg.glow);
-  // Score
   var uid = curUser ? curUser.uid : null;
   var ws = uid ? wScores[g][uid] : null;
   document.getElementById('srBest').textContent = ws && ws.bestTime ? ws.bestTime + 's' : '—';
@@ -1108,11 +1103,19 @@ function startCD() {
   setTimeout(tick, 800);
 }
  
+// ══ FIX: botón PARAR visible en todos los retos ══
 function startRun() {
   gState = 'running'; t0 = performance.now(); elapsed = 0;
   var btn = document.getElementById('gBtn');
   var cfg = GCOLORS[curGame];
-  if (btn) { btn.className='gbtn gbp'; btn.textContent='PARAR'; btn.style.borderColor=cfg.stroke; btn.style.color=cfg.stroke; }
+  if (btn) {
+    btn.className = 'gbtn gbp';
+    btn.textContent = 'PARAR';
+    btn.style.background = 'transparent';
+    btn.style.border = '';
+    btn.style.borderColor = cfg.stroke;
+    btn.style.color = cfg.stroke;
+  }
   var ring = document.getElementById('cRing');
   if (ring) { ring.className='cring run'; ring.style.borderColor=cfg.stroke; }
   document.getElementById('cL').textContent = 'CORRIENDO';
@@ -1144,7 +1147,7 @@ function stopClock() {
   var cfg = GCOLORS[curGame];
   if (ring) { ring.className = 'cring ' + (diff < target * 0.1 ? 'good' : 'bad'); if (diff < target*0.1) ring.style.borderColor=cfg.stroke; }
   var btn = document.getElementById('gBtn');
-  if (btn) { btn.className='gbtn gbo'; btn.textContent='...'; btn.style.borderColor=''; btn.style.color=''; }
+  if (btn) { btn.className='gbtn gbo'; btn.textContent='...'; btn.style.borderColor=''; btn.style.color=''; btn.style.background=''; btn.style.border=''; }
   setTimeout(function() { saveScore(fmt, diff, curGame); }, 700);
 }
  
@@ -1158,7 +1161,14 @@ function resetClock() {
   document.getElementById('cRing').style.borderColor = '';
   document.getElementById('rfg').style.strokeDashoffset = '565';
   var btn = document.getElementById('gBtn');
-  if (btn) { btn.className='gbtn gbs'; btn.textContent='INICIAR'; btn.style.background='var(--ac)'; btn.style.color='#000'; btn.style.borderColor=''; btn.style.border='none'; }
+  if (btn) {
+    btn.className = 'gbtn gbs';
+    btn.textContent = 'INICIAR';
+    btn.style.background = 'var(--ac)';
+    btn.style.color = '#000';
+    btn.style.borderColor = '';
+    btn.style.border = 'none';
+  }
 }
  
 // ══ REACTION ══
@@ -1193,7 +1203,6 @@ function reactTap() {
       if (!z2) return;
       z2.className = 'rzone ready';
       z2.innerHTML = '<div class="rz-icon">🟢</div><div class="rz-t" style="color:#000;font-size:28px;letter-spacing:4px">¡TOCA!</div>';
-      // Store start time
       window._reactT0 = rT0;
     }, delay);
   } else if (reactState === 'waiting') {
@@ -1207,6 +1216,13 @@ function reactTap() {
     var ms = Math.round(performance.now() - window._reactT0);
     reactState = 'done';
     var z = document.getElementById('rZone');
+    // Filtrar tiempos físicamente imposibles
+    if (ms <= 100) {
+      z.className = 'rzone early';
+      z.innerHTML = '<div class="rz-icon">🤨</div><div class="rz-t" style="color:#fff">SOSPECHOSO</div><div class="rz-s" style="color:rgba(255,255,255,.7)">'+ms+'ms es imposible para humanos — no cuenta</div>';
+      setTimeout(function() { reactState='idle'; showReactIdle(); }, 2000);
+      return;
+    }
     z.className = 'rzone done';
     z.innerHTML = '<div class="react-ms-big">' + ms + '</div><div class="react-ms-lbl">MILISEGUNDOS</div>';
     setTimeout(function() { saveScore(String(ms), ms, 'r'); }, 800);
@@ -1227,13 +1243,11 @@ function saveScore(fmt, diff, g) {
   if (isRec) { upd.bestTime = fmt; upd.bestDiff = diff; upd.name = pname; upd.photoURL = pphoto; }
   db.ref(getScorePath(g) + '/' + uid).update(upd).then(function() {
     showResult(fmt, diff, isRec, g);
-    // Recalculate points for today's scores in this game
     recalcPoints(g);
   });
 }
  
 function recalcPoints(g) {
-  // Read today's scores for this game and recalculate everyone's points
   var key = g === 'r' ? 'gr' : 'g' + g;
   db.ref('scores/' + weekKey + '/' + todayKey + '/' + key).once('value').then(function(s) {
     var dayScores = s.val() || {};
@@ -1243,22 +1257,17 @@ function recalcPoints(g) {
         if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
         return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
       });
- 
-    // Award points to each player
     var updates = {};
     sorted.forEach(function(e, i) {
       var uid2 = e[0], w = e[1];
       var pts = i < POINTS.length ? POINTS[i] : 0;
       var p = profiles[uid2] || {};
-      // Store points for this day + game
       updates['weekPoints/' + weekKey + '/' + uid2 + '/days/' + todayKey + '/' + key] = pts;
       updates['weekPoints/' + weekKey + '/' + uid2 + '/name'] = w.name || p.name || '?';
       updates['weekPoints/' + weekKey + '/' + uid2 + '/photoURL'] = w.photoURL || p.photoURL || null;
     });
- 
     if (Object.keys(updates).length > 0) {
       db.ref().update(updates).then(function() {
-        // Now recalculate total for each affected user
         var affectedUids = sorted.map(function(e) { return e[0]; });
         affectedUids.forEach(function(uid2) {
           db.ref('weekPoints/' + weekKey + '/' + uid2 + '/days').once('value').then(function(ds) {
@@ -1279,8 +1288,13 @@ function showResult(fmt, diff, isRec, g) {
   var uid = curUser.uid;
   var isR = g === 'r';
   var cfg = GCOLORS[g];
-  document.getElementById('rhTime').textContent = fmt + (isR ? 'ms' : 's');
-  document.getElementById('rhTime').style.color = cfg.color;
+  // Animate time number
+  var rhTime = document.getElementById('rhTime');
+  rhTime.textContent = fmt + (isR ? 'ms' : 's');
+  rhTime.style.color = cfg.color;
+  rhTime.classList.remove('anim');
+  void rhTime.offsetWidth; // reflow to retrigger
+  rhTime.classList.add('anim');
   if (isR) {
     document.getElementById('rhDiff').textContent = diff<200?'⚡ Velocidad de rayo':diff<300?'🟢 Muy bueno':diff<400?'🟡 Promedio':'🔴 Sigue practicando';
   } else {
@@ -1294,15 +1308,16 @@ function showResult(fmt, diff, isRec, g) {
   document.getElementById('nrBox').style.borderColor = cfg.color;
   document.getElementById('nrBox').style.background = cfg.glow;
   document.getElementById('lbHdr').textContent = '🏆 TOP 10 — ' + (isR ? 'REACCIÓN' : 'RETO ' + g + 's');
-  // Show points earned
-  var rank = getRank(uid, g);
-  var ptsEarned = rank > 0 && rank <= POINTS.length ? POINTS[rank-1] : (rank > 0 ? 0 : 0);
+  var ptsEarned = rank > 0 && rank <= POINTS.length ? POINTS[rank-1] : 0;
   var totalPts = weekPoints[uid] ? (weekPoints[uid].total || 0) : 0;
   var ptsEl = document.getElementById('resPts');
   if (ptsEl) {
     if (ptsEarned > 0) {
       ptsEl.innerHTML = '<span style="color:var(--wn)">+' + ptsEarned + ' pts 🏅</span> &nbsp;·&nbsp; Total semana: <strong style="color:var(--wn)">' + totalPts + ' pts</strong>';
       ptsEl.style.display = 'block';
+      ptsEl.classList.remove('pts-pop');
+      void ptsEl.offsetWidth;
+      ptsEl.classList.add('pts-pop');
     } else {
       ptsEl.style.display = 'none';
     }
@@ -1331,14 +1346,15 @@ function renderLB(hUid, g) {
     html += '<div class="li'+(isTop?' top1':'')+(isMe?' me':'')+'">'+
       '<div class="li-pos">'+medal+'</div>'+avHtml+
       '<div class="li-info"><div class="li-name">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
-      '<div class="li-diff">±'+(w.bestDiff<1?( w.bestDiff*1000).toFixed(0)+'ms': (w.bestDiff*1000).toFixed(0)+'ms')+'</div></div>'+
+      (isR ? '' : '<div class="li-diff">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+
+      '</div>'+
       '<div class="li-time" style="color:'+(isTop?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';
   });
   if (!myInTop && hUid && wScores[g][hUid] && wScores[g][hUid].bestTime) {
     var rank = getRank(hUid, g); var me = wScores[g][hUid];
     html += '<div class="li-sep">···</div>';
     html += '<div class="li me"><div class="li-pos">'+rank+'</div><div class="li-av">'+(me.name||'?')[0].toUpperCase()+'</div>'+
-      '<div class="li-info"><div class="li-name">'+(me.name||'?')+' 👈</div><div class="li-diff">±'+(me.bestDiff*1000).toFixed(0)+'ms</div></div>'+
+      '<div class="li-info"><div class="li-name">'+(me.name||'?')+' 👈</div>'+(isR?'':'<div class="li-diff">±'+(me.bestDiff*1000).toFixed(0)+'ms</div>')+'</div>'+
       '<div class="li-time">'+me.bestTime+(isR?'ms':'s')+'</div></div>';
   }
   var el = document.getElementById('lbList');
@@ -1355,11 +1371,17 @@ function setRankGame(g) {
     el.style.background = ''; el.style.color = ''; el.style.borderColor = '';
     el.className = 'rgt';
   });
+  // Mostrar/ocultar botón de puntos
+  var btnPts = document.getElementById('btnHowPts');
+  if (btnPts) btnPts.style.display = g === 'global' ? 'block' : 'none';
+  // Mostrar/ocultar explicación de puntos
+  var ptsEx = document.getElementById('ptsExplain');
+  if (ptsEx) ptsEx.style.display = g === 'global' ? 'block' : 'none';
   if (g === 'global') {
     var gEl = document.getElementById('rgtG');
     if (gEl) { gEl.style.background='var(--wn)'; gEl.style.color='#000'; gEl.style.borderColor='var(--wn)'; }
     document.getElementById('rankTitle').textContent = 'RANKING GLOBAL';
-    document.getElementById('rankSub').textContent = 'Puntos acumulados · ' + getWeekLabel();
+    document.getElementById('rankSub').textContent = 'Puntos acumulados esta semana · ' + getWeekLabel();
     renderGlobalRank();
     return;
   }
@@ -1371,14 +1393,29 @@ function setRankGame(g) {
 }
  
 function renderGlobalRank() {
-  var sorted = Object.entries(weekPoints)
-    .filter(function(e) { return e[1] && e[1].total > 0; })
-    .sort(function(a, b) { return (b[1].total||0) - (a[1].total||0); })
+  var allUids = new Set(Object.keys(weekPoints));
+  [5, 10, 15, 'r'].forEach(function(g) {
+    Object.keys(wScores[g]).forEach(function(uid2) { allUids.add(uid2); });
+  });
+  var allUsers = Array.from(allUids).map(function(uid2) {
+    var wp = weekPoints[uid2] || {};
+    var name = wp.name || (profiles[uid2] && profiles[uid2].name) || '?';
+    var photoURL = wp.photoURL || (profiles[uid2] && profiles[uid2].photoURL) || null;
+    if (name === '?') {
+      [5,10,15,'r'].forEach(function(g) {
+        if (wScores[g][uid2] && wScores[g][uid2].name) name = wScores[g][uid2].name;
+      });
+    }
+    return [uid2, { total: wp.total || 0, name: name, photoURL: photoURL }];
+  });
+  var sorted = allUsers
+    .sort(function(a, b) {
+      if (b[1].total !== a[1].total) return b[1].total - a[1].total;
+      return a[1].name.localeCompare(b[1].name);
+    })
     .slice(0, 50);
- 
   var uid = curUser ? curUser.uid : null;
   var html = '';
- 
   if (sorted.length === 0) {
     html = '<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Aún no hay puntos acumulados esta semana.<br>¡Juega para aparecer aquí!</div>';
   } else {
@@ -1391,7 +1428,6 @@ function renderGlobalRank() {
       var avHtml = p.photoURL
         ? '<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+p.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>'
         : '<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>';
- 
       html += '<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?'var(--wn)':'var(--bo)')+';border-radius:11px;margin-bottom:5px">' +
         '<div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>' +
         avHtml +
@@ -1401,8 +1437,6 @@ function renderGlobalRank() {
       '</div>';
     });
   }
- 
-  // My position if not in top 50
   if (uid && weekPoints[uid] && weekPoints[uid].total > 0) {
     var myRank = sorted.findIndex(function(e) { return e[0] === uid; });
     var myData = document.getElementById('rankMy');
@@ -1414,7 +1448,6 @@ function renderGlobalRank() {
       document.getElementById('rmyTime').textContent = (weekPoints[uid].total||0)+' puntos esta semana';
     }
   }
- 
   document.getElementById('rankList').innerHTML = html;
 }
  
@@ -1438,7 +1471,8 @@ function renderFullRank(g) {
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+
         avHtml+
         '<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
-        '<div style="font-size:10px;color:var(--tm);margin-top:1px">±'+(w.bestDiff*1000).toFixed(0)+'ms</div></div>'+
+        (isR ? '' : '<div style="font-size:10px;color:var(--tm);margin-top:1px">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+
+        '</div>'+
         '<div style="font-family:\'DM Mono\',monospace;font-size:'+(isTop3?'14':'12')+'px;color:'+(isTop3?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';
     });
   }
@@ -1451,7 +1485,7 @@ function renderFullRank(g) {
     myDiv.style.borderColor = cfg.stroke;
     document.getElementById('rmyPos').textContent = myW&&myW.bestTime ? '#'+rank+' de '+sorted.length : '—';
     document.getElementById('rmyPos').style.color = cfg.color;
-    document.getElementById('rmyTime').textContent = myW&&myW.bestTime ? myW.bestTime+(isR?'ms':'s')+' — ±'+(myW.bestDiff*1000).toFixed(0)+'ms' : 'Juega para aparecer aquí';
+    document.getElementById('rmyTime').textContent = myW&&myW.bestTime ? myW.bestTime+(isR?'ms':'s')+(isR?'':' — ±'+(myW.bestDiff*1000).toFixed(0)+'ms') : 'Juega para aparecer aquí';
   }
 }
  
@@ -1459,9 +1493,7 @@ function getSorted(g, max) {
   return Object.entries(wScores[g])
     .filter(function(e){ return e[1].bestDiff != null; })
     .sort(function(a, b) {
-      // Primary: lowest diff wins
       if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
-      // Tiebreaker: who got it first (earliest lastPlayed)
       var tA = a[1].lastPlayed || 0;
       var tB = b[1].lastPlayed || 0;
       return tA - tB;
@@ -1492,7 +1524,6 @@ function goTab(t) {
     showScreen('sRanking');
   } else if (t === 'week') {
     document.getElementById('weekRangeLbl').textContent = getWeekLabel();
-    // Reset tabs
     [5,10,15,'r'].forEach(function(x){
       var el=document.getElementById('wgt'+(x==='r'?'r':x));
       if(el){el.style.background='';el.style.color='';el.style.borderColor='';}
@@ -1504,7 +1535,6 @@ function goTab(t) {
  
 // ══ ADMIN ══
 function showAdmin() {
-  // Always force login — never auto-open panel
   admLoggedIn = false;
   document.getElementById('admLC').style.display = 'block';
   document.getElementById('admP').classList.remove('show');
@@ -1607,7 +1637,6 @@ function setAdmTab(g) {
 }
  
 function setAdmWeekGame(g) {
-  // Style tabs
   [5,10,15,'r'].forEach(function(x) {
     var el = document.getElementById('awgt'+(x==='r'?'r':x));
     if (!el) return;
@@ -1626,12 +1655,9 @@ function renderAdmWeek(g) {
   var wrap = document.getElementById('admWeekWrap');
   if (!wrap) return;
   wrap.innerHTML = '<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Cargando...</div>';
- 
   var cfg = GCOLORS[g];
   var isR = g === 'r';
   var gkey = g === 'r' ? 'gr' : 'g' + g;
-  var labels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', r:'REACCIÓN'};
- 
   var d = getCDMX();
   var day = d.getDay();
   var diff = day===0?-6:1-day;
@@ -1642,24 +1668,17 @@ function renderAdmWeek(g) {
     var dk = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
     days.push({ key:dk, label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()] });
   }
- 
   var today = getTodayKey();
-  // Also fetch legacy weekScores once (shared across all days)
   var legacyFetch = db.ref('weekScores/'+weekKey+'/'+gkey).once('value');
- 
   var fetches = days.map(function(dayObj) {
     return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
       return { day:dayObj, scores:s.val()||{}, hasNewData:!!(s.val()&&Object.keys(s.val()).length) };
     });
   });
- 
-  // Resolve all together
   fetches = [Promise.all(fetches), legacyFetch];
- 
   Promise.all(fetches).then(function(res) {
     var results = res[0];
     var legacyDataAdm = res[1].val() || {};
-    // Find earliest timestamp across all legacy users → that's launch day
     var earliestAdm = null;
     Object.values(legacyDataAdm).forEach(function(w) {
       if (w && w.lastPlayed && (!earliestAdm || w.lastPlayed < earliestAdm)) earliestAdm = w.lastPlayed;
@@ -1674,32 +1693,26 @@ function renderAdmWeek(g) {
         });
       }
     }
- 
     var html = '';
     results.forEach(function(r) {
       var isToday = r.day.key === today;
       var isFuture = r.day.key > today;
       if (isFuture) return;
- 
       var sorted = Object.entries(r.scores||{})
         .filter(function(e){return e[1].bestDiff!=null;})
         .sort(function(a,b){
           if(a[1].bestDiff!==b[1].bestDiff)return a[1].bestDiff-b[1].bestDiff;
           return (a[1].lastPlayed||0)-(b[1].lastPlayed||0);
         });
- 
-      if (sorted.length === 0 && !isToday) return; // skip empty past days
- 
+      if (sorted.length === 0 && !isToday) return;
       html += '<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:11px;padding:12px;margin-bottom:8px">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
       html += '<div style="font-size:12px;font-weight:700">'+r.day.label+(isToday?' · Hoy':'')+'</div>';
       html += '<div style="font-size:11px;color:var(--tm)">'+sorted.length+' jugador(es)</div>';
       html += '</div>';
- 
       if (sorted.length === 0) {
         html += '<div style="font-size:11px;color:var(--td)">Sin partidas aún</div>';
       } else {
-        // Table
         html += '<table style="width:100%;border-collapse:collapse">';
         html += '<tr style="font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:1px"><th style="text-align:left;padding:3px 6px">#</th><th style="text-align:left;padding:3px 6px">Jugador</th><th style="text-align:left;padding:3px 6px">Email</th><th style="padding:3px 6px">Tiempo</th><th style="padding:3px 6px">±ms</th><th style="padding:3px 6px">Partidas</th></tr>';
         sorted.forEach(function(e, i) {
@@ -1718,7 +1731,6 @@ function renderAdmWeek(g) {
       }
       html += '</div>';
     });
- 
     wrap.innerHTML = html || '<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Sin datos esta semana</div>';
   });
 }
@@ -1759,21 +1771,18 @@ function admUserHist(btn) {
     var dk = dd.getFullYear() + '-' + String(dd.getMonth()+1).padStart(2,'0') + '-' + String(dd.getDate()).padStart(2,'0');
     days.push({ key: dk, label: DAYS[dd.getDay()] + ' ' + dd.getDate() });
   }
- 
   var html = '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:4px">📅 '+name+'</div>';
   html += '<div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Historial de la semana</div>';
   html += '<div id="admHistRows">Cargando...</div>';
   html += '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-top:12px">Cerrar</button>';
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('overlay').classList.add('show');
- 
   var games = [
     {g:5, label:'RETO 1', cfg:GCOLORS[5]},
     {g:10, label:'RETO 2', cfg:GCOLORS[10]},
     {g:15, label:'RETO 3', cfg:GCOLORS[15]},
     {g:'r', label:'REACCIÓN', cfg:GCOLORS['r']}
   ];
-  // Load all game+day combos
   var fetches = [];
   var today = getTodayKey();
   days.forEach(function(dayObj) {
@@ -1782,13 +1791,11 @@ function admUserHist(btn) {
       fetches.push(
         db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
           if (s.val()) return { day: dayObj, game: gObj, data: s.val() };
-          // Fallback to old weekScores path
           return { day: dayObj, game: gObj, data: null };
         })
       );
     });
   });
- 
   Promise.all(fetches).then(function(results) {
     var rowsHtml = '';
     var byDay = {};
@@ -1796,14 +1803,12 @@ function admUserHist(btn) {
       if (!byDay[r.day.key]) byDay[r.day.key] = { dayObj: r.day, games: {} };
       byDay[r.day.key].games[r.game.g] = { data: r.data, game: r.game };
     });
- 
     days.forEach(function(dayObj) {
       var dayData = byDay[dayObj.key];
       var isToday = dayObj.key === today;
       var isFuture = dayObj.key > today;
       var anyPlayed = false;
       var gameRows = '';
- 
       games.forEach(function(gObj) {
         var info = dayData && dayData.games[gObj.g];
         var d2 = info ? info.data : null;
@@ -1818,7 +1823,6 @@ function admUserHist(btn) {
           '</div>';
         }
       });
- 
       if (!isFuture) {
         rowsHtml += '<div style="padding:10px 12px;background:var(--sf);border:1px solid '+(isToday?'var(--ac)':'var(--bo)')+';border-radius:10px;margin-bottom:6px">'+
           '<div style="font-size:12px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+dayObj.label+(isToday?' · Hoy':'')+'</div>'+
@@ -1826,7 +1830,6 @@ function admUserHist(btn) {
         '</div>';
       }
     });
- 
     var el = document.getElementById('admHistRows');
     if (el) el.innerHTML = rowsHtml || '<div style="color:var(--tm);font-size:12px;text-align:center;padding:20px">Sin datos esta semana</div>';
   });
@@ -1859,59 +1862,38 @@ function showHistory(g) {
   var gameLabels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3'};
   var label = gameLabels[g];
   var key = g === 'r' ? 'gr' : 'g' + g;
- 
-  // Get all days of current week (Mon-Sun CDMX)
   var d = getCDMX();
   var day = d.getDay();
   var diff = day === 0 ? -6 : 1 - day;
   var monday = new Date(d); monday.setDate(d.getDate() + diff);
- 
   var days = [];
   for (var i = 0; i < 7; i++) {
     var dd = new Date(monday); dd.setDate(monday.getDate() + i);
     var dk = dd.getFullYear() + '-' + String(dd.getMonth()+1).padStart(2,'0') + '-' + String(dd.getDate()).padStart(2,'0');
     days.push({ key: dk, date: dd, label: DAYS[dd.getDay()] + ' ' + dd.getDate() + ' ' + MONTHS[dd.getMonth()] });
   }
- 
   var html = '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:4px;color:'+cfg.stroke+'">'+label+'</div>';
   html += '<div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">Tu historial esta semana</div>';
   html += '<div style="display:flex;flex-direction:column;gap:6px" id="historyRows">Cargando...</div>';
   html += '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-top:14px">Cerrar</button>';
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('overlay').classList.add('show');
- 
-  // Load all days in parallel
   var promises = days.map(function(dayObj) {
-    // Try new path first, fallback to old weekScores path
     return db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
       if (s.val()) {
         return { day: dayObj, data: s.val() };
       }
-      // No legacy fallback in per-day view — legacy data has no day info
       return Promise.resolve({ day: dayObj, data: null });
     });
   });
- 
-  // Also load game config for each day to show what the target was
-  var cfgPromises = days.map(function(dayObj) {
-    return db.ref('gameConfig').once('value').then(function(s) {
-      // We only have current config — for past days we stored nothing
-      // So we show the score only
-      return null;
-    });
-  });
- 
   Promise.all(promises).then(function(results) {
     var rowsHtml = '';
     var today = getTodayKey();
-    var hasAny = false;
- 
     results.forEach(function(r) {
       var isPast = r.day.key < today;
       var isToday = r.day.key === today;
       var isFuture = r.day.key > today;
       var data = r.data;
- 
       if (isFuture) {
         rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px;opacity:.3">'+
           '<div style="font-size:12px;color:var(--tm)">'+r.day.label+'</div>'+
@@ -1924,14 +1906,11 @@ function showHistory(g) {
             '<div style="font-size:11px;color:'+cfg.stroke+'">Jugando 🔴</div>'+
           '</div>';
         }
-        // Past days with no data — don't show
       } else {
-        hasAny = true;
-        var isLegacy = r.isLegacy;
         rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:9px">'+
           '<div>'+
             '<div style="font-size:12px;font-weight:700;color:var(--tx)">'+r.day.label+(isToday?' · Hoy':'')+'</div>'+
-            '<div style="font-size:10px;color:var(--tm);margin-top:2px">'+(data.attempts||0)+' partida(s)'+(isLegacy?' · historial':'')+'</div>'+
+            '<div style="font-size:10px;color:var(--tm);margin-top:2px">'+(data.attempts||0)+' partida(s)</div>'+
           '</div>'+
           '<div style="text-align:right">'+
             '<div style="font-family:DM Mono,monospace;font-size:14px;color:'+cfg.stroke+'">'+data.bestTime+'s</div>'+
@@ -1940,7 +1919,6 @@ function showHistory(g) {
         '</div>';
       }
     });
- 
     if (!rowsHtml) rowsHtml = '<div style="text-align:center;color:var(--tm);padding:20px;font-size:13px">Sin datos esta semana</div>';
     var rowsEl = document.getElementById('historyRows');
     if (rowsEl) rowsEl.innerHTML = rowsHtml;
@@ -1953,7 +1931,6 @@ var weekDaysCache = {};
  
 function setWeekGame(g) {
   weekGame = g;
-  // Style tabs
   [5,10,15,'r'].forEach(function(x) {
     var el = document.getElementById('wgt'+(x==='r'?'r':x));
     if (!el) return;
@@ -1974,13 +1951,10 @@ function renderWeekDays(g) {
   var wrap = document.getElementById('weekDaysWrap');
   if (!wrap) return;
   wrap.innerHTML = '<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';
- 
   var cfg = GCOLORS[g];
   var isR = g === 'r';
   var gkey = g === 'r' ? 'gr' : 'g' + g;
   var uid = curUser ? curUser.uid : null;
- 
-  // Build week days (Mon-Sun CDMX)
   var d = getCDMX();
   var dayNum = d.getDay();
   var diff = dayNum === 0 ? -6 : 1 - dayNum;
@@ -1992,34 +1966,24 @@ function renderWeekDays(g) {
     days.push({ key: dk, label: DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()] });
   }
   var today = getTodayKey();
- 
-  // Step 1: Fetch new-format day scores + legacy weekScores in parallel
   var dayFetches = days.map(function(dayObj) {
     return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
       return { day: dayObj, scores: s.val() || {} };
     });
   });
- 
   var legacyFetch = db.ref('weekScores/'+weekKey+'/'+gkey).once('value');
- 
   Promise.all([Promise.all(dayFetches), legacyFetch]).then(function(res) {
     var results = res[0];
     var legacyData = res[1].val() || {};
- 
-    // Step 2: Assign ALL legacy scores to a single day
-    // Strategy: find the earliest lastPlayed across all legacy users
-    // that day is when the app first launched — assign everyone to that day
     var earliestTs = null;
     Object.values(legacyData).forEach(function(w) {
       if (w && w.lastPlayed) {
         if (!earliestTs || w.lastPlayed < earliestTs) earliestTs = w.lastPlayed;
       }
     });
- 
     if (earliestTs) {
       var legacyDayK = dayKeyFromTimestamp(earliestTs);
       var legacyTarget = legacyDayK ? results.find(function(r) { return r.day.key === legacyDayK; }) : null;
-      // If that day has no new scores, assign all legacy users to it
       if (legacyTarget && Object.keys(legacyTarget.scores).length === 0) {
         Object.entries(legacyData).forEach(function(e) {
           var uid2 = e[0], w = e[1];
@@ -2027,28 +1991,21 @@ function renderWeekDays(g) {
         });
       }
     }
- 
-    // Step 3: Render
     var html = '';
     results.forEach(function(r) {
       var isToday = r.day.key === today;
       var isFuture = r.day.key > today;
       var hasScores = Object.keys(r.scores).length > 0;
- 
-      // Only show past days that have scores — hide today and future
       if (isFuture || isToday) return;
       if (!hasScores) return;
- 
       var sorted = Object.entries(r.scores)
         .filter(function(e) { return e[1].bestDiff != null; })
         .sort(function(a, b) {
           if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
           return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
         });
- 
       var myRank = uid ? sorted.findIndex(function(e) { return e[0] === uid; }) : -1;
       var myScore = uid ? r.scores[uid] : null;
- 
       html += '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:8px">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
       html += '<div style="font-size:13px;font-weight:700;color:var(--tm)">'+r.day.label+'</div>';
@@ -2058,7 +2015,6 @@ function renderWeekDays(g) {
         html += '<div style="font-size:10px;color:var(--td)">No jugaste</div>';
       }
       html += '</div>';
- 
       if (sorted.length === 0) {
         html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:4px 0">Sin partidas aún</div>';
       } else {
@@ -2073,7 +2029,6 @@ function renderWeekDays(g) {
           html += '<div style="font-size:10px;color:var(--tm)">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>';
           html += '</div>';
         });
-        // My position if outside top 3
         if (myRank >= 3 && myScore && myScore.bestTime) {
           html += '<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div>';
           html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px">';
@@ -2087,8 +2042,6 @@ function renderWeekDays(g) {
       }
       html += '</div>';
     });
- 
-    // Total points footer
     if (curUser && weekPoints[curUser.uid] && weekPoints[curUser.uid].total > 0) {
       var myTotalPts = weekPoints[curUser.uid].total || 0;
       html += '<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between">' +
@@ -2101,7 +2054,6 @@ function renderWeekDays(g) {
   });
 }
  
- 
 // ══ UTILS ══
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(el) { el.classList.remove('on'); el.style.display=''; });
@@ -2113,6 +2065,63 @@ function findRef(code) { return Object.keys(profiles).find(function(uid){return 
 function genRef(name) { var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase(); }
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera','auth/operation-not-allowed':'Método no activado en Firebase'};return m[code]||('Error: '+code);}
+// ══ MODALES DE AYUDA ══
+function showHowPlay(g) {
+  var isR = g === 'r';
+  var cfg = GCOLORS[g] || GCOLORS[5];
+  var labels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', r:'REACCIÓN'};
+  var icons  = {5:'🟢', 10:'🔵', 15:'🟣', r:'⚡'};
+  var target = isR ? '' : GCFG[g].toFixed(3) + 's';
+  var content = isR
+    ? '<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0">'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👁️</span><div><strong style="color:var(--tx)">Observa la pantalla</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando se ponga verde, toca lo más rápido posible</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏳</span><div><strong style="color:var(--tx)">Espera el flash</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Aparece entre 1 y 5 segundos — si tocas antes, penalización</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⚡</span><div><strong style="color:var(--tx)">Gana quien reaccione más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El promedio humano es ~250ms — ¿puedes bajar de 200ms?</div></div></div>'+
+      '</div>'
+    : '<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0">'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong style="color:var(--tx)">Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza a correr — verás los segundos en pantalla</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong style="color:var(--tx)">Para exactamente en '+target+'</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Pulsa PARAR cuando creas que llegaste al objetivo</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día — todos compiten con el mismo número</div></div></div>'+
+      '</div>';
+  document.getElementById('modalBody').innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+      '<span style="font-size:20px">'+icons[g]+'</span>'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:'+cfg.stroke+'">CÓMO JUGAR — '+labels[g]+'</div>'+
+    '</div>'+
+    content+
+    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:4px">ENTENDIDO</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
+function showHowPoints() {
+  document.getElementById('modalBody').innerHTML =
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px">🏅 CÓMO SE GANAN PUNTOS</div>'+
+    '<div style="font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.7">Cada día, los mejores tiempos de <strong style="color:var(--tx)">cada reto</strong> suman puntos al ranking semanal:</div>'+
+    '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:16px">🥇</span><span style="font-size:13px;color:var(--tx)">1er lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:16px">🥈</span><span style="font-size:13px;color:var(--tx)">2do lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:16px">🥉</span><span style="font-size:13px;color:var(--tx)">3er lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">5 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:13px">4to lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">3 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:13px">5to – 10mo lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">1 pt</span></div>'+
+    '</div>'+
+    '<div style="font-size:11px;color:var(--td);background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">'+
+      '💡 Hay <strong style="color:var(--tm)">4 retos por día</strong> — puedes ganar puntos en cada uno.<br>'+
+      'El ranking global muestra quién acumuló más en la semana.'+
+    '</div>'+
+    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
 var tt;
