@@ -341,7 +341,7 @@ tr:hover td{background:var(--sf2)}
       <div class="gc g5" onclick="startGame(5)">
         <div class="gc-top">
           <div><div class="gc-title">RETO 5s</div><div class="gc-sub">Para en 5 segundos</div><div class="gc-objective" id="obj5">Cargando...</div></div>
-          <div style="text-align:right"><div class="gc-tgt" id="tgt5">5s</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--c5);margin-top:2px" id="tgtSub5">5.000s</div></div>
+          <div style="text-align:right"><div class="gc-tgt" id="tgt5" style="font-size:28px;line-height:1.1">5.000</div><div style="font-family:'DM Sans',sans-serif;font-size:10px;color:var(--c5);letter-spacing:2px;text-transform:uppercase;margin-top:2px">SEGUNDOS</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb5">—</span></div>
@@ -352,7 +352,7 @@ tr:hover td{background:var(--sf2)}
       <div class="gc g10" onclick="startGame(10)">
         <div class="gc-top">
           <div><div class="gc-title">RETO 10s</div><div class="gc-sub">Para en 10 segundos</div><div class="gc-objective" id="obj10">Cargando...</div></div>
-          <div style="text-align:right"><div class="gc-tgt" id="tgt10">10s</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--c10);margin-top:2px" id="tgtSub10">10.000s</div></div>
+          <div style="text-align:right"><div class="gc-tgt" id="tgt10" style="font-size:28px;line-height:1.1">10.000</div><div style="font-family:'DM Sans',sans-serif;font-size:10px;color:var(--c10);letter-spacing:2px;text-transform:uppercase;margin-top:2px">SEGUNDOS</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb10">—</span></div>
@@ -363,7 +363,7 @@ tr:hover td{background:var(--sf2)}
       <div class="gc g15" onclick="startGame(15)">
         <div class="gc-top">
           <div><div class="gc-title">RETO 15s</div><div class="gc-sub">Para en 15 segundos</div><div class="gc-objective" id="obj15">Cargando...</div></div>
-          <div style="text-align:right"><div class="gc-tgt" id="tgt15">15s</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--c15);margin-top:2px" id="tgtSub15">15.000s</div></div>
+          <div style="text-align:right"><div class="gc-tgt" id="tgt15" style="font-size:28px;line-height:1.1">15.000</div><div style="font-family:'DM Sans',sans-serif;font-size:10px;color:var(--c15);letter-spacing:2px;text-transform:uppercase;margin-top:2px">SEGUNDOS</div></div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hb15">—</span></div>
@@ -629,7 +629,13 @@ function checkDailyReset() {
 // Check reset every minute
 setInterval(function() {
   var newDay = getTodayKey();
-  if (newDay !== todayKey) { todayKey = newDay; checkDailyReset(); }
+  if (newDay !== todayKey) {
+    todayKey = newDay;
+    checkDailyReset();
+    // Re-attach listeners for new day
+    [5, 10, 15, 'r'].forEach(function(g) { listenWeekScore(g); });
+    wScores = {5:{},10:{},15:{},'r':{}};
+  }
 }, 60000);
  
 // ══ FIREBASE LISTENERS ══
@@ -647,9 +653,13 @@ db.ref('profiles').on('value', function(s) {
   if (admLoggedIn) updateAdmStats();
 });
  
-function listenWeekScore(g) {
+function getScorePath(g) {
   var key = g === 'r' ? 'gr' : 'g' + g;
-  db.ref('weekScores/' + weekKey + '/' + key).on('value', function(s) {
+  return 'dayScores/' + todayKey + '/' + key;
+}
+ 
+function listenWeekScore(g) {
+  db.ref(getScorePath(g)).on('value', function(s) {
     wScores[g] = s.val() || {};
     updateHomecards();
     if (document.getElementById('sResult').classList.contains('on') && curGame === g) renderLB(curUser ? curUser.uid : null, g);
@@ -968,8 +978,7 @@ function saveScore(fmt, diff, g) {
   var pphoto = (profiles[uid] || {}).photoURL || null;
   var upd = { attempts: (ws.attempts || 0) + 1, lastPlayed: Date.now() };
   if (isRec) { upd.bestTime = fmt; upd.bestDiff = diff; upd.name = pname; upd.photoURL = pphoto; }
-  var key = g === 'r' ? 'gr' : 'g' + g;
-  db.ref('weekScores/' + weekKey + '/' + key + '/' + uid).update(upd).then(function() {
+  db.ref(getScorePath(g) + '/' + uid).update(upd).then(function() {
     showResult(fmt, diff, isRec, g);
   });
 }
@@ -1252,12 +1261,9 @@ function confReset() {
 }
  
 function doReset() {
-  var upd = {};
-  [5,10,15].forEach(function(g){upd['weekScores/'+weekKey+'/g'+g]=null;});
-  upd['weekScores/'+weekKey+'/gr'] = null;
-  db.ref().update(upd).then(function() {
+  db.ref('dayScores/' + todayKey).remove().then(function() {
     wScores = {5:{},10:{},15:{},'r':{}};
-    closeModal(); toast('✅ Semana reseteada');
+    closeModal(); toast('✅ Día reseteado');
     updateHomecards(); updateAdmStats(); buildWinners(); renderAdmTable();
   });
 }
