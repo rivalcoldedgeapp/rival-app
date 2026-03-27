@@ -419,9 +419,12 @@ body.playing{overflow:hidden}
       <div class="gc g5" onclick="startGame(5)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
           <div><div class="gc-title">RETO 1</div><div class="gc-sub" id="obj5">Cargando objetivo...</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c5);text-shadow:0 0 20px var(--c5m);line-height:1" id="tgt5">5.000</div>
-            <div style="font-size:9px;color:var(--c5);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c5);text-shadow:0 0 20px var(--c5m);line-height:1" id="tgt5">5.000</div>
+              <div style="font-size:9px;color:var(--c5);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+            </div>
+            <button onclick="event.stopPropagation();showHowPlay(5)" style="background:transparent;border:1px solid var(--c5);border-radius:50%;width:22px;height:22px;color:var(--c5);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
           </div>
         </div>
         <div class="gc-stats">
@@ -433,9 +436,12 @@ body.playing{overflow:hidden}
       <div class="gc g10" onclick="startGame(10)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
           <div><div class="gc-title">RETO 2</div><div class="gc-sub" id="obj10">Cargando objetivo...</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c10);text-shadow:0 0 20px var(--c10m);line-height:1" id="tgt10">10.000</div>
-            <div style="font-size:9px;color:var(--c10);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c10);text-shadow:0 0 20px var(--c10m);line-height:1" id="tgt10">10.000</div>
+              <div style="font-size:9px;color:var(--c10);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+            </div>
+            <button onclick="event.stopPropagation();showHowPlay(10)" style="background:transparent;border:1px solid var(--c10);border-radius:50%;width:22px;height:22px;color:var(--c10);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
           </div>
         </div>
         <div class="gc-stats">
@@ -447,9 +453,12 @@ body.playing{overflow:hidden}
       <div class="gc g15" onclick="startGame(15)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
           <div><div class="gc-title">RETO 3</div><div class="gc-sub" id="obj15">Cargando objetivo...</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c15);text-shadow:0 0 20px var(--c15m);line-height:1" id="tgt15">15.000</div>
-            <div style="font-size:9px;color:var(--c15);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c15);text-shadow:0 0 20px var(--c15m);line-height:1" id="tgt15">15.000</div>
+              <div style="font-size:9px;color:var(--c15);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div>
+            </div>
+            <button onclick="event.stopPropagation();showHowPlay(15)" style="background:transparent;border:1px solid var(--c15);border-radius:50%;width:22px;height:22px;color:var(--c15);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
           </div>
         </div>
         <div class="gc-stats">
@@ -461,7 +470,10 @@ body.playing{overflow:hidden}
       <div class="gc gr" onclick="startReaction()">
         <div class="gc-top">
           <div><div class="gc-title">REACCIÓN</div><div class="gc-sub">Toca en cuanto veas el flash</div><div class="gc-objective" style="color:var(--cr)">Promedio mundial: ~250ms</div></div>
-          <div class="gc-tgt">⚡</div>
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <div class="gc-tgt">⚡</div>
+            <button onclick="event.stopPropagation();showHowPlay('r')" style="background:transparent;border:1px solid var(--cr);border-radius:50%;width:22px;height:22px;color:var(--cr);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
+          </div>
         </div>
         <div class="gc-stats">
           <div class="gc-stat">Tu mejor: <span id="hbr">—</span></div>
@@ -548,14 +560,11 @@ body.playing{overflow:hidden}
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner" style="padding-top:18px">
     <div class="rank-title" id="rankTitle">RANKING DE HOY</div>
-    <div class="rank-sub" id="rankSub">TOP 50 · Esta semana</div>
-    <!-- Explicación de puntos — solo visible en global -->
-    <div id="ptsExplain" style="display:none;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--tm);line-height:1.8">
-      🏅 <strong style="color:var(--tx)">¿Cómo se ganan puntos?</strong><br>
-      Cada día, los mejores tiempos de cada reto suman puntos:<br>
-      <span style="color:var(--wn)">🥇 10pts &nbsp; 🥈 7pts &nbsp; 🥉 5pts</span> &nbsp;·&nbsp; 4to 3pts &nbsp;·&nbsp; 5to–10mo 1pt<br>
-      El ranking global muestra quién acumuló más puntos en la semana.
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div class="rank-sub" id="rankSub">TOP 50 · Esta semana</div>
+      <button id="btnHowPts" onclick="showHowPoints()" style="display:none;background:transparent;border:1px solid var(--bo);border-radius:7px;color:var(--tm);font-size:11px;padding:4px 10px;cursor:pointer;white-space:nowrap">🏅 ¿Cómo se ganan puntos?</button>
     </div>
+    <!-- Explicación de puntos — ahora en modal via botón -->
     <div class="rg-tabs">
       <button class="rgt" id="rgtG" onclick="setRankGame('global')">🏅 Global</button>
       <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 Reto 1</button>
@@ -1379,6 +1388,9 @@ function setRankGame(g) {
     el.style.background = ''; el.style.color = ''; el.style.borderColor = '';
     el.className = 'rgt';
   });
+  // Mostrar/ocultar botón de puntos
+  var btnPts = document.getElementById('btnHowPts');
+  if (btnPts) btnPts.style.display = g === 'global' ? 'block' : 'none';
   // Mostrar/ocultar explicación de puntos
   var ptsEx = document.getElementById('ptsExplain');
   if (ptsEx) ptsEx.style.display = g === 'global' ? 'block' : 'none';
@@ -2070,6 +2082,64 @@ function findRef(code) { return Object.keys(profiles).find(function(uid){return 
 function genRef(name) { var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase(); }
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera','auth/operation-not-allowed':'Método no activado en Firebase'};return m[code]||('Error: '+code);}
+// ══ MODALES DE AYUDA ══
+function showHowPlay(g) {
+  var isR = g === 'r';
+  var cfg = GCOLORS[g] || GCOLORS[5];
+  var labels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', r:'REACCIÓN'};
+  var icons  = {5:'🟢', 10:'🔵', 15:'🟣', r:'⚡'};
+  var target = isR ? '' : GCFG[g].toFixed(3) + 's';
+  var content = isR
+    ? '<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0">'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👁️</span><div><strong style="color:var(--tx)">Observa la pantalla</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando se ponga verde, toca lo más rápido posible</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏳</span><div><strong style="color:var(--tx)">Espera el flash</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Aparece entre 1 y 5 segundos — si tocas antes, penalización</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⚡</span><div><strong style="color:var(--tx)">Gana quien reaccione más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El promedio humano es ~250ms — ¿puedes bajar de 200ms?</div></div></div>'+
+      '</div>'
+    : '<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0">'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong style="color:var(--tx)">Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza a correr — no lo veas</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🧠</span><div><strong style="color:var(--tx)">Cuenta mentalmente hasta '+target+'</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Sin mirar la pantalla — solo con tu percepción del tiempo</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏹️</span><div><strong style="color:var(--tx)">Pulsa PARAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando creas que pasaron exactamente '+target+'</div></div></div>'+
+        '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día — todos compiten con el mismo número</div></div></div>'+
+      '</div>';
+  document.getElementById('modalBody').innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+      '<span style="font-size:20px">'+icons[g]+'</span>'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:'+cfg.stroke+'">CÓMO JUGAR — '+labels[g]+'</div>'+
+    '</div>'+
+    content+
+    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:4px">ENTENDIDO</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
+function showHowPoints() {
+  document.getElementById('modalBody').innerHTML =
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px">🏅 CÓMO SE GANAN PUNTOS</div>'+
+    '<div style="font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.7">Cada día, los mejores tiempos de <strong style="color:var(--tx)">cada reto</strong> suman puntos al ranking semanal:</div>'+
+    '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:16px">🥇</span><span style="font-size:13px;color:var(--tx)">1er lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:16px">🥈</span><span style="font-size:13px;color:var(--tx)">2do lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:16px">🥉</span><span style="font-size:13px;color:var(--tx)">3er lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">5 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:13px">4to lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">3 pts</span></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px">'+
+        '<span style="font-size:13px">5to – 10mo lugar</span>'+
+        '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">1 pt</span></div>'+
+    '</div>'+
+    '<div style="font-size:11px;color:var(--td);background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">'+
+      '💡 Hay <strong style="color:var(--tm)">4 retos por día</strong> — puedes ganar puntos en cada uno.<br>'+
+      'El ranking global muestra quién acumuló más en la semana.'+
+    '</div>'+
+    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
 var tt;
