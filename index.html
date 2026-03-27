@@ -570,7 +570,7 @@ firebase.initializeApp({
   projectId:"rival-app-82470",
   storageBucket:"rival-app-82470.firebasestorage.app",
   messagingSenderId:"669224883015",
-  appId:"1:66922483015:web:af16120105ee0504967262"
+  appId:"1:669224883015:web:af16120105ee0504967262"
 });
 var auth = firebase.auth();
 var db = firebase.database();
@@ -811,17 +811,31 @@ function showApp(fu, profile) {
  
 // ══ CONFIG UI ══
 function updateConfigUI() {
-  var d = getCDMX();
   var titleEl = document.getElementById('homeTitle');
   var dateEl = document.getElementById('homeDate');
   if (titleEl) titleEl.textContent = getTodayLabel();
   if (dateEl) dateEl.textContent = getTodayDate();
+  // Small objective text
   var obj5 = document.getElementById('obj5');
   var obj10 = document.getElementById('obj10');
   var obj15 = document.getElementById('obj15');
-  if (obj5) obj5.textContent = 'Objetivo: ' + GCFG[5].toFixed(3) + 's';
-  if (obj10) obj10.textContent = 'Objetivo: ' + GCFG[10].toFixed(3) + 's';
-  if (obj15) obj15.textContent = 'Objetivo: ' + GCFG[15].toFixed(3) + 's';
+  if (obj5) obj5.textContent = 'Para exactamente en ' + GCFG[5].toFixed(3) + 's';
+  if (obj10) obj10.textContent = 'Para exactamente en ' + GCFG[10].toFixed(3) + 's';
+  if (obj15) obj15.textContent = 'Para exactamente en ' + GCFG[15].toFixed(3) + 's';
+  // BIG target number on card
+  var t5 = document.getElementById('tgt5');
+  var t10 = document.getElementById('tgt10');
+  var t15 = document.getElementById('tgt15');
+  if (t5) t5.textContent = GCFG[5].toFixed(3);
+  if (t10) t10.textContent = GCFG[10].toFixed(3);
+  if (t15) t15.textContent = GCFG[15].toFixed(3);
+  // Admin display
+  var a5 = document.getElementById('admT5');
+  var a10 = document.getElementById('admT10');
+  var a15 = document.getElementById('admT15');
+  if (a5) a5.textContent = GCFG[5].toFixed(3) + 's';
+  if (a10) a10.textContent = GCFG[10].toFixed(3) + 's';
+  if (a15) a15.textContent = GCFG[15].toFixed(3) + 's';
 }
  
 // ══ HOME CARDS ══
