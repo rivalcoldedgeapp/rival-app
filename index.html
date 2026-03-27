@@ -1323,16 +1323,22 @@ function admUserHist(btn) {
     {g:15, label:'RETO 3', cfg:GCOLORS[15]},
     {g:'r', label:'REACCIÓN', cfg:GCOLORS['r']}
   ];
-  var today = getTodayKey();
- 
   // Load all game+day combos
   var fetches = [];
+  var today = getTodayKey();
   days.forEach(function(dayObj) {
     games.forEach(function(gObj) {
       var key = gObj.g === 'r' ? 'gr' : 'g' + gObj.g;
       fetches.push(
         db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
-          return { day: dayObj, game: gObj, data: s.val() };
+          if (s.val()) return { day: dayObj, game: gObj, data: s.val() };
+          // Fallback to old weekScores path
+          if (dayObj.key <= today) {
+            return db.ref('weekScores/' + weekKey + '/' + key + '/' + uid).once('value').then(function(s2) {
+              return { day: dayObj, game: gObj, data: s2.val() || null, isLegacy: true };
+            });
+          }
+          return { day: dayObj, game: gObj, data: null };
         })
       );
     });
@@ -1431,8 +1437,20 @@ function showHistory(g) {
  
   // Load all days in parallel
   var promises = days.map(function(dayObj) {
+    // Try new path first, fallback to old weekScores path
     return db.ref('scores/' + weekKey + '/' + dayObj.key + '/' + key + '/' + uid).once('value').then(function(s) {
-      return { day: dayObj, data: s.val() };
+      if (s.val()) {
+        return { day: dayObj, data: s.val() };
+      }
+      // Fallback: read from old weekScores path (data from before migration)
+      return db.ref('weekScores/' + weekKey + '/' + key + '/' + uid).once('value').then(function(s2) {
+        // Only show old data on the days it could have been recorded (before today)
+        var today = getTodayKey();
+        if (s2.val() && dayObj.key < today) {
+          return { day: dayObj, data: s2.val(), isLegacy: true };
+        }
+        return { day: dayObj, data: null };
+      });
     });
   });
  
@@ -1470,10 +1488,11 @@ function showHistory(g) {
         '</div>';
       } else {
         hasAny = true;
+        var isLegacy = r.isLegacy;
         rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:9px">'+
           '<div>'+
             '<div style="font-size:12px;font-weight:700;color:var(--tx)">'+r.day.label+(isToday?' · Hoy':'')+'</div>'+
-            '<div style="font-size:10px;color:var(--tm);margin-top:2px">'+( data.attempts||0)+' partida(s)</div>'+
+            '<div style="font-size:10px;color:var(--tm);margin-top:2px">'+(data.attempts||0)+' partida(s)'+(isLegacy?' · historial':'')+'</div>'+
           '</div>'+
           '<div style="text-align:right">'+
             '<div style="font-family:DM Mono,monospace;font-size:14px;color:'+cfg.stroke+'">'+data.bestTime+'s</div>'+
