@@ -401,10 +401,7 @@ body.playing{overflow:hidden}
           <div class="gc-stat">Tu mejor hoy: <span id="hb5">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr5">—</span></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">
-          <div style="font-size:11px;color:var(--tm)" id="hld5">—</div>
-          <button onclick="event.stopPropagation();showHistory(5)" style="background:transparent;border:none;color:var(--tm);font-size:10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📅 Ver semana</button>
-        </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld5">—</div>
       </div>
       <div class="gc g10" onclick="startGame(10)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -418,10 +415,7 @@ body.playing{overflow:hidden}
           <div class="gc-stat">Tu mejor hoy: <span id="hb10">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr10" style="color:var(--c10)">—</span></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">
-          <div style="font-size:11px;color:var(--tm)" id="hld10">—</div>
-          <button onclick="event.stopPropagation();showHistory(10)" style="background:transparent;border:none;color:var(--tm);font-size:10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📅 Ver semana</button>
-        </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld10">—</div>
       </div>
       <div class="gc g15" onclick="startGame(15)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -435,10 +429,7 @@ body.playing{overflow:hidden}
           <div class="gc-stat">Tu mejor hoy: <span id="hb15">—</span></div>
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr15" style="color:var(--c15)">—</span></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">
-          <div style="font-size:11px;color:var(--tm)" id="hld15">—</div>
-          <button onclick="event.stopPropagation();showHistory(15)" style="background:transparent;border:none;color:var(--tm);font-size:10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📅 Ver semana</button>
-        </div>
+        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld15">—</div>
       </div>
       <div class="gc gr" onclick="startReaction()">
         <div class="gc-top">
@@ -612,6 +603,19 @@ body.playing{overflow:hidden}
           <div style="font-size:9px;letter-spacing:2px;color:var(--c15);text-transform:uppercase;margin-bottom:4px">🟣 Reto 15s</div>
           <div style="font-family:DM Mono,monospace;font-size:16px;color:var(--c15)" id="admT15">—</div>
         </div>
+      </div>
+      <!-- Week by day -->
+      <div class="sec-hdr">
+        <div class="sec-lbl">📅 Vista semanal por día</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap" id="admWeekGameTabs">
+          <button class="apt" id="awgt5" onclick="setAdmWeekGame(5)">🟢 Reto 1</button>
+          <button class="apt" id="awgt10" onclick="setAdmWeekGame(10)">🔵 Reto 2</button>
+          <button class="apt" id="awgt15" onclick="setAdmWeekGame(15)">🟣 Reto 3</button>
+          <button class="apt" id="awgtr" onclick="setAdmWeekGame('r')">⚡ Reacción</button>
+        </div>
+      </div>
+      <div id="admWeekWrap" style="margin-bottom:20px">
+        <div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Selecciona un reto para ver el historial semanal</div>
       </div>
       <!-- Winners -->
       <div class="sec-hdr"><div class="sec-lbl">🏆 Líderes actuales</div></div>
@@ -1360,6 +1364,105 @@ function setAdmTab(g) {
   renderAdmTable();
 }
  
+function setAdmWeekGame(g) {
+  // Style tabs
+  [5,10,15,'r'].forEach(function(x) {
+    var el = document.getElementById('awgt'+(x==='r'?'r':x));
+    if (!el) return;
+    el.style.background=''; el.style.color=''; el.style.borderColor='';
+    el.className='apt';
+  });
+  var active = document.getElementById('awgt'+(g==='r'?'r':g));
+  if (active) {
+    var cfg = GCOLORS[g];
+    active.style.background=cfg.stroke; active.style.color='#000'; active.style.borderColor=cfg.stroke;
+  }
+  renderAdmWeek(g);
+}
+ 
+function renderAdmWeek(g) {
+  var wrap = document.getElementById('admWeekWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Cargando...</div>';
+ 
+  var cfg = GCOLORS[g];
+  var isR = g === 'r';
+  var gkey = g === 'r' ? 'gr' : 'g' + g;
+  var labels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', r:'REACCIÓN'};
+ 
+  var d = getCDMX();
+  var day = d.getDay();
+  var diff = day===0?-6:1-day;
+  var monday = new Date(d); monday.setDate(d.getDate()+diff);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var dd = new Date(monday); dd.setDate(monday.getDate()+i);
+    var dk = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    days.push({ key:dk, label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()] });
+  }
+ 
+  var today = getTodayKey();
+  var fetches = days.map(function(dayObj) {
+    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
+      if (s.val()) return { day:dayObj, scores:s.val() };
+      if (dayObj.key <= today) {
+        return db.ref('weekScores/'+weekKey+'/'+gkey).once('value').then(function(s2) {
+          return { day:dayObj, scores:s2.val()||{}, isLegacy:true };
+        });
+      }
+      return { day:dayObj, scores:{} };
+    });
+  });
+ 
+  Promise.all(fetches).then(function(results) {
+    var html = '';
+    results.forEach(function(r) {
+      var isToday = r.day.key === today;
+      var isFuture = r.day.key > today;
+      if (isFuture) return;
+ 
+      var sorted = Object.entries(r.scores||{})
+        .filter(function(e){return e[1].bestDiff!=null;})
+        .sort(function(a,b){
+          if(a[1].bestDiff!==b[1].bestDiff)return a[1].bestDiff-b[1].bestDiff;
+          return (a[1].lastPlayed||0)-(b[1].lastPlayed||0);
+        });
+ 
+      if (sorted.length === 0 && !isToday) return; // skip empty past days
+ 
+      html += '<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:11px;padding:12px;margin-bottom:8px">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+      html += '<div style="font-size:12px;font-weight:700">'+r.day.label+(isToday?' · Hoy':''+(r.isLegacy?' (hist.)':''))+'</div>';
+      html += '<div style="font-size:11px;color:var(--tm)">'+sorted.length+' jugador(es)</div>';
+      html += '</div>';
+ 
+      if (sorted.length === 0) {
+        html += '<div style="font-size:11px;color:var(--td)">Sin partidas aún</div>';
+      } else {
+        // Table
+        html += '<table style="width:100%;border-collapse:collapse">';
+        html += '<tr style="font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:1px"><th style="text-align:left;padding:3px 6px">#</th><th style="text-align:left;padding:3px 6px">Jugador</th><th style="text-align:left;padding:3px 6px">Email</th><th style="padding:3px 6px">Tiempo</th><th style="padding:3px 6px">±ms</th><th style="padding:3px 6px">Partidas</th></tr>';
+        sorted.forEach(function(e, i) {
+          var uid2=e[0], w=e[1], p=profiles[uid2]||{};
+          var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+          html += '<tr style="border-top:1px solid var(--bo);font-size:11px">'+
+            '<td style="padding:5px 6px">'+medal+'</td>'+
+            '<td style="padding:5px 6px;font-weight:600">'+(w.name||'—')+'</td>'+
+            '<td style="padding:5px 6px;color:var(--tm);font-size:10px">'+(p.email||'—')+'</td>'+
+            '<td style="padding:5px 6px;font-family:DM Mono,monospace;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
+            '<td style="padding:5px 6px;font-family:DM Mono,monospace;color:var(--tm);text-align:center">±'+(w.bestDiff*1000).toFixed(0)+'ms</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:var(--tm)">'+(w.attempts||0)+'</td>'+
+          '</tr>';
+        });
+        html += '</table>';
+      }
+      html += '</div>';
+    });
+ 
+    wrap.innerHTML = html || '<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Sin datos esta semana</div>';
+  });
+}
+ 
 function renderAdmTable() {
   var tbody = document.getElementById('admTbl'); if (!tbody) return;
   var g = admGame;
@@ -1566,12 +1669,13 @@ function showHistory(g) {
           '<div style="font-size:11px;color:var(--td)">Por jugar</div>'+
         '</div>';
       } else if (!data || !data.bestTime) {
-        rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px;opacity:'+(isToday?'1':'.5')+'">'+
-          '<div>'+
-            '<div style="font-size:12px;font-weight:'+(isToday?'700':'400')+';color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+r.day.label+(isToday?' · Hoy':'')+'</div>'+
-          '</div>'+
-          '<div style="font-size:11px;color:var(--td)">Sin jugar</div>'+
-        '</div>';
+        if (isToday) {
+          rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px">'+
+            '<div style="font-size:12px;font-weight:700;color:var(--tx)">'+r.day.label+' · Hoy</div>'+
+            '<div style="font-size:11px;color:var(--td)">Sin jugar</div>'+
+          '</div>';
+        }
+        // Past days with no data — don't show
       } else {
         hasAny = true;
         var isLegacy = r.isLegacy;
