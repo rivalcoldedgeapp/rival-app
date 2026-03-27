@@ -485,7 +485,7 @@ tr:hover td{background:var(--sf2)}
       <div class="fld"><label>Contraseña</label><input id="ap" type="password" onkeydown="if(event.key==='Enter')admLogin()"></div>
       <button class="adm-lbtn" onclick="admLogin()">ENTRAR</button>
       <div style="margin-top:10px;text-align:center">
-        <button onclick="goScreen('sAuth')" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer">← Volver</button>
+        <button onclick="admLogout()" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer">← Volver</button>
       </div>
     </div>
     <!-- Panel (hidden until login) -->
@@ -494,7 +494,7 @@ tr:hover td{background:var(--sf2)}
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn btn-r" onclick="confReset()">🗑️ Resetear semana</button>
-          <button class="btn btn-gh" onclick="goScreen('sAuth')">← Salir</button>
+          <button class="btn btn-gh" onclick="admLogout()">← Salir</button>
         </div>
       </div>
       <!-- Stats -->
@@ -1089,7 +1089,17 @@ function renderFullRank(g) {
 }
  
 function getSorted(g, max) {
-  return Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;}).slice(0,max);
+  return Object.entries(wScores[g])
+    .filter(function(e){ return e[1].bestDiff != null; })
+    .sort(function(a, b) {
+      // Primary: lowest diff wins
+      if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
+      // Tiebreaker: who got it first (earliest lastPlayed)
+      var tA = a[1].lastPlayed || 0;
+      var tB = b[1].lastPlayed || 0;
+      return tA - tB;
+    })
+    .slice(0, max);
 }
  
 function getRank(uid, g) {
@@ -1119,6 +1129,15 @@ function showAdmin() {
   document.getElementById('admLC').style.display = 'block';
   if (!admLoggedIn) document.getElementById('admP').classList.remove('show');
   showScreen('sAdmin');
+}
+ 
+function admLogout() {
+  admLoggedIn = false;
+  document.getElementById('admLC').style.display = 'block';
+  document.getElementById('admP').classList.remove('show');
+  document.getElementById('au').value = '';
+  document.getElementById('ap').value = '';
+  showScreen('sAuth');
 }
  
 function admLogin() {
