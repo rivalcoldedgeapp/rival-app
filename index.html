@@ -18,6 +18,7 @@
   --c5:#00e87a;--c5dim:#00e87a15;--c5mid:#00e87a40;
   --c10:#3d9bff;--c10dim:#3d9bff15;--c10mid:#3d9bff40;
   --c15:#b319ff;--c15dim:#b319ff15;--c15mid:#b319ff40;
+  --cr:#ff6b00;--crdim:#ff6b0015;--crmid:#ff6b0040;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
@@ -113,6 +114,22 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .g10 .gc-rank{color:var(--c10)}
 .g15 .gc-rank{color:var(--c15)}
 .gc-arrow{font-size:20px;color:var(--bo)}
+.game-card.gr{border-color:var(--cr)}.game-card.gr::before{background:var(--cr)}
+.gr .gc-target{color:var(--cr);text-shadow:0 0 20px var(--crmid)}
+.gr .gc-rank{color:var(--cr)}
+/* Reaction game styles */
+.react-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:20px}
+.react-zone{width:100%;max-width:340px;height:220px;border-radius:16px;border:2px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;user-select:none;-webkit-user-select:none;position:relative;overflow:hidden}
+.react-zone.wait{border-color:var(--bo)}
+.react-zone.ready{background:#00e87a;border-color:#00e87a;animation:rFlash .15s ease-out}
+.react-zone.early{background:var(--dg);border-color:var(--dg);animation:bs .4s}
+.react-zone.done{border-color:var(--cr)}
+@keyframes rFlash{from{transform:scale(.98)}to{transform:scale(1)}}
+.rz-icon{font-size:52px;margin-bottom:8px}
+.rz-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px}
+.rz-sub{font-size:12px;color:var(--tm);margin-top:4px;text-align:center;padding:0 20px}
+.react-time{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--cr);line-height:1;text-shadow:0 0 30px var(--crmid)}
+.react-ms{font-size:14px;color:var(--tm);letter-spacing:2px;text-transform:uppercase}
  
 /* ── GAME PLAY ── */
 #sGame{padding:18px;position:relative}
@@ -264,7 +281,7 @@ tr:hover td{background:var(--sf2)}
 <div class="overlay" id="overlay"><div class="modal" id="modalBody"></div></div>
  
 <nav>
-  <div class="logo">RIVAL</div>
+  <div style="display:flex;align-items:baseline;gap:8px"><div class="logo">RIVAL</div><div style="font-size:11px;letter-spacing:3px;color:var(--td);text-transform:uppercase;font-family:'DM Sans',sans-serif;font-weight:500;padding:2px 7px;border:1px solid var(--td);border-radius:4px">DEMO</div></div>
   <div class="nav-tabs" id="navTabs">
     <button class="ntab on" id="nt-home" onclick="goTab('home')">🎮 Juegos</button>
     <button class="ntab" id="nt-rank" onclick="goTab('rank')">🏆 Ranking</button>
@@ -374,6 +391,20 @@ tr:hover td{background:var(--sf2)}
           <div class="gc-stat">Posición: <span class="gc-rank" id="hr15" style="color:var(--c15)">—</span></div>
         </div>
       </div>
+      <!-- Reacción -->
+      <div class="game-card gr" onclick="startGame('r')">
+        <div class="gc-top">
+          <div>
+            <div class="gc-title">REACCIÓN</div>
+            <div class="gc-sub">Toca en cuanto veas el flash verde</div>
+          </div>
+          <div class="gc-target" style="font-size:32px;padding-top:4px">⚡</div>
+        </div>
+        <div class="gc-stats">
+          <div class="gc-stat">Tu mejor: <span id="hbr">—</span></div>
+          <div class="gc-stat">Posición: <span class="gc-rank" id="hrr" style="color:var(--cr)">—</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -426,6 +457,33 @@ tr:hover td{background:var(--sf2)}
   </div>
 </div>
  
+<!-- REACTION GAME SCREEN -->
+<div class="screen" id="sReaction">
+  <div class="game-inner">
+    <div class="game-header">
+      <button class="gh-back" onclick="clearTimeout(reactTimeout);reactState='idle';goTab('home')">← Volver</button>
+      <div class="gh-title" style="color:var(--cr)">REACCIÓN PURA</div>
+      <div class="gh-sub" style="color:var(--cr)">Toca en cuanto veas el flash verde</div>
+    </div>
+    <div class="score-row">
+      <div class="sr-col"><div class="sr-lbl">Tu mejor</div><div class="sr-val" id="srBestR" style="color:var(--cr)">—</div></div>
+      <div class="sr-col" style="text-align:right"><div class="sr-lbl">Posición</div><div class="sr-val" id="srPosR" style="color:var(--cr)">—</div></div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px">Promedio mundial</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--td)">~250ms</div>
+    </div>
+    <div class="react-zone wait" id="reactZone" onclick="reactTap()">
+      <div class="rz-icon">👁️</div>
+      <div class="rz-title">LISTO</div>
+      <div class="rz-sub">Toca aquí para comenzar</div>
+    </div>
+    <div style="font-size:11px;color:var(--td);text-align:center;max-width:240px">
+      Espera el flash verde y toca lo más rápido posible
+    </div>
+  </div>
+</div>
+ 
 <!-- RANKING FULL -->
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner" style="padding-top:20px">
@@ -435,6 +493,7 @@ tr:hover td{background:var(--sf2)}
       <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 Reto 5s</button>
       <button class="rgt" id="rgt10" onclick="setRankGame(10)">🔵 Reto 10s</button>
       <button class="rgt" id="rgt15" onclick="setRankGame(15)">🟣 Reto 15s</button>
+      <button class="rgt" id="rgtr" onclick="setRankGame('r')">⚡ Reacción</button>
     </div>
     <div class="rank-list-wrap" id="rankListWrap"></div>
     <div class="rank-my-pos" id="rankMyPos">
@@ -476,6 +535,7 @@ tr:hover td{background:var(--sf2)}
         <button class="apt" id="apt5" onclick="setAdmTab(5)">🟢 Reto 5s</button>
         <button class="apt" id="apt10" onclick="setAdmTab(10)">🔵 Reto 10s</button>
         <button class="apt" id="apt15" onclick="setAdmTab(15)">🟣 Reto 15s</button>
+        <button class="apt" id="aptrr" onclick="setAdmTab('r')">⚡ Reacción</button>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -502,13 +562,14 @@ var auth=firebase.auth(), db=firebase.database();
  
 // ══ GAMES CONFIG ══
 var GAMES = {
+  'r': {target:0, color:'var(--cr)', shadow:'var(--crmid)', stroke:'#ff6b00', maxTime:0, isReaction:true},
   5:  {target:5.0,  color:'var(--c5)',  shadow:'var(--c5mid)',  stroke:'#00e87a', maxTime:20},
   10: {target:10.0, color:'var(--c10)', shadow:'var(--c10mid)', stroke:'#3d9bff', maxTime:30},
   15: {target:15.0, color:'var(--c15)', shadow:'var(--c15mid)', stroke:'#b319ff', maxTime:40}
 };
  
 // ══ STATE ══
-var profiles={}, weekScores={5:{},10:{},15:{}};
+var profiles={}, weekScores={5:{},10:{},15:{},'r':{}};
 var curUser=null, curGame=5;
 var gState='idle', t0=null, raf=null, elapsed=0;
 var admGame=5, rankGame=5;
@@ -531,7 +592,14 @@ function getWeekLabel(){
  
 // ══ LISTENERS ══
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();renderAdmTable();}});
-[5,10,15].forEach(function(g){
+db.ref('weekScores/'+weekKey+'/gr').on('value',function(s){
+  weekScores['r']=s.val()||{};
+  updateHomecards();
+  if(document.getElementById('sResult').classList.contains('on')&&curGame==='r') renderLB(curUser?curUser.uid:null,'r',10,'lbList');
+  if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='r') renderFullRank('r');
+  if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();if(admGame==='r')renderAdmTable();}
+});
+[5,10,15,'r'].forEach(function(g){
   db.ref('weekScores/'+weekKey+'/g'+g).on('value',function(s){
     weekScores[g]=s.val()||{};
     updateHomecards();
@@ -638,11 +706,18 @@ function showApp(fu,profile){
 function updateHomecards(){
   if(!curUser)return;
   var uid=curUser.uid;
-  [5,10,15].forEach(function(g){
+  db.ref('weekScores/'+weekKey+'/gr').on('value',function(s){
+  weekScores['r']=s.val()||{};
+  updateHomecards();
+  if(document.getElementById('sResult').classList.contains('on')&&curGame==='r') renderLB(curUser?curUser.uid:null,'r',10,'lbList');
+  if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='r') renderFullRank('r');
+  if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();if(admGame==='r')renderAdmTable();}
+});
+[5,10,15].forEach(function(g){
     var ws=weekScores[g][uid];
     var bEl=document.getElementById('hb'+g);
     var rEl=document.getElementById('hr'+g);
-    if(bEl)bEl.textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';
+    if(bEl)bEl.textContent=ws&&ws.bestTime?(g==='r'?ws.bestTime+'ms':ws.bestTime+'s'):'—';
     if(rEl)rEl.textContent=ws&&ws.bestTime?'#'+getRank(uid,g):'—';
     // Also update game screen if visible
     if(curGame===g&&document.getElementById('sGame').classList.contains('on')){
@@ -656,6 +731,7 @@ function updateHomecards(){
 // ══ START GAME ══
 function startGame(g){
   curGame=g;
+  if(g==='r'){startReactionGame();return;}
   var cfg=GAMES[g];
   // Colors
   document.getElementById('ghTitle').textContent='RETO '+g+'s';
@@ -674,6 +750,94 @@ function startGame(g){
   document.getElementById('srPos').textContent=ws&&ws.bestTime?'#'+getRank(uid,g):'—';
   resetClock();
   goScreen('sGame');
+}
+ 
+// ══ REACTION GAME ══
+var reactState = 'idle'; // idle, waiting, ready, done, early
+var reactT0 = null;
+var reactTimeout = null;
+ 
+function startReactionGame() {
+  goScreen('sReaction');
+  reactState = 'idle';
+  showReactIdle();
+  // Update score
+  var uid = curUser ? curUser.uid : null;
+  var ws = uid ? weekScores['r'][uid] : null;
+  document.getElementById('srBestR').textContent = ws && ws.bestTime ? ws.bestTime + 'ms' : '—';
+  document.getElementById('srPosR').textContent = ws && ws.bestTime ? '#' + getRank(uid,'r') : '—';
+}
+ 
+function showReactIdle() {
+  var zone = document.getElementById('reactZone');
+  if (!zone) return;
+  zone.className = 'react-zone wait';
+  zone.innerHTML = '<div class="rz-icon">👁️</div><div class="rz-title">LISTO</div><div class="rz-sub">Toca aquí para comenzar</div>';
+}
+ 
+function reactTap() {
+  if (reactState === 'idle') {
+    reactState = 'waiting';
+    var zone = document.getElementById('reactZone');
+    zone.className = 'react-zone wait';
+    zone.innerHTML = '<div class="rz-icon">⏳</div><div class="rz-title">ESPERA...</div><div class="rz-sub">Toca cuando veas el verde</div>';
+    // Random delay 1-5 seconds
+    var delay = 1000 + Math.random() * 4000;
+    reactTimeout = setTimeout(function() {
+      reactState = 'ready';
+      reactT0 = performance.now();
+      zone.className = 'react-zone ready';
+      zone.innerHTML = '<div class="rz-icon">🟢</div><div class="rz-title" style="color:#000;font-size:32px;letter-spacing:4px">¡TOCA AHORA!</div>';
+    }, delay);
+  } else if (reactState === 'waiting') {
+    // Too early
+    clearTimeout(reactTimeout);
+    reactState = 'early';
+    var zone = document.getElementById('reactZone');
+    zone.className = 'react-zone early';
+    zone.innerHTML = '<div class="rz-icon">❌</div><div class="rz-title" style="color:#fff">MUY RÁPIDO</div><div class="rz-sub" style="color:rgba(255,255,255,.7)">Toca de nuevo para reintentar</div>';
+    setTimeout(function() { reactState = 'idle'; showReactIdle(); }, 1500);
+  } else if (reactState === 'ready') {
+    var rt = performance.now() - reactT0;
+    var ms = Math.round(rt);
+    reactState = 'done';
+    var zone = document.getElementById('reactZone');
+    zone.className = 'react-zone done';
+    zone.innerHTML = '<div class="react-time">' + ms + '</div><div class="react-ms">MILISEGUNDOS</div>';
+    setTimeout(function() { saveReactResult(ms); }, 800);
+  } else if (reactState === 'done' || reactState === 'early') {
+    reactState = 'idle';
+    showReactIdle();
+  }
+}
+ 
+function saveReactResult(ms) {
+  if (!curUser) return;
+  var uid = curUser.uid;
+  var ws = weekScores['r'][uid] || {};
+  var isRec = !ws.bestTime || ms < parseInt(ws.bestTime);
+  var pname = (profiles[uid] || {}).name || '?';
+  var pphoto = (profiles[uid] || {}).photoURL || null;
+  var upd = { attempts: (ws.attempts || 0) + 1, lastPlayed: Date.now() };
+  if (isRec) { upd.bestTime = String(ms); upd.bestDiff = ms; upd.name = pname; upd.photoURL = pphoto; }
+  db.ref('weekScores/' + weekKey + '/gr/' + uid).update(upd).then(function() {
+    showReactResult(ms, isRec);
+  });
+}
+ 
+function showReactResult(ms, isRec) {
+  var uid = curUser.uid;
+  var rank = getRank(uid, 'r');
+  var total = Object.values(weekScores['r']).filter(function(w) { return w.bestDiff != null; }).length;
+  document.getElementById('rhTime').textContent = ms + 'ms';
+  document.getElementById('rhTime').style.color = 'var(--cr)';
+  document.getElementById('rhDiff').textContent = ms < 200 ? '⚡ Velocidad de rayo' : ms < 300 ? '🟢 Muy bueno' : ms < 400 ? '🟡 Promedio' : '🔴 Sigue practicando';
+  document.getElementById('rhRank').innerHTML = 'Posición <span style="color:var(--cr)">#' + rank + '</span> de ' + total + ' esta semana';
+  document.getElementById('nrBox').classList.toggle('show', isRec);
+  document.getElementById('nrBox').style.color = 'var(--cr)';
+  document.getElementById('lbTitle').textContent = '🏆 TOP 10 — REACCIÓN';
+  renderLB(uid, 'r', 10, 'lbList');
+  goScreen('sResult');
 }
  
 // ══ CLOCK ══
@@ -741,7 +905,8 @@ function saveResult(fmt,diff){
   var pphoto=(profiles[uid]||{}).photoURL||null;
   var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};
   if(isRec){upd.bestTime=fmt;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
-  db.ref('weekScores/'+weekKey+'/g'+g+'/'+uid).update(upd).then(function(){
+  var gkey = g==='r' ? 'gr' : 'g'+g;
+  db.ref('weekScores/'+weekKey+'/'+gkey+'/'+uid).update(upd).then(function(){
     showResult(fmt,diff,isRec,g);
   });
 }
@@ -818,6 +983,9 @@ function setRankGame(g){
   document.getElementById('rgt5').className='rgt'+(g===5?' on5':'');
   document.getElementById('rgt10').className='rgt'+(g===10?' on10':'');
   document.getElementById('rgt15').className='rgt'+(g===15?' on15':'');
+  document.getElementById('rgtr').className='rgt'+(g==='r'?' on5':'');
+  if(g==='r')document.getElementById('rgtr').style.background='var(--cr)',document.getElementById('rgtr').style.color='#000',document.getElementById('rgtr').style.borderColor='var(--cr)';
+  else document.getElementById('rgtr').style.background='',document.getElementById('rgtr').style.color='',document.getElementById('rgtr').style.borderColor='';
   renderFullRank(g);
 }
  
@@ -870,6 +1038,7 @@ function goTab(t){
     document.getElementById('rgt5').className='rgt on5';
     document.getElementById('rgt10').className='rgt';
     document.getElementById('rgt15').className='rgt';
+    document.getElementById('rgtr').className='rgt';document.getElementById('rgtr').style.background='';document.getElementById('rgtr').style.color='';
     rankGame=5;renderFullRank(5);
     goScreen('sRanking');
   }
@@ -891,12 +1060,22 @@ function setAdmTab(g){
   document.getElementById('apt5').className='apt'+(g===5?' on5':'');
   document.getElementById('apt10').className='apt'+(g===10?' on10':'');
   document.getElementById('apt15').className='apt'+(g===15?' on15':'');
+  document.getElementById('aptrr').className='apt'+(g==='r'?' on5':'');
+  if(g==='r'){document.getElementById('aptrr').style.background='var(--cr)';document.getElementById('aptrr').style.color='#000';document.getElementById('aptrr').style.borderColor='var(--cr)';}
+  else{document.getElementById('aptrr').style.background='';document.getElementById('aptrr').style.color='';document.getElementById('aptrr').style.borderColor='';}
   renderAdmTable();
 }
  
 function updateAdmStats(){
   document.getElementById('stU').textContent=Object.keys(profiles).length;
-  var total=0;[5,10,15].forEach(function(g){total+=Object.values(weekScores[g]).reduce(function(a,w){return a+(w.attempts||0);},0);});
+  var total=0;db.ref('weekScores/'+weekKey+'/gr').on('value',function(s){
+  weekScores['r']=s.val()||{};
+  updateHomecards();
+  if(document.getElementById('sResult').classList.contains('on')&&curGame==='r') renderLB(curUser?curUser.uid:null,'r',10,'lbList');
+  if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='r') renderFullRank('r');
+  if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();if(admGame==='r')renderAdmTable();}
+});
+[5,10,15].forEach(function(g){total+=Object.values(weekScores[g]).reduce(function(a,w){return a+(w.attempts||0);},0);});
   document.getElementById('stP').textContent=total;
   var b5=Object.values(weekScores[5]).filter(function(w){return w.bestDiff!=null;}).sort(function(a,b){return a.bestDiff-b.bestDiff;});
   document.getElementById('stB5').textContent=b5.length>0?b5[0].bestTime+'s':'—';
@@ -908,14 +1087,21 @@ function updateAdmStats(){
 function buildWinners(){
   var wrap=document.getElementById('winnersWrap');
   var html='';
-  [5,10,15].forEach(function(g){
+  db.ref('weekScores/'+weekKey+'/gr').on('value',function(s){
+  weekScores['r']=s.val()||{};
+  updateHomecards();
+  if(document.getElementById('sResult').classList.contains('on')&&curGame==='r') renderLB(curUser?curUser.uid:null,'r',10,'lbList');
+  if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='r') renderFullRank('r');
+  if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();if(admGame==='r')renderAdmTable();}
+});
+[5,10,15].forEach(function(g){
     var cfg=GAMES[g];
     var sorted=Object.entries(weekScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
     var w=sorted.length>0?sorted[0][1]:null;
     var wUid=sorted.length>0?sorted[0][0]:null;
     var email=wUid&&profiles[wUid]?profiles[wUid].email:'—';
     html+='<div style="background:var(--sf);border:1px solid '+cfg.stroke+';border-radius:11px;padding:13px">'+
-      '<div style="font-size:9px;letter-spacing:2px;color:'+cfg.color+';text-transform:uppercase;margin-bottom:6px">🏆 Reto '+g+'s</div>'+
+      '<div style="font-size:9px;letter-spacing:2px;color:'+cfg.color+';text-transform:uppercase;margin-bottom:6px">'+(g==="r"?"⚡ Reacción":"🏆 Reto "+g+"s")+'</div>'+
       (w?'<div style="font-weight:700;font-size:13px">'+w.name+'</div>'+
       '<div style="font-family:\'DM Mono\',monospace;font-size:13px;color:'+cfg.color+';margin-top:2px">'+w.bestTime+'s</div>'+
       '<div style="font-size:11px;color:var(--tm);margin-top:4px">'+email+'</div>':
@@ -957,8 +1143,15 @@ function confReset(){
  
 function doReset(){
   var upd={};
-  [5,10,15].forEach(function(g){upd['weekScores/'+weekKey+'/g'+g]=null;});
-  db.ref().update(upd).then(function(){closeModal();toast('✅ Semana reseteada');weekScores={5:{},10:{},15:{}};updateHomecards();});
+  db.ref('weekScores/'+weekKey+'/gr').on('value',function(s){
+  weekScores['r']=s.val()||{};
+  updateHomecards();
+  if(document.getElementById('sResult').classList.contains('on')&&curGame==='r') renderLB(curUser?curUser.uid:null,'r',10,'lbList');
+  if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='r') renderFullRank('r');
+  if(document.getElementById('admP').classList.contains('show')){updateAdmStats();buildWinners();if(admGame==='r')renderAdmTable();}
+});
+[5,10,15].forEach(function(g){upd['weekScores/'+weekKey+'/g'+g]=null;});upd['weekScores/'+weekKey+'/gr']=null;
+  db.ref().update(upd).then(function(){closeModal();toast('✅ Semana reseteada');weekScores={5:{},10:{},15:{},'r':{}};updateHomecards();});
 }
  
 // ══ UTILS ══
