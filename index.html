@@ -1425,17 +1425,21 @@ function renderAdmWeek(g) {
   Promise.all(fetches).then(function(res) {
     var results = res[0];
     var legacyDataAdm = res[1].val() || {};
-    Object.entries(legacyDataAdm).forEach(function(e) {
-      var uid2=e[0], w=e[1];
-      if (!w||!w.lastPlayed) return;
-      var dayK = dayKeyFromTimestamp(w.lastPlayed);
-      if (!dayK) return;
-      var dayResult = results.find(function(r){ return r.day.key===dayK; });
-      if (dayResult && !dayResult.hasNewData && !dayResult.scores[uid2]) {
-        dayResult.scores[uid2] = w;
-        dayResult.isLegacy = true;
-      }
+    // Find earliest timestamp across all legacy users → that's launch day
+    var earliestAdm = null;
+    Object.values(legacyDataAdm).forEach(function(w) {
+      if (w && w.lastPlayed && (!earliestAdm || w.lastPlayed < earliestAdm)) earliestAdm = w.lastPlayed;
     });
+    if (earliestAdm) {
+      var legDayK = dayKeyFromTimestamp(earliestAdm);
+      var legTarget = legDayK ? results.find(function(r){ return r.day.key===legDayK; }) : null;
+      if (legTarget && Object.keys(legTarget.scores).length === 0) {
+        Object.entries(legacyDataAdm).forEach(function(e) {
+          var uid2=e[0], w=e[1];
+          if (w && w.bestDiff != null) legTarget.scores[uid2] = w;
+        });
+      }
+    }
  
     var html = '';
     results.forEach(function(r) {
@@ -1767,17 +1771,27 @@ function renderWeekDays(g) {
     var results = res[0];
     var legacyData = res[1].val() || {};
  
-    // Step 2: Assign legacy scores to correct day using lastPlayed timestamp
-    Object.entries(legacyData).forEach(function(e) {
-      var uid2 = e[0], w = e[1];
-      if (!w || !w.lastPlayed) return;
-      var dayK = dayKeyFromTimestamp(w.lastPlayed);
-      if (!dayK) return;
-      var target = results.find(function(r) { return r.day.key === dayK; });
-      if (target && Object.keys(target.scores).length === 0) {
-        target.scores[uid2] = w;
+    // Step 2: Assign ALL legacy scores to a single day
+    // Strategy: find the earliest lastPlayed across all legacy users
+    // that day is when the app first launched — assign everyone to that day
+    var earliestTs = null;
+    Object.values(legacyData).forEach(function(w) {
+      if (w && w.lastPlayed) {
+        if (!earliestTs || w.lastPlayed < earliestTs) earliestTs = w.lastPlayed;
       }
     });
+ 
+    if (earliestTs) {
+      var legacyDayK = dayKeyFromTimestamp(earliestTs);
+      var legacyTarget = legacyDayK ? results.find(function(r) { return r.day.key === legacyDayK; }) : null;
+      // If that day has no new scores, assign all legacy users to it
+      if (legacyTarget && Object.keys(legacyTarget.scores).length === 0) {
+        Object.entries(legacyData).forEach(function(e) {
+          var uid2 = e[0], w = e[1];
+          if (w && w.bestDiff != null) legacyTarget.scores[uid2] = w;
+        });
+      }
+    }
  
     // Step 3: Render
     var html = '';
