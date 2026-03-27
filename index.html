@@ -17,12 +17,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .tabs{display:flex;gap:4px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:4px}
 .tab{padding:8px 16px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--tm);transition:all .2s}
 .tab.on{background:var(--ac);color:#000}
-.saldo-pill{background:var(--sf);border:1px solid var(--bo);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--tm);cursor:pointer;display:none}
-.saldo-pill.show{display:flex;align-items:center;gap:6px}
+.saldo-pill{background:var(--sf);border:1px solid var(--bo);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--tm);display:none;align-items:center;gap:6px}
+.saldo-pill.show{display:flex}
 .saldo-pill .amt{color:var(--ac);font-weight:700;font-family:'DM Mono',monospace}
 .view{display:none}.view.on{display:block}
- 
-/* ── AUTH ── */
+/* AUTH */
 .auth-wrap{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:20px}
 .auth-box{width:100%;max-width:360px;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:30px}
 .auth-logo{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:6px;color:var(--ac);text-align:center;margin-bottom:4px}
@@ -41,17 +40,18 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .abtn{width:100%;height:50px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:8px;transition:opacity .2s}
 .abtn:hover{opacity:.9}
 .ahint{font-size:11px;color:var(--tm);text-align:center;margin-top:10px;line-height:1.7}
- 
-/* ── PROFILE HEADER ── */
+.admin-link{margin-top:16px;padding-top:14px;border-top:1px solid var(--bo);text-align:center}
+.admin-link button{background:transparent;border:none;color:var(--tm);font-size:12px;cursor:pointer;letter-spacing:1px}
+.admin-link button:hover{color:var(--ac)}
+/* PROFILE HEADER */
 .prof-header{background:var(--sf);border-bottom:1px solid var(--bo);padding:14px 20px;display:none}
 .prof-header.show{display:flex;align-items:center;gap:14px}
 .prof-avatar{width:42px;height:42px;border-radius:50%;background:var(--adim);border:2px solid var(--ac);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--ac);flex-shrink:0}
 .prof-info{flex:1}
 .prof-alias{font-weight:700;font-size:16px}
 .prof-name{font-size:12px;color:var(--tm);margin-top:1px}
-.prof-stats{display:flex;gap:16px;margin-top:4px}
+.prof-stats{display:flex;gap:16px;margin-top:4px;flex-wrap:wrap}
 .pstat{font-size:11px;color:var(--tm)}
-.pstat span{font-weight:700}
 .pstat .g{color:var(--ac)}.pstat .r{color:var(--dg)}.pstat .y{color:var(--wn)}
 .saldo-info{text-align:right;flex-shrink:0}
 .saldo-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
@@ -59,47 +59,39 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .saldo-breakdown{font-size:10px;color:var(--tm);margin-top:2px}
 .logout-btn{background:transparent;border:1px solid var(--bo);border-radius:8px;color:var(--tm);padding:5px 10px;cursor:pointer;font-size:12px;margin-left:8px;transition:all .2s}
 .logout-btn:hover{border-color:var(--dg);color:var(--dg)}
- 
-/* ── LOBBY ── */
+/* LOBBY */
 .lobby{padding:18px;max-width:600px;margin:0 auto}
 .lob-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;margin-bottom:4px}
 .lob-sub{font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
 .sec-sep{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;padding:8px 0;border-bottom:1px solid var(--bo);margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .sep-dot{width:6px;height:6px;border-radius:50%;background:var(--ac)}
-.sep-dot.inactive{background:var(--td)}
+.sep-dot.off{background:var(--td)}
 .reto-card{background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:16px;margin-bottom:10px;transition:all .2s;position:relative;overflow:hidden}
 .reto-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
 .reto-card.open::before{background:var(--ac)}
 .reto-card.full::before{background:var(--wn)}
 .reto-card.done::before{background:var(--td)}
-.reto-card.open{cursor:pointer}
-.reto-card.open:hover{border-color:var(--ac);transform:translateY(-1px)}
+.reto-card.open{cursor:pointer}.reto-card.open:hover{border-color:var(--ac);transform:translateY(-1px)}
 .rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
 .rc-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;line-height:1}
 .bdg{font-size:10px;padding:3px 9px;border-radius:5px;font-weight:700;letter-spacing:1px;white-space:nowrap}
-.bo{background:#00e87a20;color:var(--ac)}
-.bf{background:#ffb80020;color:var(--wn)}
-.bd{background:#ffffff10;color:var(--tm)}
+.bo{background:#00e87a20;color:var(--ac)}.bf{background:#ffb80020;color:var(--wn)}.bd{background:#ffffff10;color:var(--tm)}
 .rc-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .rcm{font-size:12px;color:var(--tm)}.rcm span{color:var(--tx);font-weight:600}
 .rc-bar{background:var(--bo);border-radius:4px;height:4px;margin-bottom:8px;overflow:hidden}
 .rc-fill{height:100%;border-radius:4px;background:var(--ac)}.rc-fill.ff{background:var(--wn)}
 .rc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
 .chip{background:var(--sf2);border:1px solid var(--bo);border-radius:20px;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:4px}
-.chip.played{border-color:var(--ac);color:var(--ac)}
-.chip.lead{border-color:var(--wn);color:var(--wn)}
+.chip.played{border-color:var(--ac);color:var(--ac)}.chip.lead{border-color:var(--wn);color:var(--wn)}
 .chip-empty{border:1px dashed var(--td);background:transparent;color:var(--td);border-radius:20px;padding:3px 10px;font-size:11px}
 .cdot{width:5px;height:5px;border-radius:50%;background:currentColor}
 .rc-btn{width:100%;height:42px;background:var(--ac);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;transition:opacity .2s}
 .rc-btn:hover{opacity:.9}.rc-btn.disabled{background:var(--sf2);border:1px solid var(--bo);color:var(--tm);cursor:not-allowed}
-/* winner chip in done reto */
 .win-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--adim);border:1px solid var(--amid);border-radius:8px;margin-bottom:10px;font-size:12px}
-.win-chip .wname{font-weight:700;color:var(--ac)}
-.win-chip .wtime{font-family:'DM Mono',monospace;color:var(--tm)}
+.win-chip .wname{font-weight:700;color:var(--ac)}.win-chip .wtime{font-family:'DM Mono',monospace;color:var(--tm)}
 .no-saldo-msg{font-size:11px;color:var(--dg);text-align:center;margin-top:6px}
 .empty-state{text-align:center;padding:48px 20px;color:var(--tm);font-size:14px;line-height:2}
- 
-/* ── GAME ── */
+/* GAME */
 .game-wrap{min-height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative}
 .game-wrap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.25;pointer-events:none}
 .game-box{width:100%;max-width:400px;position:relative;z-index:1}
@@ -107,11 +99,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .grn{font-size:12px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;text-align:center;margin:4px 0 5px;font-weight:600}
 .gsub{font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:16px}
 .pbadge{background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:11px 15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.pb-l{}.pb-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
+.pb-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px}
 .pb-alias{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--ac)}
-.pb-r{text-align:right}
-.pb-n{font-size:17px;font-weight:700;color:var(--tm)}
-/* leader banner */
+.pb-r{text-align:right}.pb-n{font-size:17px;font-weight:700;color:var(--tm)}
 .lead-banner{background:#ffb80010;border:1px solid #ffb80040;border-radius:10px;padding:9px 13px;margin-bottom:14px;display:none;align-items:center;gap:8px}
 .lead-banner.show{display:flex}
 .lb-txt{font-size:12px;color:var(--wn);flex:1;line-height:1.5}
@@ -138,27 +128,21 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .gbp{background:transparent;border:2px solid var(--ac);color:var(--ac);animation:sp 1s ease-in-out infinite}
 .gbo{background:var(--bo);color:var(--td);cursor:not-allowed}
 @keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--amid)}50%{box-shadow:0 0 0 10px transparent}}
- 
-/* ── RESULT ── */
+/* RESULT */
 .result-wrap{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:22px}
 .result-box{width:100%;max-width:420px}
 .res-rn{font-size:12px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;text-align:center;font-weight:600;margin-bottom:3px}
 .res-t{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;text-align:center;margin-bottom:3px}
 .res-s{font-size:11px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;text-align:center;margin-bottom:16px}
 .rank-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:7px}
-.rank-item.me{border-color:var(--bl)}
-.rank-item.winner{border-color:var(--ac);background:var(--adim)}
-.rank-item.leader{border-color:var(--wn);background:#ffb80010}
+.rank-item.me{border-color:var(--bl)}.rank-item.winner{border-color:var(--ac);background:var(--adim)}.rank-item.leader{border-color:var(--wn);background:#ffb80010}
 .rpos{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--td);width:28px;text-align:center}
 .rank-item.winner .rpos,.rank-item.leader .rpos{color:var(--wn)}
-.rinfo{flex:1}
-.rname{font-size:13px;font-weight:600}
-.rdiff{font-size:11px;color:var(--tm);margin-top:1px}
+.rinfo{flex:1}.rname{font-size:13px;font-weight:600}.rdiff{font-size:11px;color:var(--tm);margin-top:1px}
 .rank-item.winner .rdiff,.rank-item.leader .rdiff{color:var(--ac)}
 .rtime{font-family:'DM Mono',monospace;font-size:12px;color:var(--tm)}
 .rank-item.winner .rtime,.rank-item.leader .rtime{color:var(--ac)}
 .pend-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--sf);border:1px dashed var(--bo);border-radius:12px;margin-bottom:7px;opacity:.45}
-/* prize / waiting */
 .prize-box{background:var(--adim);border:1px solid var(--amid);border-radius:12px;padding:16px;margin:12px 0;text-align:center}
 .pz-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:6px;font-weight:700}
 .pz-amt{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--ac);letter-spacing:2px}
@@ -166,15 +150,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .wait-box{background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin:12px 0;text-align:center}
 .wb-l{font-size:10px;letter-spacing:3px;color:var(--wn);text-transform:uppercase;margin-bottom:6px;font-weight:700}
 .wb-s{font-size:12px;color:var(--tm)}
-/* saldo credited */
 .credited-box{background:#00e87a08;border:1px solid var(--ac);border-radius:12px;padding:14px;margin:12px 0;text-align:center;display:none}
 .credited-box.show{display:block}
 .cb-lbl{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:4px;font-weight:700}
 .cb-amt{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--ac)}
 .back-btn{width:100%;height:42px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;color:var(--tm);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:6px}
 .back-btn:hover{border-color:var(--ac);color:var(--ac)}
- 
-/* ── ADMIN ── */
+/* ADMIN */
 .adm-wrap{padding:20px;max-width:980px;margin:0 auto}
 .login-box{max-width:360px;margin:60px auto;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:32px}
 .lt{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;text-align:center;margin-bottom:6px}
@@ -206,7 +188,6 @@ td{padding:12px;border-bottom:1px solid var(--bo);font-size:13px;vertical-align:
 tr:hover td{background:var(--sf2)}
 .mono{font-family:'DM Mono',monospace}
 .btn-row{display:flex;gap:5px;flex-wrap:wrap}
-/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
 .overlay.show{display:flex}
 .modal{background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:26px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;margin:12px;animation:mi .2s ease-out}
@@ -227,27 +208,24 @@ tr:hover td{background:var(--sf2)}
 .ff label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
 .ff input,.ff select{height:42px;background:var(--sf2);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 10px;outline:none;transition:border-color .2s}
 .ff input:focus,.ff select:focus{border-color:var(--ac)}
-.ff select option{background:var(--sf2)}
-.ff.full{grid-column:1/-1}
-/* TOAST */
+.ff select option{background:var(--sf2)}.ff.full{grid-column:1/-1}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--sf);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;font-size:13px;z-index:300;display:none;max-width:280px;box-shadow:0 4px 20px rgba(0,232,122,.15);animation:ti .3s ease-out}
 .toast.show{display:block}
 @keyframes ti{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-/* CD */
 .cd-wrap{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 .cd-wrap.show{display:flex}
 .cdn{font-family:'Bebas Neue',sans-serif;font-size:180px;color:var(--ac);text-shadow:0 0 80px var(--amid);animation:cdp .8s ease-out;line-height:1}
 @keyframes cdp{from{transform:scale(1.4);opacity:0}30%{transform:scale(.95);opacity:1}to{transform:scale(1);opacity:1}}
 .cds{font-size:13px;letter-spacing:4px;color:var(--tm);text-transform:uppercase}
 @media(max-width:680px){
-  .stats{grid-template-columns:1fr 1fr}
-  .fgrid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}
   .game-wrap,.result-wrap,.lobby{padding:14px}
   .gt{font-size:30px}.tnum{font-size:56px}
   .cring{width:165px;height:165px}.cns{font-size:42px}
   nav{padding:10px 14px}.logo{font-size:22px}
   .tab{padding:7px 11px;font-size:12px}
   .adm-wrap{padding:12px}.modal{padding:20px 14px;margin:8px}
+  .prof-header{flex-wrap:wrap}.saldo-info{width:100%;text-align:left;margin-top:8px}
 }
 </style>
 </head>
@@ -259,17 +237,14 @@ tr:hover td{background:var(--sf2)}
 <nav>
   <div class="logo">RIVAL</div>
   <div class="nav-right">
-    <div class="tabs" id="navTabs">
+    <div class="tabs">
       <button class="tab on" id="tab-game" onclick="goTo('game')">🎮 Juegos</button>
       <button class="tab" id="tab-admin" onclick="goTo('admin')">⚙️ Admin</button>
     </div>
-    <div class="saldo-pill" id="saldoPill">
-      💰 <span class="amt" id="saldoPillAmt">$0</span>
-    </div>
+    <div class="saldo-pill" id="saldoPill">💰 <span class="amt" id="saldoPillAmt">$0</span></div>
   </div>
 </nav>
  
-<!-- PROFILE HEADER -->
 <div class="prof-header" id="profHeader">
   <div class="prof-avatar" id="profAvatar">R</div>
   <div class="prof-info">
@@ -279,6 +254,7 @@ tr:hover td{background:var(--sf2)}
       <div class="pstat">🏆 <span class="g" id="psWins">0</span> ganadas</div>
       <div class="pstat">💀 <span class="r" id="psLosses">0</span> perdidas</div>
       <div class="pstat">⚡ <span class="y" id="psBest">—</span> mejor</div>
+      <div class="pstat">🔥 Racha: <span class="y" id="psRacha">0</span></div>
     </div>
   </div>
   <div class="saldo-info">
@@ -289,7 +265,7 @@ tr:hover td{background:var(--sf2)}
   <button class="logout-btn" onclick="doLogout()">Salir</button>
 </div>
  
-<!-- ══ AUTH VIEW ══ -->
+<!-- AUTH -->
 <div id="view-auth" class="view on">
   <div class="auth-wrap">
     <div class="auth-box">
@@ -299,7 +275,6 @@ tr:hover td{background:var(--sf2)}
         <button class="atab on" id="atab-login" onclick="switchAuthTab('login')">Entrar</button>
         <button class="atab" id="atab-reg" onclick="switchAuthTab('reg')">Registrarse</button>
       </div>
-      <!-- LOGIN -->
       <div id="authLogin">
         <div class="afield"><label>Tu alias</label><input id="loginAlias" placeholder="CarlosRey" autocomplete="off"></div>
         <div class="afield"><label>PIN (4 dígitos)</label>
@@ -312,15 +287,12 @@ tr:hover td{background:var(--sf2)}
         </div>
         <button class="abtn" onclick="doLogin()">ENTRAR</button>
         <div class="ahint">¿No tienes cuenta? Pide un código de invitación</div>
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bo);text-align:center">
-        <button onclick="goTo('admin')" style="background:transparent;border:none;color:var(--tm);font-size:12px;cursor:pointer;letter-spacing:1px">⚙️ Acceso Admin</button>
+        <div class="admin-link"><button onclick="goTo('admin')">⚙️ Acceso Admin</button></div>
       </div>
-      </div>
-      <!-- REGISTER -->
       <div id="authReg" style="display:none">
         <div class="afield"><label>Código de invitación</label><input id="regCode" placeholder="RIVAL-XXXX" autocomplete="off" style="text-transform:uppercase"></div>
         <div class="afield"><label>Nombre completo</label><input id="regName" placeholder="Carlos García"></div>
-        <div class="afield"><label>Alias (apodo)</label><input id="regAlias" placeholder="CarlosRey" autocomplete="off"></div>
+        <div class="afield"><label>Alias (apodo único)</label><input id="regAlias" placeholder="CarlosRey" autocomplete="off"></div>
         <div class="afield"><label>PIN (4 dígitos)</label>
           <div class="pin-row">
             <input class="pdig" id="rp1" maxlength="1" type="tel" oninput="pinNext(this,'rp2')" onkeydown="pinBack(event,this,null)">
@@ -330,15 +302,14 @@ tr:hover td{background:var(--sf2)}
           </div>
         </div>
         <button class="abtn" onclick="doRegister()">CREAR CUENTA</button>
-        <div class="ahint">Pídele el código de invitación al administrador</div>
+        <div class="ahint">Pídele el código al administrador</div>
       </div>
     </div>
   </div>
 </div>
  
-<!-- ══ GAME VIEW ══ -->
+<!-- GAME -->
 <div id="view-game" class="view">
-  <!-- SCREEN: Lobby -->
   <div id="sLobby">
     <div class="lobby">
       <div class="lob-title">RETOS</div>
@@ -346,7 +317,6 @@ tr:hover td{background:var(--sf2)}
       <div id="retosList"></div>
     </div>
   </div>
-  <!-- SCREEN: Game -->
   <div id="sGame" style="display:none">
     <div class="game-wrap">
       <div class="game-box">
@@ -354,7 +324,7 @@ tr:hover td{background:var(--sf2)}
         <div class="grn" id="gRetoName">—</div>
         <div class="gsub" id="gSub">—</div>
         <div class="pbadge">
-          <div class="pb-l"><div class="pb-lbl">Jugando como</div><div class="pb-alias" id="pbAlias">—</div></div>
+          <div><div class="pb-lbl">Jugando como</div><div class="pb-alias" id="pbAlias">—</div></div>
           <div class="pb-r"><div class="pb-lbl">Jugaron</div><div class="pb-n" id="pbJugaron">0/0</div></div>
         </div>
         <div class="lead-banner" id="leadBanner">
@@ -382,7 +352,6 @@ tr:hover td{background:var(--sf2)}
       </div>
     </div>
   </div>
-  <!-- SCREEN: Result -->
   <div id="sResult" style="display:none">
     <div class="result-wrap">
       <div class="result-box">
@@ -390,28 +359,22 @@ tr:hover td{background:var(--sf2)}
         <div class="res-t" id="resTitle">RESULTADO</div>
         <div class="res-s" id="resSub">—</div>
         <div id="rankList"></div>
-        <div class="credited-box" id="creditedBox">
-          <div class="cb-lbl">✅ Ganancia acreditada</div>
-          <div class="cb-amt" id="creditedAmt">+$0</div>
-        </div>
+        <div class="credited-box" id="creditedBox"><div class="cb-lbl">✅ Ganancia acreditada</div><div class="cb-amt" id="creditedAmt">+$0</div></div>
         <div class="prize-box" id="prizeBox" style="display:none"></div>
-        <div class="wait-box" id="waitBox" style="display:none">
-          <div class="wb-l">⏳ ESPERANDO JUGADORES</div>
-          <div class="wb-s" id="waitTxt">—</div>
-        </div>
+        <div class="wait-box" id="waitBox" style="display:none"><div class="wb-l">⏳ ESPERANDO JUGADORES</div><div class="wb-s" id="waitTxt">—</div></div>
         <button class="back-btn" onclick="goBack()">← Volver a los retos</button>
       </div>
     </div>
   </div>
 </div>
  
-<!-- ══ ADMIN VIEW ══ -->
+<!-- ADMIN -->
 <div id="view-admin" class="view">
   <div class="adm-wrap">
     <div id="loginBox" class="login-box">
       <div class="lt">ADMIN RIVAL</div>
       <div class="ls">Acceso restringido</div>
-      <div class="fld"><label>Usuario</label><input id="alu" placeholder="admin"></div>
+      <div class="fld"><label>Usuario</label><input id="alu" placeholder="admin" autocomplete="off"></div>
       <div class="fld"><label>Contraseña</label><input id="alp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
       <button class="btn-login" onclick="doAdminLogin()">ENTRAR</button>
       <div class="hint">admin / rival2024 — socio / rival2024</div>
@@ -421,24 +384,14 @@ tr:hover td{background:var(--sf2)}
         <div class="stat"><div class="sl">Jugadores</div><div class="sv g" id="stU">0</div></div>
         <div class="stat"><div class="sl">Retos activos</div><div class="sv y" id="stR">0</div></div>
         <div class="stat"><div class="sl">Por dispersar</div><div class="sv r" id="stD">0</div></div>
-        <div class="stat"><div class="sl">Saldo en juego</div><div class="sv b" id="stV">$0</div></div>
+        <div class="stat"><div class="sl">Saldo total</div><div class="sv b" id="stV">$0</div></div>
       </div>
- 
-      <!-- JUGADORES -->
-      <div class="sec-hdr">
-        <div class="sec-lbl">👥 Jugadores</div>
-        <button class="btn btn-b" onclick="genCode()">+ Código de invitación</button>
-      </div>
+      <div class="sec-hdr"><div class="sec-lbl">👥 Jugadores</div><button class="btn btn-b" onclick="genCode()">+ Código invitación</button></div>
       <div class="tbl-wrap">
         <table><thead><tr><th>Alias</th><th>Nombre</th><th>Saldo</th><th>Fondo</th><th>Ganancia</th><th>Stats</th><th>Acciones</th></tr></thead>
         <tbody id="usersTable"></tbody></table>
       </div>
- 
-      <!-- RETOS -->
-      <div class="sec-hdr">
-        <div class="sec-lbl">⚔️ Retos</div>
-        <button class="btn btn-g" onclick="openCreateReto()">+ Nuevo reto</button>
-      </div>
+      <div class="sec-hdr"><div class="sec-lbl">⚔️ Retos</div><button class="btn btn-g" onclick="openCreateReto()">+ Nuevo reto</button></div>
       <div class="tbl-wrap">
         <table><thead><tr><th>Título</th><th>Objetivo</th><th>Jugadores</th><th>Apuesta</th><th>Estado</th><th>Acciones</th></tr></thead>
         <tbody id="retosTable"></tbody></table>
@@ -450,845 +403,765 @@ tr:hover td{background:var(--sf2)}
 <script>
 // ══ FIREBASE ══
 firebase.initializeApp({
-  apiKey:"AIzaSyB2cpU5WtMZ3DgaZv6viTDCXPvj8VHrTwE",
-  authDomain:"rival-app-82470.firebaseapp.com",
-  databaseURL:"https://rival-app-82470-default-rtdb.firebaseio.com",
-  projectId:"rival-app-82470",
-  storageBucket:"rival-app-82470.firebasestorage.app",
-  messagingSenderId:"669224883015",
-  appId:"1:669224883015:web:af16120105ee0504967262"
+  apiKey: "AIzaSyB2cpU5WtMZ3DgaZv6viTDCXPvj8VHrTwE",
+  authDomain: "rival-app-82470.firebaseapp.com",
+  databaseURL: "https://rival-app-82470-default-rtdb.firebaseio.com",
+  projectId: "rival-app-82470",
+  storageBucket: "rival-app-82470.firebasestorage.app",
+  messagingSenderId: "669224883015",
+  appId: "1:669224883015:web:af16120105ee0504967262"
 });
-var db=firebase.database();
+var db = firebase.database();
  
 // ══ STATE ══
-var users={}, retos={}, invCodes={};
-var curUser=null, myRetoId=null, loggedIn=false;
-var gState='idle', t0=null, raf=null, elapsed=0, curScreen='lobby';
-var DEVICE_KEY='rival_device_'+Math.random().toString(36).slice(2,8);
+var users = {}, retos = {}, invCodes = {};
+var curUser = null, myRetoId = null, adminLoggedIn = false;
+var gState = 'idle', t0 = null, raf = null, elapsed = 0, curScreen = 'lobby';
  
-// ══ DEVICE ID ══
-function getDeviceId(){
-  var k=localStorage.getItem('rival_device_id');
-  if(!k){k='dev_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);localStorage.setItem('rival_device_id',k);}
+function getDeviceId() {
+  var k = localStorage.getItem('rival_did');
+  if (!k) { k = 'dev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); localStorage.setItem('rival_did', k); }
   return k;
 }
-var DEVICE_ID=getDeviceId();
+var DEVICE_ID = getDeviceId();
  
-// ══ REALTIME LISTENERS ══
-db.ref('users').on('value',function(s){users=s.val()||{};if(loggedIn)renderUsersTable();updateAdminStats();if(curUser&&users[curUser.uid]){curUser=users[curUser.uid];curUser.uid=Object.keys(users).find(function(k){return users[k]===curUser;})||curUser.uid;updateProfileUI();}});
-db.ref('retos').on('value',function(s){retos=s.val()||{};renderLobby();if(loggedIn)renderRetosTable();updateAdminStats();if(myRetoId&&curUser&&curScreen==='result'){var r=retos[myRetoId];if(r)renderResult(myRetoId,r);}if(myRetoId&&curUser&&curScreen==='game'){var r=retos[myRetoId];if(r)updateGameInfo(r);}});
-db.ref('invCodes').on('value',function(s){invCodes=s.val()||{};});
- 
-// ══ AUTO LOGIN ══
-window.addEventListener('load',function(){
-  var saved=localStorage.getItem('rival_user');
-  if(saved){
-    try{var u=JSON.parse(saved);curUser=u;showLoggedIn();}catch(e){localStorage.removeItem('rival_user');}
+// ══ LISTENERS ══
+db.ref('users').on('value', function(s) {
+  users = s.val() || {};
+  if (adminLoggedIn) renderUsersTable();
+  updateAdminStats();
+  if (curUser && users[curUser.uid]) {
+    var fresh = users[curUser.uid];
+    fresh.uid = curUser.uid;
+    curUser = fresh;
+    localStorage.setItem('rival_user', JSON.stringify(curUser));
+    updateProfileUI();
   }
 });
  
-// ══ AUTH HELPERS ══
-function switchAuthTab(t){
-  document.getElementById('atab-login').classList.toggle('on',t==='login');
-  document.getElementById('atab-reg').classList.toggle('on',t==='reg');
-  document.getElementById('authLogin').style.display=t==='login'?'block':'none';
-  document.getElementById('authReg').style.display=t==='reg'?'block':'none';
+db.ref('retos').on('value', function(s) {
+  retos = s.val() || {};
+  renderLobby();
+  if (adminLoggedIn) renderRetosTable();
+  updateAdminStats();
+  if (myRetoId && curUser) {
+    var r = retos[myRetoId];
+    if (r && curScreen === 'result') renderResult(myRetoId, r);
+    if (r && curScreen === 'game') updateGameInfo(r);
+  }
+});
+ 
+db.ref('invCodes').on('value', function(s) { invCodes = s.val() || {}; });
+ 
+// ══ AUTO LOGIN ══
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('rival_user');
+  if (saved) {
+    try { var u = JSON.parse(saved); if (u && u.uid) { curUser = u; showLoggedIn(); } }
+    catch(e) { localStorage.removeItem('rival_user'); }
+  }
+});
+ 
+// ══ AUTH ══
+function switchAuthTab(t) {
+  document.getElementById('atab-login').classList.toggle('on', t === 'login');
+  document.getElementById('atab-reg').classList.toggle('on', t === 'reg');
+  document.getElementById('authLogin').style.display = t === 'login' ? 'block' : 'none';
+  document.getElementById('authReg').style.display = t === 'reg' ? 'block' : 'none';
 }
  
-function pinNext(el,nextId){
-  if(el.value&&nextId)document.getElementById(nextId).focus();
+function pinNext(el, nextId) { if (el.value && nextId) document.getElementById(nextId).focus(); }
+function pinBack(e, el, prevId) { if (e.key === 'Backspace' && !el.value && prevId) document.getElementById(prevId).focus(); }
+function getPin(prefix) {
+  return ['1','2','3','4'].map(function(n) {
+    var el = document.getElementById(prefix + n);
+    return el ? el.value : '';
+  }).join('');
 }
-function pinBack(e,el,prevId){
-  if(e.key==='Backspace'&&!el.value&&prevId)document.getElementById(prevId).focus();
-}
-function getPin(prefix){
-  return ['1','2','3','4'].map(function(n){return(document.getElementById(prefix+n)||{}).value||'';}).join('');
-}
-function clearPin(prefix){
-  ['1','2','3','4'].forEach(function(n){var el=document.getElementById(prefix+n);if(el)el.value='';});
+function clearPin(prefix) {
+  ['1','2','3','4'].forEach(function(n) {
+    var el = document.getElementById(prefix + n);
+    if (el) el.value = '';
+  });
 }
  
-function doLogin(){
-  var alias=document.getElementById('loginAlias').value.trim();
-  var pin=getPin('lp');
-  if(!alias||pin.length<4){toast('❌ Alias y PIN requeridos');return;}
-  var uid=Object.keys(users).find(function(k){return users[k].alias===alias;});
-  if(!uid){toast('❌ Alias no encontrado');return;}
-  var u=users[uid];
-  if(u.pin!==pin){toast('❌ PIN incorrecto');return;}
-  curUser={...u,uid:uid};
-  localStorage.setItem('rival_user',JSON.stringify(curUser));
-  // Update device
-  db.ref('users/'+uid).update({lastDevice:DEVICE_ID,lastLogin:Date.now()});
+function doLogin() {
+  var alias = document.getElementById('loginAlias').value.trim();
+  var pin = getPin('lp');
+  if (!alias || pin.length < 4) { toast('❌ Alias y PIN requeridos'); return; }
+  var uid = Object.keys(users).find(function(k) { return users[k].alias === alias; });
+  if (!uid) { toast('❌ Alias no encontrado'); return; }
+  var u = users[uid];
+  if (u.pin !== pin) { toast('❌ PIN incorrecto'); return; }
+  curUser = Object.assign({}, u, { uid: uid });
+  localStorage.setItem('rival_user', JSON.stringify(curUser));
+  db.ref('users/' + uid).update({ lastDevice: DEVICE_ID, lastLogin: Date.now() });
   showLoggedIn();
-  toast('✅ Bienvenido, '+u.alias);
+  toast('✅ Bienvenido, ' + u.alias);
   clearPin('lp');
 }
  
-function doRegister(){
-  var code=document.getElementById('regCode').value.trim().toUpperCase();
-  var name=document.getElementById('regName').value.trim();
-  var alias=document.getElementById('regAlias').value.trim();
-  var pin=getPin('rp');
-  if(!code||!name||!alias||pin.length<4){toast('❌ Llena todos los campos');return;}
-  // Validate code
-  var codeData=invCodes[code];
-  if(!codeData||codeData.used){toast('❌ Código inválido o ya usado');return;}
-  // Check alias unique
-  var exists=Object.values(users).find(function(u){return u.alias===alias;});
-  if(exists){toast('❌ Ese alias ya existe');return;}
-  // Check device
-  var devUsed=Object.values(users).find(function(u){return u.lastDevice===DEVICE_ID;});
-  if(devUsed){toast('❌ Ya existe una cuenta en este dispositivo');return;}
-  // Create user
-  var uid='usr_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
-  var newUser={alias:alias,name:name,pin:pin,saldoFondo:0,saldoGanancia:0,ganadas:0,perdidas:0,mejorTiempo:null,racha:0,lastDevice:DEVICE_ID,createdAt:Date.now()};
-  db.ref('users/'+uid).set(newUser).then(function(){
-    db.ref('invCodes/'+code).update({used:true,usedBy:alias,usedAt:Date.now()});
-    curUser={...newUser,uid:uid};
-    localStorage.setItem('rival_user',JSON.stringify(curUser));
+function doRegister() {
+  var code = document.getElementById('regCode').value.trim().toUpperCase();
+  var name = document.getElementById('regName').value.trim();
+  var alias = document.getElementById('regAlias').value.trim();
+  var pin = getPin('rp');
+  if (!code || !name || !alias || pin.length < 4) { toast('❌ Llena todos los campos'); return; }
+  var codeData = invCodes[code];
+  if (!codeData || codeData.used) { toast('❌ Código inválido o ya usado'); return; }
+  var exists = Object.values(users).find(function(u) { return u.alias === alias; });
+  if (exists) { toast('❌ Ese alias ya existe, elige otro'); return; }
+  var devUsed = Object.values(users).find(function(u) { return u.lastDevice === DEVICE_ID; });
+  if (devUsed) { toast('❌ Ya existe una cuenta en este dispositivo'); return; }
+  var uid = 'usr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  var newUser = { alias: alias, name: name, pin: pin, saldoFondo: 0, saldoGanancia: 0, ganadas: 0, perdidas: 0, mejorTiempo: null, racha: 0, lastDevice: DEVICE_ID, createdAt: Date.now() };
+  db.ref('users/' + uid).set(newUser).then(function() {
+    db.ref('invCodes/' + code).update({ used: true, usedBy: alias, usedAt: Date.now() });
+    curUser = Object.assign({}, newUser, { uid: uid });
+    localStorage.setItem('rival_user', JSON.stringify(curUser));
     showLoggedIn();
-    toast('✅ Cuenta creada. ¡Bienvenido, '+alias+'!');
+    toast('✅ Cuenta creada. ¡Bienvenido, ' + alias + '!');
     clearPin('rp');
-  }).catch(function(){toast('❌ Error al crear cuenta');});
+  }).catch(function() { toast('❌ Error al crear cuenta'); });
 }
  
-function doLogout(){
-  curUser=null;
+function doLogout() {
+  curUser = null;
   localStorage.removeItem('rival_user');
-  myRetoId=null; gState='idle'; cancelAnimationFrame(raf);
+  myRetoId = null; gState = 'idle'; cancelAnimationFrame(raf);
   document.getElementById('profHeader').classList.remove('show');
-  // keep navTabs visible
   document.getElementById('saldoPill').classList.remove('show');
-  document.getElementById('view-auth').classList.add('on');
-  document.getElementById('view-game').classList.remove('on');
-  document.getElementById('view-admin').classList.remove('on');
+  goTo('auth');
 }
  
-function showLoggedIn(){
-  db.ref('users/'+curUser.uid).once('value').then(function(s){
-    var u=s.val();
-    if(!u)return;
-    curUser={...u,uid:curUser.uid};
-    localStorage.setItem('rival_user',JSON.stringify(curUser));
-    document.getElementById('view-auth').classList.remove('on');
-    document.getElementById('view-game').classList.add('on');
-    // navTabs already visible
+function showLoggedIn() {
+  db.ref('users/' + curUser.uid).once('value').then(function(s) {
+    var u = s.val();
+    if (!u) { doLogout(); return; }
+    curUser = Object.assign({}, u, { uid: curUser.uid });
+    localStorage.setItem('rival_user', JSON.stringify(curUser));
     document.getElementById('profHeader').classList.add('show');
     document.getElementById('saldoPill').classList.add('show');
     updateProfileUI();
-    renderLobby();
     showScreen('lobby');
     goTo('game');
   });
 }
  
-function updateProfileUI(){
-  if(!curUser)return;
-  var u=curUser;
-  var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
-  document.getElementById('profAlias').textContent=u.alias||'—';
-  document.getElementById('profName').textContent=u.name||'—';
-  document.getElementById('profAvatar').textContent=(u.alias||'R')[0].toUpperCase();
-  document.getElementById('psWins').textContent=u.ganadas||0;
-  document.getElementById('psLosses').textContent=u.perdidas||0;
-  document.getElementById('psBest').textContent=u.mejorTiempo?u.mejorTiempo+'s':'—';
-  document.getElementById('profSaldo').textContent='$'+total;
-  document.getElementById('profBreakdown').textContent='Fondo: $'+(u.saldoFondo||0)+' | Ganancia: $'+(u.saldoGanancia||0);
-  document.getElementById('saldoPillAmt').textContent='$'+total;
+function updateProfileUI() {
+  if (!curUser) return;
+  var total = (curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0);
+  document.getElementById('profAlias').textContent = curUser.alias || '—';
+  document.getElementById('profName').textContent = curUser.name || '—';
+  document.getElementById('profAvatar').textContent = (curUser.alias || 'R')[0].toUpperCase();
+  document.getElementById('psWins').textContent = curUser.ganadas || 0;
+  document.getElementById('psLosses').textContent = curUser.perdidas || 0;
+  document.getElementById('psBest').textContent = curUser.mejorTiempo ? curUser.mejorTiempo + 's' : '—';
+  document.getElementById('psRacha').textContent = curUser.racha || 0;
+  document.getElementById('profSaldo').textContent = '$' + total;
+  document.getElementById('profBreakdown').textContent = 'Fondo: $' + (curUser.saldoFondo || 0) + ' | Ganancia: $' + (curUser.saldoGanancia || 0);
+  document.getElementById('saldoPillAmt').textContent = '$' + total;
 }
  
 // ══ NAV ══
-function goTo(v){
-  document.querySelectorAll('.view').forEach(function(el){el.classList.remove('on');});
-  document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('on');});
-  document.getElementById('view-'+v).classList.add('on');
-  var t=document.getElementById('tab-'+v);
-  if(t)t.classList.add('on');
+function goTo(v) {
+  document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('on'); });
+  document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('on'); });
+  document.getElementById('view-' + v).classList.add('on');
+  var t = document.getElementById('tab-' + v);
+  if (t) t.classList.add('on');
 }
  
-function showScreen(s){
-  curScreen=s;
-  document.getElementById('sLobby').style.display=s==='lobby'?'block':'none';
-  document.getElementById('sGame').style.display=s==='game'?'block':'none';
-  document.getElementById('sResult').style.display=s==='result'?'block':'none';
+function showScreen(s) {
+  curScreen = s;
+  document.getElementById('sLobby').style.display = s === 'lobby' ? 'block' : 'none';
+  document.getElementById('sGame').style.display = s === 'game' ? 'block' : 'none';
+  document.getElementById('sResult').style.display = s === 'result' ? 'block' : 'none';
 }
  
-function goBack(){myRetoId=null;gState='idle';cancelAnimationFrame(raf);showScreen('lobby');}
+function goBack() { myRetoId = null; gState = 'idle'; cancelAnimationFrame(raf); showScreen('lobby'); }
  
 // ══ LOBBY ══
-function renderLobby(){
-  var list=document.getElementById('retosList');
-  if(!list)return;
-  var keys=Object.keys(retos);
-  if(keys.length===0){list.innerHTML='<div class="empty-state">Sin retos disponibles</div>';return;}
- 
-  // Sort: active first, then done
-  var active=keys.filter(function(k){var s=retos[k].status;return s!=='done'&&s!=='dispersado';});
-  var inactive=keys.filter(function(k){var s=retos[k].status;return s==='done'||s==='dispersado';});
- 
-  var html='';
- 
-  if(active.length>0){
-    html+='<div class="sec-sep"><div class="sep-dot"></div>Retos activos ('+active.length+')</div>';
-    active.forEach(function(id){html+=buildRetoCard(id,retos[id]);});
+function renderLobby() {
+  var list = document.getElementById('retosList');
+  if (!list) return;
+  var keys = Object.keys(retos);
+  if (keys.length === 0) { list.innerHTML = '<div class="empty-state">Sin retos disponibles</div>'; return; }
+  var active = keys.filter(function(k) { var s = retos[k].status; return s !== 'done' && s !== 'dispersado'; });
+  var inactive = keys.filter(function(k) { var s = retos[k].status; return s === 'done' || s === 'dispersado'; });
+  var html = '';
+  if (active.length > 0) {
+    html += '<div class="sec-sep"><div class="sep-dot"></div>Activos (' + active.length + ')</div>';
+    active.forEach(function(id) { html += buildCard(id, retos[id]); });
   }
- 
-  if(inactive.length>0){
-    html+='<div class="sec-sep" style="margin-top:20px"><div class="sep-dot inactive"></div>Terminados</div>';
-    inactive.forEach(function(id){html+=buildRetoCard(id,retos[id]);});
+  if (inactive.length > 0) {
+    html += '<div class="sec-sep" style="margin-top:20px"><div class="sep-dot off"></div>Terminados</div>';
+    inactive.forEach(function(id) { html += buildCard(id, retos[id]); });
   }
- 
-  list.innerHTML=html;
+  list.innerHTML = html;
 }
  
-function buildRetoCard(id,r){
-  var players=r.players||{};
-  var joined=Object.keys(players).length;
-  var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-  var max=r.maxPlayers||4;
-  var isDone=r.status==='done'||r.status==='dispersado';
-  var isFull=joined>=max&&!isDone;
-  var pct=Math.round((joined/max)*100);
- 
-  var cardClass=isDone?'reto-card done':isFull?'reto-card full':'reto-card open';
-  var badge=isDone?'<span class="bdg bd">TERMINADO</span>':isFull?'<span class="bdg bf">LLENO</span>':'<span class="bdg bo">DISPONIBLE</span>';
- 
-  // Chips
-  var chips='';
-  var pkeys=Object.keys(players);
-  for(var i=0;i<max;i++){
-    if(pkeys[i]){
-      var p=players[pkeys[i]];
-      var isLead=false;
-      // Find current leader
-      if(p&&p.time!=null&&played>0&&played<max){
-        var target=parseFloat(r.objetivo)||5.0;
-        var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
-        isLead=sorted.length>0&&sorted[0].name===pkeys[i];
+function buildCard(id, r) {
+  var players = r.players || {};
+  var joined = Object.keys(players).length;
+  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+  var max = r.maxPlayers || 4;
+  var isDone = r.status === 'done' || r.status === 'dispersado';
+  var isFull = joined >= max && !isDone;
+  var pct = Math.round((joined / max) * 100);
+  var cardClass = isDone ? 'reto-card done' : isFull ? 'reto-card full' : 'reto-card open';
+  var badge = isDone ? '<span class="bdg bd">TERMINADO</span>' : isFull ? '<span class="bdg bf">LLENO</span>' : '<span class="bdg bo">DISPONIBLE</span>';
+  var target = parseFloat(r.objetivo) || 5.0;
+  var chips = '';
+  var pkeys = Object.keys(players);
+  for (var i = 0; i < max; i++) {
+    if (pkeys[i]) {
+      var p = players[pkeys[i]];
+      var isLead = false;
+      if (p && p.time != null && played > 0 && played < max) {
+        var sortedChip = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
+        isLead = sortedChip.length > 0 && sortedChip[0].name === pkeys[i];
       }
-      var cls=p&&p.time!=null?(isLead?'chip lead':'chip played'):'chip';
-      chips+='<div class="'+cls+'"><div class="cdot"></div>'+pkeys[i]+'</div>';
+      var cls = p && p.time != null ? (isLead ? 'chip lead' : 'chip played') : 'chip';
+      chips += '<div class="' + cls + '"><div class="cdot"></div>' + pkeys[i] + '</div>';
     } else {
-      chips+='<div class="chip-empty">libre</div>';
+      chips += '<div class="chip-empty">libre</div>';
     }
   }
- 
-  // Winner for done retos
-  var winnerSection='';
-  if(isDone&&played>0){
-    var target=parseFloat(r.objetivo)||5.0;
-    var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
-    if(sorted.length>0){
-      winnerSection='<div class="win-chip">🏆 <span class="wname">'+sorted[0].name+'</span><span class="wtime"> — '+sorted[0].time.toFixed(3)+'s (±'+(sorted[0].diff*1000).toFixed(0)+'ms)</span></div>';
-    }
+  var winnerSection = '';
+  if (isDone && played > 0) {
+    var sw = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
+    if (sw.length > 0) winnerSection = '<div class="win-chip">🏆 <span class="wname">' + sw[0].name + '</span><span class="wtime"> — ' + sw[0].time.toFixed(3) + 's (±' + (sw[0].diff * 1000).toFixed(0) + 'ms)</span></div>';
   }
- 
-  // Button logic
-  var userSaldo=curUser?(((curUser.saldoFondo||0)+(curUser.saldoGanancia||0))):0;
-  var hasSaldo=userSaldo>=(r.apuesta||0);
-  var alreadyIn=curUser&&players[curUser.alias];
-  var btnHtml='';
-  if(!isDone&&!isFull){
-    if(alreadyIn){
-      btnHtml='<button class="rc-btn disabled">Ya estás inscrito</button>';
-    } else if(!hasSaldo){
-      btnHtml='<button class="rc-btn disabled">Sin saldo suficiente</button><div class="no-saldo-msg">Necesitas $'+(r.apuesta||0)+' — tienes $'+userSaldo+'</div>';
+  var userSaldo = curUser ? ((curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0)) : 0;
+  var apuesta = r.apuesta || 0;
+  var hasSaldo = userSaldo >= apuesta;
+  var alreadyIn = curUser && players[curUser.alias];
+  var btnHtml = '';
+  if (!isDone && !isFull && !alreadyIn) {
+    if (!hasSaldo) {
+      btnHtml = '<button class="rc-btn disabled" disabled>Sin saldo suficiente</button><div class="no-saldo-msg">Necesitas $' + apuesta + ' — tienes $' + userSaldo + '</div>';
     } else {
-      btnHtml='<button class="rc-btn" onclick="openJoin(\''+id+'\')">⚔️ UNIRME — $'+(r.apuesta||0)+'</button>';
+      btnHtml = '<button class="rc-btn" onclick="openJoin(\'' + id + '\')">⚔️ UNIRME — $' + apuesta + '</button>';
     }
-  } else if(alreadyIn&&!isDone){
-    btnHtml='<button class="rc-btn" onclick="openReto(\''+id+'\')">▶️ VER MI RETO</button>';
-  } else if(isDone){
-    btnHtml='<button class="rc-btn done-btn" disabled>Finalizado</button>';
+  } else if (alreadyIn && !isDone) {
+    btnHtml = '<button class="rc-btn" onclick="openReto(\'' + id + '\')">▶️ VER MI RETO</button>';
+  } else if (isDone) {
+    btnHtml = '<button class="rc-btn disabled" disabled>Finalizado</button>';
   } else {
-    btnHtml='<button class="rc-btn disabled">❌ Sin lugares</button>';
+    btnHtml = '<button class="rc-btn disabled" disabled>❌ Sin lugares</button>';
   }
- 
-  return '<div class="'+cardClass+'">'+
-    '<div class="rc-top"><div class="rc-title">'+(r.titulo||'Reto')+'</div>'+badge+'</div>'+
-    '<div class="rc-meta">'+
-    '<div class="rcm">⏱️ <span>'+parseFloat(r.objetivo||5).toFixed(3)+'s</span></div>'+
-    '<div class="rcm">💰 <span style="color:var(--wn)">$'+(r.apuesta||0)+' c/u</span></div>'+
-    '<div class="rcm">🏆 <span style="color:var(--ac)">$'+((r.apuesta||0)*max)+'</span></div>'+
-    '<div class="rcm">👥 <span>'+joined+'/'+max+'</span></div>'+
-    '</div>'+
-    '<div class="rc-bar"><div class="rc-fill'+(isFull?' ff':'')+'" style="width:'+pct+'%"></div></div>'+
-    '<div class="rc-chips">'+chips+'</div>'+
-    winnerSection+
-    btnHtml+'</div>';
+  return '<div class="' + cardClass + '">' +
+    '<div class="rc-top"><div class="rc-title">' + (r.titulo || 'Reto') + '</div>' + badge + '</div>' +
+    '<div class="rc-meta"><div class="rcm">⏱️ <span>' + target.toFixed(3) + 's</span></div><div class="rcm">💰 <span style="color:var(--wn)">$' + apuesta + ' c/u</span></div><div class="rcm">🏆 <span style="color:var(--ac)">$' + (apuesta * max) + '</span></div><div class="rcm">👥 <span>' + joined + '/' + max + '</span></div></div>' +
+    '<div class="rc-bar"><div class="rc-fill' + (isFull ? ' ff' : '') + '" style="width:' + pct + '%"></div></div>' +
+    '<div class="rc-chips">' + chips + '</div>' +
+    winnerSection + btnHtml + '</div>';
 }
  
-// ══ JOIN RETO ══
-function openJoin(id){
-  var r=retos[id];
-  var players=r.players||{};
-  var joined=Object.keys(players).length;
-  var max=r.maxPlayers||4;
-  var apuesta=r.apuesta||0;
-  var userSaldo=(curUser.saldoFondo||0)+(curUser.saldoGanancia||0);
- 
-  document.getElementById('modalBody').innerHTML=
-    '<div class="mt">⚔️ '+(r.titulo||'Reto')+'</div>'+
-    '<div class="ibox">'+
-    '<div class="ir"><span class="il">Objetivo</span><span class="iv">'+parseFloat(r.objetivo||5).toFixed(3)+'s</span></div>'+
-    '<div class="ir"><span class="il">Apuesta</span><span class="iv" style="color:var(--wn)">$'+apuesta+' MXN</span></div>'+
-    '<div class="ir"><span class="il">Lugares</span><span class="iv">'+joined+'/'+max+'</span></div>'+
-    '<div class="ir"><span class="il">Tu saldo</span><span class="iv" style="color:var(--ac)">$'+userSaldo+' disponibles</span></div>'+
-    '<div class="ir"><span class="il">Saldo tras inscripción</span><span class="iv">$'+(userSaldo-apuesta)+' restantes</span></div>'+
-    '</div>'+
-    '<div style="font-size:13px;color:var(--tm);text-align:center;padding:10px;background:var(--sf2);border-radius:10px;margin-bottom:14px">'+
-    'Jugando como <strong style="color:var(--ac)">'+curUser.alias+'</strong><br>'+
-    'Se descontarán <strong style="color:var(--wn)">$'+apuesta+'</strong> de tu saldo</div>'+
-    '<div class="mbtns">'+
-    '<button class="btn btn-gh" onclick="closeModal()">Cancelar</button>'+
-    '<button class="btn btn-g" onclick="confirmJoin(\''+id+'\')" style="font-weight:700">✅ CONFIRMAR</button>'+
-    '</div>';
+// ══ JOIN ══
+function openJoin(id) {
+  var r = retos[id];
+  var apuesta = r.apuesta || 0;
+  var max = r.maxPlayers || 4;
+  var joined = Object.keys(r.players || {}).length;
+  var userSaldo = (curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0);
+  document.getElementById('modalBody').innerHTML =
+    '<div class="mt">⚔️ ' + (r.titulo || 'Reto') + '</div>' +
+    '<div class="ibox">' +
+    '<div class="ir"><span class="il">Objetivo</span><span class="iv">' + parseFloat(r.objetivo || 5).toFixed(3) + 's</span></div>' +
+    '<div class="ir"><span class="il">Apuesta</span><span class="iv" style="color:var(--wn)">$' + apuesta + ' MXN</span></div>' +
+    '<div class="ir"><span class="il">Lugares</span><span class="iv">' + joined + ' de ' + max + ' tomados</span></div>' +
+    '<div class="ir"><span class="il">Tu saldo</span><span class="iv" style="color:var(--ac)">$' + userSaldo + '</span></div>' +
+    '</div>' +
+    '<div style="font-size:13px;color:var(--tm);text-align:center;padding:10px;background:var(--sf2);border-radius:10px;margin-bottom:14px">' +
+    'Jugando como <strong style="color:var(--ac)">' + curUser.alias + '</strong><br>Se descontarán <strong style="color:var(--wn)">$' + apuesta + '</strong> de tu saldo</div>' +
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="confirmJoin(\'' + id + '\')" style="font-weight:700">✅ CONFIRMAR</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function confirmJoin(id){
-  var r=retos[id];
-  var apuesta=r.apuesta||0;
-  var players=r.players||{};
-  var max=r.maxPlayers||4;
-  var uid=curUser.uid;
-  var alias=curUser.alias;
- 
-  if(players[alias]){toast('❌ Ya estás en este reto');closeModal();return;}
-  if(Object.keys(players).length>=max){toast('❌ Reto lleno');closeModal();return;}
- 
-  var saldoTotal=(curUser.saldoFondo||0)+(curUser.saldoGanancia||0);
-  if(saldoTotal<apuesta){toast('❌ Saldo insuficiente');closeModal();return;}
- 
-  // Deduct from fondo first, then ganancia
-  var nuevoFondo=curUser.saldoFondo||0;
-  var nuevoGanancia=curUser.saldoGanancia||0;
-  var resta=apuesta;
-  if(nuevoFondo>=resta){nuevoFondo-=resta;}
-  else{resta-=nuevoFondo;nuevoFondo=0;nuevoGanancia-=resta;}
- 
-  var updates={};
-  updates['users/'+uid+'/saldoFondo']=nuevoFondo;
-  updates['users/'+uid+'/saldoGanancia']=nuevoGanancia;
-  updates['retos/'+id+'/players/'+alias]={time:null,joinedAt:Date.now(),uid:uid};
-  if(r.status==='waiting')updates['retos/'+id+'/status']='playing';
- 
-  db.ref().update(updates).then(function(){
-    curUser.saldoFondo=nuevoFondo;
-    curUser.saldoGanancia=nuevoGanancia;
-    localStorage.setItem('rival_user',JSON.stringify(curUser));
+function confirmJoin(id) {
+  var r = retos[id];
+  var apuesta = r.apuesta || 0;
+  var players = r.players || {};
+  var max = r.maxPlayers || 4;
+  var uid = curUser.uid;
+  var alias = curUser.alias;
+  if (players[alias]) { toast('❌ Ya estás en este reto'); closeModal(); return; }
+  if (Object.keys(players).length >= max) { toast('❌ Reto lleno'); closeModal(); return; }
+  var saldoTotal = (curUser.saldoFondo || 0) + (curUser.saldoGanancia || 0);
+  if (saldoTotal < apuesta) { toast('❌ Saldo insuficiente'); closeModal(); return; }
+  var nf = curUser.saldoFondo || 0, ng = curUser.saldoGanancia || 0, resta = apuesta;
+  if (nf >= resta) { nf -= resta; } else { resta -= nf; nf = 0; ng -= resta; }
+  var upd = {};
+  upd['users/' + uid + '/saldoFondo'] = nf;
+  upd['users/' + uid + '/saldoGanancia'] = ng;
+  upd['retos/' + id + '/players/' + alias] = { time: null, joinedAt: Date.now(), uid: uid };
+  if (r.status === 'waiting') upd['retos/' + id + '/status'] = 'playing';
+  db.ref().update(upd).then(function() {
+    curUser.saldoFondo = nf; curUser.saldoGanancia = ng;
+    localStorage.setItem('rival_user', JSON.stringify(curUser));
     updateProfileUI();
-    myRetoId=id;
+    myRetoId = id;
     closeModal();
-    toast('✅ Inscrito — $'+apuesta+' descontados');
-    showGameScreen(id,retos[id]||r);
-  }).catch(function(){toast('❌ Error — intenta de nuevo');});
+    toast('✅ Inscrito — $' + apuesta + ' descontados');
+    showGameScreen(id, retos[id] || r);
+  }).catch(function() { toast('❌ Error — intenta de nuevo'); });
 }
  
-function openReto(id){
-  myRetoId=id;
-  var r=retos[id];
-  if(r)showGameScreen(id,r);
-}
+function openReto(id) { myRetoId = id; var r = retos[id]; if (r) showGameScreen(id, r); }
  
-// ══ GAME SCREEN ══
-function showGameScreen(id,r){
-  if(!r)return;
-  var target=parseFloat(r.objetivo)||5.0;
-  var players=r.players||{};
-  var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-  var joined=Object.keys(players).length;
- 
-  document.getElementById('gRetoName').textContent=r.titulo||'Reto';
-  document.getElementById('gSub').textContent='#'+id.slice(-4).toUpperCase()+' — '+played+'/'+joined+' jugaron';
-  document.getElementById('pbAlias').textContent=curUser.alias;
-  document.getElementById('pbJugaron').textContent=played+'/'+joined;
-  document.getElementById('tgtNum').textContent=target.toFixed(3);
- 
-  // Reset clock
-  document.getElementById('cS').textContent='0';
-  document.getElementById('cM').textContent='.000';
-  document.getElementById('cL').textContent='LISTO';
-  document.getElementById('cRing').className='cring';
-  document.getElementById('rfg').style.strokeDashoffset='565';
-  document.getElementById('gBtn').className='gbtn gbs';
-  document.getElementById('gBtn').textContent='INICIAR';
-  gState='idle';
- 
-  // Check if already played
-  var myEntry=players[curUser.alias];
-  if(myEntry&&myEntry.time!=null){
-    renderResult(id,r);showScreen('result');return;
-  }
- 
-  // Show leader banner
+// ══ GAME ══
+function showGameScreen(id, r) {
+  if (!r) return;
+  var target = parseFloat(r.objetivo) || 5.0;
+  var players = r.players || {};
+  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+  var max = r.maxPlayers || 4;
+  var myEntry = players[curUser.alias];
+  if (myEntry && myEntry.time != null) { renderResult(id, r); showScreen('result'); return; }
+  document.getElementById('gRetoName').textContent = r.titulo || 'Reto';
+  document.getElementById('gSub').textContent = '#' + id.slice(-4).toUpperCase() + ' — ' + played + '/' + max + ' jugaron';
+  document.getElementById('pbAlias').textContent = curUser.alias;
+  document.getElementById('pbJugaron').textContent = played + '/' + max;
+  document.getElementById('tgtNum').textContent = target.toFixed(3);
+  document.getElementById('cS').textContent = '0';
+  document.getElementById('cM').textContent = '.000';
+  document.getElementById('cL').textContent = 'LISTO';
+  document.getElementById('cRing').className = 'cring';
+  document.getElementById('rfg').style.strokeDashoffset = '565';
+  document.getElementById('gBtn').className = 'gbtn gbs';
+  document.getElementById('gBtn').textContent = 'INICIAR';
+  gState = 'idle';
   updateLeaderBanner(r);
   showScreen('game');
 }
  
-function updateGameInfo(r){
-  if(!r)return;
-  var players=r.players||{};
-  var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-  var joined=Object.keys(players).length;
-  var sub=document.getElementById('gSub');
-  var pos=document.getElementById('pbJugaron');
-  if(sub)sub.textContent='#'+myRetoId.slice(-4).toUpperCase()+' — '+played+'/'+joined+' jugaron';
-  if(pos)pos.textContent=played+'/'+joined;
+function updateGameInfo(r) {
+  if (!r) return;
+  var players = r.players || {};
+  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+  var max = r.maxPlayers || 4;
+  var sub = document.getElementById('gSub');
+  var pos = document.getElementById('pbJugaron');
+  if (sub) sub.textContent = '#' + myRetoId.slice(-4).toUpperCase() + ' — ' + played + '/' + max + ' jugaron';
+  if (pos) pos.textContent = played + '/' + max;
   updateLeaderBanner(r);
 }
  
-function updateLeaderBanner(r){
-  var players=r.players||{};
-  var target=parseFloat(r.objetivo)||5.0;
-  var joined=Object.keys(players).length;
-  var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-  var banner=document.getElementById('leadBanner');
-  var leadTxt=document.getElementById('leadTxt');
-  var leadTime=document.getElementById('leadTime');
-  if(!banner)return;
- 
-  if(played>0&&played<max){
-    var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
-    if(sorted.length>0){
+function updateLeaderBanner(r) {
+  var players = r.players || {};
+  var target = parseFloat(r.objetivo) || 5.0;
+  var max = r.maxPlayers || 4;
+  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+  var banner = document.getElementById('leadBanner');
+  if (!banner) return;
+  if (played > 0 && played < max) {
+    var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
+    if (sorted.length > 0) {
       banner.classList.add('show');
-      leadTxt.textContent=sorted[0].name+' lleva el mejor tiempo — faltan '+(max-played)+' por jugar';
-      leadTime.textContent=sorted[0].time.toFixed(3)+'s';
+      document.getElementById('leadTxt').textContent = sorted[0].name + ' lleva el mejor tiempo — faltan ' + (max - played) + ' por jugar';
+      document.getElementById('leadTime').textContent = sorted[0].time.toFixed(3) + 's';
     }
-  } else {
-    banner.classList.remove('show');
-  }
+  } else { banner.classList.remove('show'); }
 }
  
 // ══ CLOCK ══
-function handleBtn(){
-  if(gState==='idle')startCD();
-  else if(gState==='running')stopClock();
-}
+function handleBtn() { if (gState === 'idle') startCD(); else if (gState === 'running') stopClock(); }
  
-function startCD(){
-  gState='countdown';
-  var btn=document.getElementById('gBtn');
-  if(btn){btn.className='gbtn gbo';btn.textContent='...';}
+function startCD() {
+  gState = 'countdown';
+  var btn = document.getElementById('gBtn');
+  if (btn) { btn.className = 'gbtn gbo'; btn.textContent = '...'; }
   document.getElementById('cdWrap').classList.add('show');
-  var num=document.getElementById('cdN');
-  var n=3;
-  function tick(){
+  var num = document.getElementById('cdN'), n = 3;
+  function tick() {
     n--;
-    if(n>0){num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.style.color='var(--ac)';num.textContent=n;setTimeout(tick,800);}
-    else{num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');startRun();},600);}
+    if (n > 0) { num.style.animation = 'none'; num.offsetHeight; num.style.animation = 'cdp .8s ease-out'; num.style.color = 'var(--ac)'; num.textContent = n; setTimeout(tick, 800); }
+    else { num.textContent = '¡YA!'; setTimeout(function() { document.getElementById('cdWrap').classList.remove('show'); startRun(); }, 600); }
   }
-  setTimeout(tick,800);
+  setTimeout(tick, 800);
 }
  
-function startRun(){
-  gState='running';t0=performance.now();elapsed=0;
-  var btn=document.getElementById('gBtn');
-  if(btn){btn.className='gbtn gbp';btn.textContent='PARAR';}
-  document.getElementById('cRing').className='cring run';
-  document.getElementById('cL').textContent='CORRIENDO';
-  raf=requestAnimationFrame(function loop(){
-    if(gState!=='running')return;
-    elapsed=(performance.now()-t0)/1000;
-    document.getElementById('cS').textContent=Math.floor(elapsed);
-    document.getElementById('cM').textContent='.'+String(Math.floor((elapsed%1)*1000)).padStart(3,'0');
-    var rfg=document.getElementById('rfg');
-    if(rfg)rfg.style.strokeDashoffset=565-(565*Math.min(elapsed/10,1));
-    if(elapsed>=15)stopClock();
-    else raf=requestAnimationFrame(loop);
+function startRun() {
+  gState = 'running'; t0 = performance.now(); elapsed = 0;
+  var btn = document.getElementById('gBtn');
+  if (btn) { btn.className = 'gbtn gbp'; btn.textContent = 'PARAR'; }
+  document.getElementById('cRing').className = 'cring run';
+  document.getElementById('cL').textContent = 'CORRIENDO';
+  raf = requestAnimationFrame(function loop() {
+    if (gState !== 'running') return;
+    elapsed = (performance.now() - t0) / 1000;
+    document.getElementById('cS').textContent = Math.floor(elapsed);
+    document.getElementById('cM').textContent = '.' + String(Math.floor((elapsed % 1) * 1000)).padStart(3, '0');
+    var rfg = document.getElementById('rfg');
+    if (rfg) rfg.style.strokeDashoffset = 565 - (565 * Math.min(elapsed / 10, 1));
+    if (elapsed >= 15) stopClock();
+    else raf = requestAnimationFrame(loop);
   });
 }
  
-function stopClock(){
-  cancelAnimationFrame(raf);gState='stopped';
-  elapsed=(performance.now()-t0)/1000;
-  var r=retos[myRetoId];
-  var target=parseFloat(r?r.objetivo:5)||5.0;
-  var fmt=elapsed.toFixed(3);
-  var diff=Math.abs(elapsed-target);
-  document.getElementById('cS').textContent=fmt.split('.')[0];
-  document.getElementById('cM').textContent='.'+fmt.split('.')[1];
-  document.getElementById('cL').textContent='PARADO';
-  document.getElementById('cRing').className='cring '+(diff<0.3?'good':'bad');
-  var btn=document.getElementById('gBtn');
-  if(btn){btn.className='gbtn gbo';btn.textContent='...';}
- 
-  setTimeout(function(){
-    var r2=retos[myRetoId];
-    var max=r2?r2.maxPlayers||4:4;
-    var players=r2?r2.players||{}:{};
-    var joined=Object.keys(players).length;
-    var playedNow=Object.values(players).filter(function(p){return p&&p.time!=null;}).length+1;
-    var allDone=playedNow>=max;
- 
-    // Save time
-    db.ref('retos/'+myRetoId+'/players/'+curUser.alias).update({time:fmt}).then(function(){
-      toast('✅ Tu tiempo: '+fmt+'s guardado');
- 
-      // If all done — determine winner and credit saldo
-      if(allDone){
-        var allPlayers={...players};
-        allPlayers[curUser.alias]={time:fmt,joinedAt:Date.now(),uid:curUser.uid};
-        var ob=parseFloat((r2||{}).objetivo)||5.0;
-        var sorted2=Object.entries(allPlayers).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-ob),uid2:(e[1].uid||null)};}).sort(function(a,b){return a.diff-b.diff;});
- 
-        if(sorted2.length>0){
-          var winner=sorted2[0];
-          var premio=Math.round((r2.apuesta||0)*max*0.9);
-          db.ref('retos/'+myRetoId).update({status:'done',winner:winner.name,winnerTime:winner.time});
- 
-          // Credit ganancia to winner
-          var winnerUid=Object.keys(users).find(function(k){return users[k].alias===winner.name;});
-          if(winnerUid){
-            var currentGanancia=users[winnerUid].saldoGanancia||0;
-            db.ref('users/'+winnerUid+'/saldoGanancia').set(currentGanancia+premio);
-            // Update stats for all players
-            Object.keys(allPlayers).forEach(function(alias){
-              var pUid=Object.keys(users).find(function(k){return users[k].alias===alias;});
-              if(pUid){
-                var pu=users[pUid];
-                var isWinner=alias===winner.name;
-                var ptime=parseFloat(allPlayers[alias].time);
-                var updates2={};
-                if(isWinner){updates2['users/'+pUid+'/ganadas']=(pu.ganadas||0)+1;updates2['users/'+pUid+'/racha']=(pu.racha||0)+1;}
-                else{updates2['users/'+pUid+'/perdidas']=(pu.perdidas||0)+1;updates2['users/'+pUid+'/racha']=0;}
-                if(!pu.mejorTiempo||Math.abs(ptime-(r2.objetivo||5))<Math.abs(parseFloat(pu.mejorTiempo)-(r2.objetivo||5))){updates2['users/'+pUid+'/mejorTiempo']=allPlayers[alias].time;}
-                db.ref().update(updates2);
-              }
-            });
-          }
+function stopClock() {
+  cancelAnimationFrame(raf); gState = 'stopped';
+  elapsed = (performance.now() - t0) / 1000;
+  var r = retos[myRetoId];
+  var target = parseFloat(r ? r.objetivo : 5) || 5.0;
+  var fmt = elapsed.toFixed(3);
+  var diff = Math.abs(elapsed - target);
+  document.getElementById('cS').textContent = fmt.split('.')[0];
+  document.getElementById('cM').textContent = '.' + fmt.split('.')[1];
+  document.getElementById('cL').textContent = 'PARADO';
+  document.getElementById('cRing').className = 'cring ' + (diff < 0.3 ? 'good' : 'bad');
+  var btn = document.getElementById('gBtn');
+  if (btn) { btn.className = 'gbtn gbo'; btn.textContent = '...'; }
+  setTimeout(function() {
+    var r2 = retos[myRetoId];
+    if (!r2) return;
+    var max = r2.maxPlayers || 4;
+    var players = r2.players || {};
+    var playedSoFar = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+    var allDone = (playedSoFar + 1) >= max;
+    db.ref('retos/' + myRetoId + '/players/' + curUser.alias).update({ time: fmt }).then(function() {
+      toast('✅ Tu tiempo: ' + fmt + 's');
+      if (allDone) {
+        var allP = Object.assign({}, players);
+        allP[curUser.alias] = { time: fmt };
+        var ob = parseFloat(r2.objetivo) || 5.0;
+        var sorted2 = Object.entries(allP).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - ob) }; }).sort(function(a, b) { return a.diff - b.diff; });
+        if (sorted2.length > 0) {
+          var winner = sorted2[0];
+          var premio = Math.round((r2.apuesta || 0) * max * 0.9);
+          db.ref('retos/' + myRetoId).update({ status: 'done', winner: winner.name });
+          var winUid = Object.keys(users).find(function(k) { return users[k].alias === winner.name; });
+          if (winUid) db.ref('users/' + winUid + '/saldoGanancia').set((users[winUid].saldoGanancia || 0) + premio);
+          Object.keys(allP).forEach(function(alias) {
+            var pUid = Object.keys(users).find(function(k) { return users[k].alias === alias; });
+            if (!pUid) return;
+            var pu = users[pUid];
+            var isW = alias === winner.name;
+            var upd2 = {};
+            upd2['users/' + pUid + '/ganadas'] = (pu.ganadas || 0) + (isW ? 1 : 0);
+            upd2['users/' + pUid + '/perdidas'] = (pu.perdidas || 0) + (isW ? 0 : 1);
+            upd2['users/' + pUid + '/racha'] = isW ? (pu.racha || 0) + 1 : 0;
+            var pt = parseFloat(allP[alias].time);
+            if (!pu.mejorTiempo || Math.abs(pt - ob) < Math.abs(parseFloat(pu.mejorTiempo) - ob)) upd2['users/' + pUid + '/mejorTiempo'] = allP[alias].time;
+            db.ref().update(upd2);
+          });
         }
       }
- 
-      // Show result after brief delay
-      setTimeout(function(){
-        var r3=retos[myRetoId];
-        renderResult(myRetoId,r3);showScreen('result');
-      },800);
+      setTimeout(function() { var r3 = retos[myRetoId]; renderResult(myRetoId, r3); showScreen('result'); }, 800);
     });
-  },600);
+  }, 600);
 }
  
 // ══ RESULT ══
-function renderResult(id,r){
-  if(!r)return;
-  var players=r.players||{};
-  var target=parseFloat(r.objetivo)||5.0;
-  var max=r.maxPlayers||4;
-  var joined=Object.keys(players).length;
-  var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-  var allDone=played>=max;
- 
-  document.getElementById('resRN').textContent=r.titulo||'Reto';
-  document.getElementById('resTitle').textContent=allDone?'RESULTADO FINAL':'EN CURSO';
-  document.getElementById('resSub').textContent=allDone?played+' jugadores — resultado oficial':'Esperando '+(max-played)+' jugador(es) más';
- 
-  var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
-  var pending=Object.entries(players).filter(function(e){return !e[1]||e[1].time==null;});
- 
-  var html='';
-  sorted.forEach(function(p,i){
-    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
-    var isMe=p.name===curUser.alias;
-    var isWin=i===0&&allDone;
-    var isLead=i===0&&!allDone;
-    html+='<div class="rank-item'+(isWin?' winner':'')+(isLead?' leader':'')+(isMe?' me':'')+'">'+
-      '<div class="rpos">'+medal+'</div>'+
-      '<div class="rinfo">'+
-        '<div class="rname">'+p.name+(isMe?' 👈':'')+(isLead?' ⚡ mejor tiempo':isWin?' 🏆':'')+' </div>'+
-        '<div class="rdiff">±'+(p.diff*1000).toFixed(0)+'ms del objetivo'+(isLead&&!allDone?' — famax+(max-played)+' por jugar':'')+' </div>'+
-      '</div>'+
-      '<div class="rtime">'+p.time.toFixed(3)+'s</div>'+
-    '</div>';
+function renderResult(id, r) {
+  if (!r) return;
+  var players = r.players || {};
+  var target = parseFloat(r.objetivo) || 5.0;
+  var max = r.maxPlayers || 4;
+  var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+  var allDone = played >= max;
+  document.getElementById('resRN').textContent = r.titulo || 'Reto';
+  document.getElementById('resTitle').textContent = allDone ? 'RESULTADO FINAL' : 'EN CURSO';
+  document.getElementById('resSub').textContent = allDone ? played + ' jugadores — resultado oficial' : 'Esperando ' + (max - played) + ' jugador(es) más';
+  var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
+  var pending = Object.entries(players).filter(function(e) { return !e[1] || e[1].time == null; });
+  var html = '';
+  sorted.forEach(function(p, i) {
+    var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '';
+    var isMe = p.name === curUser.alias;
+    var isWin = i === 0 && allDone;
+    var isLead = i === 0 && !allDone;
+    html += '<div class="rank-item' + (isWin ? ' winner' : '') + (isLead ? ' leader' : '') + (isMe ? ' me' : '') + '">' +
+      '<div class="rpos">' + medal + '</div>' +
+      '<div class="rinfo"><div class="rname">' + p.name + (isMe ? ' 👈' : '') + (isLead ? ' ⚡' : isWin ? ' 🏆' : '') + '</div>' +
+      '<div class="rdiff">±' + (p.diff * 1000).toFixed(0) + 'ms del objetivo' + (isLead ? ' — faltan ' + (max - played) + ' por jugar' : '') + '</div></div>' +
+      '<div class="rtime">' + p.time.toFixed(3) + 's</div></div>';
   });
- 
-  pending.forEach(function(e){
-    html+='<div class="pend-item"><div class="rpos">⏳</div><div class="rinfo"><div class="rname">'+e[0]+'</div><div class="rdiff">Jugando...</div></div><div class="rtime">—</div></div>';
+  pending.forEach(function(e) {
+    html += '<div class="pend-item"><div class="rpos">⏳</div><div class="rinfo"><div class="rname">' + e[0] + '</div><div class="rdiff">Jugando...</div></div><div class="rtime">—</div></div>';
   });
-  document.getElementById('rankList').innerHTML=html;
- 
-  // Credited box (only for winner)
-  var credited=document.getElementById('creditedBox');
-  var prizeBox=document.getElementById('prizeBox');
-  var waitBox=document.getElementById('waitBox');
-  var premio=Math.round((r.apuesta||0)*max*0.9);
- 
-  if(allDone&&sorted.length>0&&sorted[0].name===curUser.alias){
+  document.getElementById('rankList').innerHTML = html;
+  var premio = Math.round((r.apuesta || 0) * max * 0.9);
+  var winner = sorted.length > 0 ? sorted[0].name : '—';
+  var credited = document.getElementById('creditedBox');
+  var prizeBox = document.getElementById('prizeBox');
+  var waitBox = document.getElementById('waitBox');
+  if (allDone && sorted.length > 0 && sorted[0].name === curUser.alias) {
     credited.classList.add('show');
-    document.getElementById('creditedAmt').textContent='+$'+premio+' MXN';
-    prizeBox.style.display='block';
-    prizeBox.innerHTML='<div class="pz-lbl">🏆 Ganaste</div><div class="pz-amt">$'+premio+'</div><div class="pz-to">Acreditado a tu saldo de ganancia</div>';
-    waitBox.style.display='none';
-  } else if(allDone){
+    document.getElementById('creditedAmt').textContent = '+$' + premio + ' MXN';
+    prizeBox.style.display = 'block';
+    prizeBox.innerHTML = '<div class="pz-lbl">🏆 Ganaste</div><div class="pz-amt">$' + premio + '</div><div class="pz-to">Acreditado a tu ganancia</div>';
+    waitBox.style.display = 'none';
+  } else if (allDone) {
     credited.classList.remove('show');
-    prizeBox.style.display='block';
-    prizeBox.innerHTML='<div class="pz-lbl">🏆 Ganador</div><div class="pz-amt">$'+premio+'</div><div class="pz-to">→ '+(sorted.length>0?sorted[0].name:'—')+'</div>';
-    waitBox.style.display='none';
+    prizeBox.style.display = 'block';
+    prizeBox.innerHTML = '<div class="pz-lbl">🏆 Ganador</div><div class="pz-amt">$' + premio + '</div><div class="pz-to">→ ' + winner + '</div>';
+    waitBox.style.display = 'none';
   } else {
     credited.classList.remove('show');
-    prizeBox.style.display='none';
-    waitBox.style.display='block';
-    document.getElementById('waitTxt').textContent='Faltan '+(max-played)+' jugador(es). El resultado final se muestra cuando todos jueguen.';
+    prizeBox.style.display = 'none';
+    waitBox.style.display = 'block';
+    document.getElementById('waitTxt').textContent = 'Faltan ' + (max - played) + ' jugador(es). El resultado final aparece cuando todos jueguen.';
   }
 }
  
-// ══ ADMIN ══
-function doAdminLogin(){
-  var u=document.getElementById('alu').value;
-  var p=document.getElementById('alp').value;
-  if((u==='admin'||u==='socio')&&p==='rival2024'){
-    loggedIn=true;
-    document.getElementById('loginBox').style.display='none';
+// ══ ADMIN LOGIN ══
+function doAdminLogin() {
+  var u = document.getElementById('alu').value;
+  var p = document.getElementById('alp').value;
+  if ((u === 'admin' || u === 'socio') && p === 'rival2024') {
+    adminLoggedIn = true;
+    document.getElementById('loginBox').style.display = 'none';
     document.getElementById('admPanel').classList.add('show');
-    renderUsersTable();renderRetosTable();updateAdminStats();
-    toast('✅ Bienvenido '+u);
-  } else {toast('❌ Credenciales incorrectas');}
+    renderUsersTable(); renderRetosTable(); updateAdminStats();
+    toast('✅ Bienvenido ' + u);
+  } else { toast('❌ Credenciales incorrectas'); }
 }
  
-function renderUsersTable(){
-  var tbody=document.getElementById('usersTable');
-  var keys=Object.keys(users);
-  if(keys.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:28px">Sin jugadores registrados</td></tr>';return;}
-  tbody.innerHTML=keys.map(function(uid){
-    var u=users[uid];
-    var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
-    return '<tr>'+
-      '<td><strong>'+u.alias+'</strong></td>'+
-      '<td style="font-size:12px;color:var(--tm)">'+u.name+'</td>'+
-      '<td class="mono" style="color:var(--ac)">$'+total+'</td>'+
-      '<td class="mono" style="color:var(--tm);font-size:12px">$'+(u.saldoFondo||0)+'</td>'+
-      '<td class="mono" style="color:var(--wn);font-size:12px">$'+(u.saldoGanancia||0)+'</td>'+
-      '<td style="font-size:11px;color:var(--tm)">🏆'+(u.ganadas||0)+' 💀'+(u.perdidas||0)+'<br>Racha: '+(u.racha||0)+'</td>'+
-      '<td><div class="btn-row">'+
-        '<button class="btn btn-g" onclick="openCargaSaldo(\\''+uid+'\\',' + '\'cargar\')">+ Saldo</button>'+
-        '<button class="btn btn-r" onclick="openCargaSaldo(\\''+uid+'\\','\'restar\')">- Saldo</button>'+
-        '<button class="btn btn-b" onclick="openVerJugador(\\''+uid+'\\')">Ver</button>'+
-      '</div></td>'+
+// ══ USERS TABLE ══
+function renderUsersTable() {
+  var tbody = document.getElementById('usersTable');
+  var keys = Object.keys(users);
+  if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:28px">Sin jugadores registrados</td></tr>'; return; }
+  tbody.innerHTML = keys.map(function(uid) {
+    var u = users[uid];
+    var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
+    return '<tr>' +
+      '<td><strong>' + u.alias + '</strong></td>' +
+      '<td style="font-size:12px;color:var(--tm)">' + u.name + '</td>' +
+      '<td class="mono" style="color:var(--ac)">$' + total + '</td>' +
+      '<td class="mono" style="color:var(--tm)">$' + (u.saldoFondo || 0) + '</td>' +
+      '<td class="mono" style="color:var(--wn)">$' + (u.saldoGanancia || 0) + '</td>' +
+      '<td style="font-size:11px;color:var(--tm)">🏆' + (u.ganadas || 0) + ' 💀' + (u.perdidas || 0) + ' 🔥' + (u.racha || 0) + '</td>' +
+      '<td><div class="btn-row">' +
+        '<button class="btn btn-g" onclick="openSaldo(\'' + uid + '\',false)">+ Saldo</button>' +
+        '<button class="btn btn-r" onclick="openSaldo(\'' + uid + '\',true)">- Saldo</button>' +
+        '<button class="btn btn-b" onclick="verJugador(\'' + uid + '\')">Ver</button>' +
+      '</div></td>' +
     '</tr>';
   }).join('');
 }
  
-function renderRetosTable(){
-  var tbody=document.getElementById('retosTable');
-  var keys=Object.keys(retos);
-  if(keys.length===0){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:28px">Sin retos</td></tr>';return;}
+// ══ CARGAR / RESTAR SALDO ══
+function openSaldo(uid, isRestar) {
+  var u = users[uid];
+  var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
+  var titulo = isRestar ? '➖ RESTAR SALDO' : '💰 CARGAR SALDO';
+  var btnClass = isRestar ? 'btn btn-r' : 'btn btn-g';
+  var btnTxt = isRestar ? '➖ RESTAR' : '✅ CARGAR';
+  document.getElementById('modalBody').innerHTML =
+    '<div class="mt">' + titulo + '</div>' +
+    '<div class="ibox">' +
+    '<div class="ir"><span class="il">Jugador</span><span class="iv">' + u.alias + '</span></div>' +
+    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$' + total + '</span></div>' +
+    '<div class="ir"><span class="il">Fondo</span><span class="iv">$' + (u.saldoFondo || 0) + '</span></div>' +
+    '<div class="ir"><span class="il">Ganancia</span><span class="iv">$' + (u.saldoGanancia || 0) + '</span></div>' +
+    '</div>' +
+    '<div class="ff" style="margin-bottom:14px">' +
+    '<label>Monto ($MXN)</label>' +
+    '<input id="montoInput" type="number" placeholder="200" style="height:46px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:DM Mono,monospace;font-size:16px;padding:0 14px;outline:none">' +
+    '</div>' +
+    '<div class="mbtns">' +
+    '<button class="btn btn-gh" onclick="closeModal()">Cancelar</button>' +
+    '<button class="' + btnClass + '" id="saldoBtn" style="font-weight:700">' + btnTxt + '</button>' +
+    '</div>';
+  document.getElementById('saldoBtn').onclick = function() { doSaldo(uid, isRestar); };
+  document.getElementById('overlay').classList.add('show');
+}
  
-  // Sort: active first
-  var active=keys.filter(function(k){var s=retos[k].status;return s!=='done'&&s!=='dispersado';});
-  var inactive=keys.filter(function(k){var s=retos[k].status;return s==='done'||s==='dispersado';});
-  var sorted=[].concat(active,inactive);
+function doSaldo(uid, isRestar) {
+  var monto = parseInt(document.getElementById('montoInput').value) || 0;
+  if (!monto || monto <= 0) { toast('❌ Ingresa un monto válido'); return; }
+  var u = users[uid];
+  if (isRestar) {
+    var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
+    if (monto > total) { toast('❌ Solo tiene $' + total + ' disponibles'); return; }
+    var nf = u.saldoFondo || 0, ng = u.saldoGanancia || 0, r = monto;
+    if (nf >= r) { nf -= r; } else { r -= nf; nf = 0; ng = Math.max(0, ng - r); }
+    db.ref('users/' + uid).update({ saldoFondo: nf, saldoGanancia: ng }).then(function() { closeModal(); toast('➖ -$' + monto + ' restados a ' + u.alias); });
+  } else {
+    db.ref('users/' + uid + '/saldoFondo').set((u.saldoFondo || 0) + monto).then(function() { closeModal(); toast('✅ +$' + monto + ' cargados a ' + u.alias); });
+  }
+}
  
-  tbody.innerHTML=sorted.map(function(id){
-    var r=retos[id];
-    var players=r.players||{};
-    var joined=Object.keys(players).length;
-    var played=Object.values(players).filter(function(p){return p&&p.time!=null;}).length;
-    var max=r.maxPlayers||4;
-    var isDone=r.status==='done'||r.status==='dispersado';
-    var bc=isDone?'bd':'bo';
-    var bt=r.status==='dispersado'?'✅ DISP':isDone?'TERMINADO':r.status==='playing'?'EN JUEGO':'ABIERTO';
-    var plist=Object.entries(players).map(function(e){return '<span style="font-size:11px;color:'+(e[1]&&e[1].time?'var(--ac)':'var(--tm)')+'">'+(e[1]&&e[1].time?'✅ ':'⏳ ')+e[0]+(e[1]&&e[1].time?' ('+e[1].time+'s)':'')+'</span>';}).join('<br>');
-    var acts='<div class="btn-row">';
-    if(isDone&&r.status!=='dispersado'){acts+='<button class="btn btn-y" onclick="showWinner(\''+id+'\')">🏆</button><button class="btn btn-g" onclick="showDispersar(\''+id+'\')">💸</button>';}
-    acts+='<button class="btn btn-r" onclick="confirmDel(\''+id+'\')">🗑️</button></div>';
-    return '<tr>'+
-      '<td><strong>'+(r.titulo||'—')+'</strong></td>'+
-      '<td class="mono">'+parseFloat(r.objetivo||5).toFixed(3)+'s</td>'+
-      '<td>'+(plist||'<span style="color:var(--td);font-size:11px">Sin jugadores</span>')+'</td>'+
-      '<td class="mono" style="color:var(--wn)">$'+((r.apuesta||0)*max)+'<br><span style="font-size:11px;color:var(--tm)">'+played+'/'+joined+'/'+max+'</span></td>'+
-      '<td><span class="bdg '+bc+'">'+bt+'</span></td>'+
-      '<td>'+acts+'</td>'+
+// ══ VER JUGADOR (con PIN) ══
+function verJugador(uid) {
+  var u = users[uid];
+  var total = (u.saldoFondo || 0) + (u.saldoGanancia || 0);
+  document.getElementById('modalBody').innerHTML =
+    '<div class="mt">👤 ' + u.alias + '</div>' +
+    '<div class="ibox">' +
+    '<div class="ir"><span class="il">Nombre</span><span class="iv">' + u.name + '</span></div>' +
+    '<div class="ir"><span class="il">PIN</span><span class="iv mono" style="color:var(--wn);letter-spacing:6px;font-size:20px">' + u.pin + '</span></div>' +
+    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$' + total + '</span></div>' +
+    '<div class="ir"><span class="il">Fondo</span><span class="iv">$' + (u.saldoFondo || 0) + '</span></div>' +
+    '<div class="ir"><span class="il">Ganancia</span><span class="iv" style="color:var(--wn)">$' + (u.saldoGanancia || 0) + '</span></div>' +
+    '<div class="ir"><span class="il">Ganadas</span><span class="iv" style="color:var(--ac)">' + (u.ganadas || 0) + '</span></div>' +
+    '<div class="ir"><span class="il">Perdidas</span><span class="iv" style="color:var(--dg)">' + (u.perdidas || 0) + '</span></div>' +
+    '<div class="ir"><span class="il">Mejor tiempo</span><span class="iv mono">' + (u.mejorTiempo || '—') + '</span></div>' +
+    '<div class="ir"><span class="il">Racha actual</span><span class="iv">' + (u.racha || 0) + ' victorias</span></div>' +
+    '</div>' +
+    '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:42px;border-radius:10px">Cerrar</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
+// ══ RETOS TABLE ══
+function renderRetosTable() {
+  var tbody = document.getElementById('retosTable');
+  var keys = Object.keys(retos);
+  if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:28px">Sin retos</td></tr>'; return; }
+  var active = keys.filter(function(k) { var s = retos[k].status; return s !== 'done' && s !== 'dispersado'; });
+  var inactive = keys.filter(function(k) { var s = retos[k].status; return s === 'done' || s === 'dispersado'; });
+  var sorted = active.concat(inactive);
+  tbody.innerHTML = sorted.map(function(id) {
+    var r = retos[id];
+    var players = r.players || {};
+    var joined = Object.keys(players).length;
+    var played = Object.values(players).filter(function(p) { return p && p.time != null; }).length;
+    var max = r.maxPlayers || 4;
+    var isDone = r.status === 'done' || r.status === 'dispersado';
+    var bc = isDone ? 'bd' : 'bo';
+    var bt = r.status === 'dispersado' ? '✅ DISP' : isDone ? 'TERMINADO' : r.status === 'playing' ? 'EN JUEGO' : 'ABIERTO';
+    var plist = Object.entries(players).map(function(e) { return '<span style="font-size:11px;color:' + (e[1] && e[1].time ? 'var(--ac)' : 'var(--tm)') + '">' + (e[1] && e[1].time ? '✅ ' : '⏳ ') + e[0] + (e[1] && e[1].time ? ' (' + e[1].time + 's)' : '') + '</span>'; }).join('<br>');
+    var acts = '<div class="btn-row">';
+    if (isDone && r.status !== 'dispersado') acts += '<button class="btn btn-y" onclick="showWinner(\'' + id + '\')">🏆</button><button class="btn btn-g" onclick="showDispersar(\'' + id + '\')">💸</button>';
+    acts += '<button class="btn btn-r" onclick="confirmDel(\'' + id + '\')">🗑️</button></div>';
+    return '<tr>' +
+      '<td><strong>' + (r.titulo || '—') + '</strong></td>' +
+      '<td class="mono">' + parseFloat(r.objetivo || 5).toFixed(3) + 's</td>' +
+      '<td>' + (plist || '<span style="color:var(--td);font-size:11px">Sin jugadores</span>') + '</td>' +
+      '<td class="mono" style="color:var(--wn)">$' + ((r.apuesta || 0) * max) + '<br><span style="font-size:11px;color:var(--tm)">' + played + '/' + joined + '/' + max + '</span></td>' +
+      '<td><span class="bdg ' + bc + '">' + bt + '</span></td>' +
+      '<td>' + acts + '</td>' +
     '</tr>';
   }).join('');
 }
  
 // ══ ADMIN ACTIONS ══
-function genCode(){
-  var code='RIVAL-'+Math.random().toString(36).slice(2,6).toUpperCase();
-  db.ref('invCodes/'+code).set({used:false,createdAt:Date.now()}).then(function(){
-    document.getElementById('modalBody').innerHTML=
-      '<div class="mt">🎟️ CÓDIGO CREADO</div>'+
-      '<div class="ibox"><div style="text-align:center;padding:10px">'+
-      '<div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Código de invitación</div>'+
-      '<div style="font-family:Bebas Neue,sans-serif;font-size:40px;letter-spacing:6px;color:var(--ac)">'+code+'</div>'+
-      '<div style="font-size:12px;color:var(--tm);margin-top:8px">Un solo uso — compártelo por Telegram</div>'+
-      '</div></div>'+
-      '<button class="btn btn-g" style="width:100%;height:44px;border-radius:10px" onclick="copyText(\''+code+'\')">📋 Copiar código</button>'+
-      '<button class="btn btn-gh" style="width:100%;height:40px;border-radius:10px;margin-top:8px" onclick="closeModal()">Cerrar</button>';
+function genCode() {
+  var code = 'RIVAL-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+  db.ref('invCodes/' + code).set({ used: false, createdAt: Date.now() }).then(function() {
+    document.getElementById('modalBody').innerHTML =
+      '<div class="mt">🎟️ CÓDIGO CREADO</div>' +
+      '<div class="ibox"><div style="text-align:center;padding:10px">' +
+      '<div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Código de invitación</div>' +
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:40px;letter-spacing:6px;color:var(--ac)">' + code + '</div>' +
+      '<div style="font-size:12px;color:var(--tm);margin-top:8px">Un solo uso — compártelo por Telegram</div>' +
+      '</div></div>' +
+      '<button class="btn btn-g" onclick="copyText(\'' + code + '\')" style="width:100%;height:44px;border-radius:10px;margin-bottom:8px">📋 Copiar código</button>' +
+      '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:10px">Cerrar</button>';
     document.getElementById('overlay').classList.add('show');
   });
 }
  
-function openCargaSaldo(uid, mode){
-  var u=users[uid];
-  var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
-  var isRestar=mode==='restar';
-  var titulo=isRestar?'➖ RESTAR SALDO':'💰 CARGAR SALDO';
-  var btnClass=isRestar?'btn btn-r':'btn btn-g';
-  var btnTxt=isRestar?'➖ RESTAR':'✅ CARGAR';
-  document.getElementById('modalBody').innerHTML=
-    '<div class="mt">'+titulo+'</div>'+
-    '<div class="ibox">'+
-    '<div class="ir"><span class="il">Jugador</span><span class="iv">'+u.alias+'</span></div>'+
-    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$'+total+'</span></div>'+
-    '<div class="ir"><span class="il">Fondo</span><span class="iv">$'+(u.saldoFondo||0)+'</span></div>'+
-    '<div class="ir"><span class="il">Ganancia</span><span class="iv">$'+(u.saldoGanancia||0)+'</span></div>'+
-    '</div>'+
-    '<div class="ff" style="margin-bottom:14px">'+
-    '<label>Monto ($MXN)</label>'+
-    '<input id="cargaMonto" type="number" placeholder="200" style="height:46px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:DM Mono,monospace;font-size:16px;padding:0 14px;outline:none">'+
-    '</div>'+
-    '<div class="mbtns">'+
-    '<button class="btn btn-gh" onclick="closeModal()">Cancelar</button>'+
-    '<button class="'+btnClass+'" onclick="doCargaSaldo(\''+uid+'\',\''+mode+'\')" style="font-weight:700">'+btnTxt+'</button>'+
-    '</div>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function doCargaSaldo(uid, mode){
-  var monto=parseInt(document.getElementById('cargaMonto').value)||0;
-  if(!monto||monto<=0){toast('❌ Ingresa un monto válido');return;}
-  var u=users[uid];
-  if(mode==='restar'){
-    var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
-    if(monto>total){toast('❌ Solo tiene $'+total+' disponibles');return;}
-    var nf=u.saldoFondo||0, ng=u.saldoGanancia||0, r=monto;
-    if(nf>=r){nf-=r;}else{r-=nf;nf=0;ng=Math.max(0,ng-r);}
-    db.ref('users/'+uid).update({saldoFondo:nf,saldoGanancia:ng}).then(function(){closeModal();toast('➖ -$'+monto+' restados a '+u.alias);});
-  } else {
-    db.ref('users/'+uid+'/saldoFondo').set((u.saldoFondo||0)+monto).then(function(){closeModal();toast('✅ +$'+monto+' cargados a '+u.alias);});
-  }
-}
- 
-function openVerJugador(uid){
-  var u=users[uid];
-  var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
-  document.getElementById('modalBody').innerHTML=
-    '<div class="mt">👤 '+u.alias+'</div>'+
-    '<div class="ibox">'+
-    '<div class="ir"><span class="il">Nombre</span><span class="iv">'+u.name+'</span></div>'+
-    '<div class="ir"><span class="il">PIN</span><span class="iv mono" style="color:var(--wn);letter-spacing:4px;font-size:18px">'+u.pin+'</span></div>'+
-    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$'+total+'</span></div>'+
-    '<div class="ir"><span class="il">Fondo</span><span class="iv">$'+(u.saldoFondo||0)+'</span></div>'+
-    '<div class="ir"><span class="il">Ganancia</span><span class="iv" style="color:var(--wn)">$'+(u.saldoGanancia||0)+'</span></div>'+
-    '<div class="ir"><span class="il">Ganadas</span><span class="iv" style="color:var(--ac)">'+( u.ganadas||0)+'</span></div>'+
-    '<div class="ir"><span class="il">Perdidas</span><span class="iv" style="color:var(--dg)">'+(u.perdidas||0)+'</span></div>'+
-    '<div class="ir"><span class="il">Mejor tiempo</span><span class="iv mono">'+(u.mejorTiempo||'—')+'</span></div>'+
-    '<div class="ir"><span class="il">Racha actual</span><span class="iv">'+(u.racha||0)+' victorias</span></div>'+
-    '</div>'+
-    '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:42px;border-radius:10px">Cerrar</button>';
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function openCreateReto(){
-  document.getElementById('modalBody').innerHTML=
-    '<div class="mt">➕ NUEVO RETO</div>'+
-    '<div class="fgrid">'+
-    '<div class="ff full"><label>Título del reto</label><input id="fti" placeholder="Reto del Viernes 🔥"></div>'+
-    '<div class="ff"><label>Jugadores</label><input id="fmax" type="number" value="4" min="2" max="20"></div>'+
-    '<div class="ff"><label>Apuesta ($MXN)</label><input id="fap" type="number" placeholder="200"></div>'+
-    '<div class="ff"><label>Objetivo (segundos)</label><input id="fob" type="number" step="0.001" value="5.000"></div>'+
-    '<div class="ff"><label>Tipo</label><select id="ftp"><option>⏱️ Para el reloj</option><option>⚡ Reacción</option><option>🎯 Precisión</option></select></div>'+
-    '</div>'+
+function openCreateReto() {
+  document.getElementById('modalBody').innerHTML =
+    '<div class="mt">➕ NUEVO RETO</div>' +
+    '<div class="fgrid">' +
+    '<div class="ff full"><label>Título del reto</label><input id="fti" placeholder="Reto del Viernes 🔥"></div>' +
+    '<div class="ff"><label>Jugadores</label><input id="fmax" type="number" value="4" min="2" max="20"></div>' +
+    '<div class="ff"><label>Apuesta ($MXN)</label><input id="fap" type="number" placeholder="200"></div>' +
+    '<div class="ff"><label>Objetivo (segundos)</label><input id="fob" type="number" step="0.001" value="5.000"></div>' +
+    '<div class="ff"><label>Tipo</label><select id="ftp"><option>⏱️ Para el reloj</option><option>⚡ Reacción</option><option>🎯 Precisión</option></select></div>' +
+    '</div>' +
     '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="doCreateReto()" style="font-weight:700">✅ CREAR</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function doCreateReto(){
-  var ti=document.getElementById('fti').value.trim();
-  var max=parseInt(document.getElementById('fmax').value)||4;
-  var ap=parseInt(document.getElementById('fap').value);
-  var ob=parseFloat(document.getElementById('fob').value)||5.0;
-  var tp=document.getElementById('ftp').value;
-  if(!ti){toast('❌ Ponle un título');return;}
-  if(!ap){toast('❌ Define la apuesta');return;}
-  db.ref('retos').push({titulo:ti,maxPlayers:max,apuesta:ap,objetivo:ob,tipo:tp,status:'waiting',players:{},createdAt:Date.now()}).then(function(){closeModal();toast('✅ Reto "'+ti+'" creado');}).catch(function(){toast('❌ Error');});
+function doCreateReto() {
+  var ti = document.getElementById('fti').value.trim();
+  var max = parseInt(document.getElementById('fmax').value) || 4;
+  var ap = parseInt(document.getElementById('fap').value);
+  var ob = parseFloat(document.getElementById('fob').value) || 5.0;
+  var tp = document.getElementById('ftp').value;
+  if (!ti) { toast('❌ Ponle un título'); return; }
+  if (!ap) { toast('❌ Define la apuesta'); return; }
+  db.ref('retos').push({ titulo: ti, maxPlayers: max, apuesta: ap, objetivo: ob, tipo: tp, status: 'waiting', players: {}, createdAt: Date.now() }).then(function() { closeModal(); toast('✅ Reto "' + ti + '" creado'); }).catch(function() { toast('❌ Error'); });
 }
  
-function showWinner(id){
-  var r=retos[id];
-  var players=r.players||{};
-  var target=parseFloat(r.objetivo)||5.0;
-  var max=r.maxPlayers||4;
-  var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
-  var html='<div class="mt">🏆 '+(r.titulo||'RETO')+'</div>';
-  sorted.forEach(function(p,i){
-    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
-    html+='<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bo)">'+
-      '<span style="font-size:20px;width:28px">'+medal+'</span>'+
-      '<span style="flex:1;font-weight:600">'+p.name+'</span>'+
-      '<span class="mono" style="color:'+(i===0?'var(--ac)':'var(--tm)')+'">'+p.time.toFixed(3)+'s</span>'+
-      '<span style="font-size:11px;color:'+(i===0?'var(--ac)':'var(--tm)')+';margin-left:5px">±'+(p.diff*1000).toFixed(0)+'ms</span>'+
-    '</div>';
+function showWinner(id) {
+  var r = retos[id];
+  var players = r.players || {};
+  var target = parseFloat(r.objetivo) || 5.0;
+  var max = r.maxPlayers || 4;
+  var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], time: parseFloat(e[1].time), diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
+  var html = '<div class="mt">🏆 ' + (r.titulo || 'RETO') + '</div>';
+  sorted.forEach(function(p, i) {
+    var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '';
+    html += '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bo)">' +
+      '<span style="font-size:20px;width:28px">' + medal + '</span>' +
+      '<span style="flex:1;font-weight:600">' + p.name + '</span>' +
+      '<span class="mono" style="color:' + (i === 0 ? 'var(--ac)' : 'var(--tm)') + '">' + p.time.toFixed(3) + 's</span>' +
+      '<span style="font-size:11px;color:' + (i === 0 ? 'var(--ac)' : 'var(--tm)') + ';margin-left:5px">±' + (p.diff * 1000).toFixed(0) + 'ms</span></div>';
   });
-  var premio=Math.round((r.apuesta||0)*max*.9);
-  var winner=sorted.length>0?sorted[0].name:'—';
-  html+='<div class="pbox"><div class="pl2">💸 Premio acreditado</div><div class="pa">$'+premio+'</div><div class="pt">→ '+winner+'</div></div>';
-  html+='<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button><button class="btn btn-g" onclick="closeModal();showDispersar(\''+id+'\')" style="font-size:13px">💸 Dispersar fondo</button></div>';
-  document.getElementById('modalBody').innerHTML=html;
+  var premio = Math.round((r.apuesta || 0) * max * 0.9);
+  var winner = sorted.length > 0 ? sorted[0].name : '—';
+  html += '<div class="pbox"><div class="pl2">💸 Premio acreditado automáticamente</div><div class="pa">$' + premio + '</div><div class="pt">→ ' + winner + '</div></div>';
+  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button><button class="btn btn-g" onclick="closeModal();showDispersar(\'' + id + '\')" style="font-size:13px">💸 Dispersar</button></div>';
+  document.getElementById('modalBody').innerHTML = html;
   document.getElementById('overlay').classList.add('show');
 }
  
-function showDispersar(id){
-  var r=retos[id];
-  var players=r.players||{};
-  var target=parseFloat(r.objetivo)||5.0;
-  var max=r.maxPlayers||4;
-  var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
-  var winner=sorted.length>0?sorted[0].name:'—';
-  var pozo=(r.apuesta||0)*max;
-  var premio=Math.round(pozo*.9);
-  var com=pozo-premio;
-  document.getElementById('modalBody').innerHTML=
-    '<div class="mt">💸 DISPERSAR COMISIÓN</div>'+
-    '<div class="ibox">'+
-    '<div class="ir"><span class="il">Reto</span><span class="iv">'+(r.titulo||'—')+'</span></div>'+
-    '<div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--ac)">🏆 '+winner+'</span></div>'+
-    '<div class="ir"><span class="il">Premio (ya acreditado)</span><span class="iv" style="color:var(--tm)">$'+premio+' MXN ✅</span></div>'+
-    '<div class="ir"><span class="il">Tu comisión (10%)</span><span class="iv" style="color:var(--wn);font-size:16px;font-weight:700">$'+com+' MXN</span></div>'+
-    '</div>'+
-    '<div style="background:#17212b;border-radius:10px;padding:12px;margin-bottom:14px;font-family:DM Mono,monospace;font-size:12px;line-height:1.8;color:#aaa">🏆 <strong style="color:#fff">RIVAL — '+( r.titulo||'Reto')+'</strong>\n\n<span style="color:#4cd964">Ganador: '+winner+'</span>\n<span style="color:#ffcc00">Premio: $'+premio+' (en su saldo)</span>\n<span style="color:#aaa">Tu comisión: $'+com+'</span></div>'+
-    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doDispersar(\''+id+'\')" style="font-weight:700">✅ MARCAR DISPERSADO</button></div>';
+function showDispersar(id) {
+  var r = retos[id];
+  var players = r.players || {};
+  var target = parseFloat(r.objetivo) || 5.0;
+  var max = r.maxPlayers || 4;
+  var sorted = Object.entries(players).filter(function(e) { return e[1] && e[1].time != null; }).map(function(e) { return { name: e[0], diff: Math.abs(parseFloat(e[1].time) - target) }; }).sort(function(a, b) { return a.diff - b.diff; });
+  var winner = sorted.length > 0 ? sorted[0].name : '—';
+  var pozo = (r.apuesta || 0) * max;
+  var premio = Math.round(pozo * 0.9);
+  var com = pozo - premio;
+  document.getElementById('modalBody').innerHTML =
+    '<div class="mt">💸 DISPERSAR COMISIÓN</div>' +
+    '<div class="ibox">' +
+    '<div class="ir"><span class="il">Reto</span><span class="iv">' + (r.titulo || '—') + '</span></div>' +
+    '<div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--ac)">🏆 ' + winner + '</span></div>' +
+    '<div class="ir"><span class="il">Premio (ya en su saldo)</span><span class="iv" style="color:var(--tm)">$' + premio + ' ✅</span></div>' +
+    '<div class="ir"><span class="il">Tu comisión (10%)</span><span class="iv" style="color:var(--wn);font-size:16px;font-weight:700">$' + com + ' MXN</span></div>' +
+    '</div>' +
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doDispersar(\'' + id + '\')" style="font-weight:700">✅ MARCAR DISPERSADO</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function doDispersar(id){
-  db.ref('retos/'+id).update({status:'dispersado',dispersadoAt:Date.now()}).then(function(){closeModal();toast('✅ Reto marcado como dispersado');});
+function doDispersar(id) {
+  db.ref('retos/' + id).update({ status: 'dispersado', dispersadoAt: Date.now() }).then(function() { closeModal(); toast('✅ Reto marcado como dispersado'); });
 }
  
-function confirmDel(id){
-  var r=retos[id];
-  document.getElementById('modalBody').innerHTML=
-    '<div class="mt">🗑️ BORRAR RETO</div>'+
-    '<div class="ibox"><div class="ir"><span class="il">Título</span><span class="iv">'+(r.titulo||'—')+'</span></div></div>'+
-    '<p style="font-size:13px;color:var(--dg);margin-bottom:16px">⚠️ Esta acción no se puede deshacer.</p>'+
-    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-r" onclick="doDel(\''+id+'\')" style="font-weight:700">🗑️ BORRAR</button></div>';
+function confirmDel(id) {
+  var r = retos[id];
+  document.getElementById('modalBody').innerHTML =
+    '<div class="mt">🗑️ BORRAR RETO</div>' +
+    '<div class="ibox"><div class="ir"><span class="il">Título</span><span class="iv">' + (r.titulo || '—') + '</span></div></div>' +
+    '<p style="font-size:13px;color:var(--dg);margin-bottom:16px">⚠️ Esta acción no se puede deshacer.</p>' +
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-r" onclick="doDel(\'' + id + '\')" style="font-weight:700">🗑️ BORRAR</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function doDel(id){db.ref('retos/'+id).remove().then(function(){closeModal();toast('🗑️ Reto eliminado');});}
+function doDel(id) { db.ref('retos/' + id).remove().then(function() { closeModal(); toast('🗑️ Reto eliminado'); }); }
  
-function updateAdminStats(){
-  var us=Object.keys(users).length;
-  var rs=Object.values(retos).filter(function(r){return r.status!=='done'&&r.status!=='dispersado';}).length;
-  var ds=Object.values(retos).filter(function(r){return r.status==='done';}).length;
-  var vs=Object.values(users).reduce(function(a,u){return a+(u.saldoFondo||0)+(u.saldoGanancia||0);},0);
-  document.getElementById('stU').textContent=us;
-  document.getElementById('stR').textContent=rs;
-  document.getElementById('stD').textContent=ds;
-  document.getElementById('stV').textContent='$'+vs;
+function updateAdminStats() {
+  var us = Object.keys(users).length;
+  var rs = Object.values(retos).filter(function(r) { return r.status !== 'done' && r.status !== 'dispersado'; }).length;
+  var ds = Object.values(retos).filter(function(r) { return r.status === 'done'; }).length;
+  var vs = Object.values(users).reduce(function(a, u) { return a + (u.saldoFondo || 0) + (u.saldoGanancia || 0); }, 0);
+  document.getElementById('stU').textContent = us;
+  document.getElementById('stR').textContent = rs;
+  document.getElementById('stD').textContent = ds;
+  document.getElementById('stV').textContent = '$' + vs;
 }
  
 // ══ UTILS ══
-function copyText(t){navigator.clipboard.writeText(t).then(function(){toast('✅ Copiado: '+t);}).catch(function(){toast('Copia manualmente: '+t);});}
-function closeModal(){document.getElementById('overlay').classList.remove('show');}
-document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
+function copyText(t) { navigator.clipboard.writeText(t).then(function() { toast('✅ Copiado: ' + t); }).catch(function() { toast('Copia manualmente: ' + t); }); }
+function closeModal() { document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('overlay').addEventListener('click', function(e) { if (e.target === document.getElementById('overlay')) closeModal(); });
 var tt;
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},3500);}
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape')closeModal();
-  if(e.code==='Space'&&curScreen==='game'&&gState!=='countdown'){e.preventDefault();handleBtn();}
+function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function() { t.classList.remove('show'); }, 3500); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+  if (e.code === 'Space' && curScreen === 'game' && gState !== 'countdown') { e.preventDefault(); handleBtn(); }
 });
 </script>
 </body>
