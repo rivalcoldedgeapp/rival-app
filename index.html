@@ -3,819 +3,261 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RIVAL — Sistema Completo</title>
- 
-<!-- ============================================================
-     FIREBASE SDK — NO BORRES ESTAS LÍNEAS
-     ============================================================ -->
+<title>RIVAL</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
- 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;700&display=swap');
+:root{--bg:#080808;--surface:#0f0f0f;--surface2:#161616;--border:#222;--border2:#2a2a2a;--accent:#00e87a;--accent-dim:#00e87a15;--accent-mid:#00e87a40;--danger:#ff3d5a;--warn:#ffb800;--blue:#3d9bff;--text:#f0f0f0;--text-mid:#666;--text-dim:#333}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,8,0.95);backdrop-filter:blur(10px);z-index:100}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--accent)}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px}
+.tab{padding:8px 18px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--text-mid);transition:all .2s}
+.tab.on{background:var(--accent);color:#000}
+.badge-wrap{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-mid)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.view{display:none}.view.on{display:block}
  
-:root {
-  --bg: #080808;
-  --surface: #0f0f0f;
-  --surface2: #161616;
-  --border: #222;
-  --border2: #2a2a2a;
-  --accent: #00e87a;
-  --accent-dim: #00e87a15;
-  --accent-mid: #00e87a40;
-  --danger: #ff3d5a;
-  --warn: #ffb800;
-  --blue: #3d9bff;
-  --text: #f0f0f0;
-  --text-mid: #666;
-  --text-dim: #333;
-}
+/* ── GAME ── */
+.game-wrap{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 57px)}
+.sidebar{border-right:1px solid var(--border);padding:16px;overflow-y:auto}
+.side-lbl{font-size:10px;letter-spacing:3px;color:var(--text-mid);text-transform:uppercase;margin-bottom:12px}
+.reto-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.reto-card:hover,.reto-card.sel{border-color:var(--accent);background:var(--accent-dim)}
+.rc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.rc-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid)}
+.bdg{font-size:10px;padding:3px 7px;border-radius:4px;font-weight:700;letter-spacing:1px}
+.bw{background:#ffb80020;color:var(--warn)}
+.bp{background:#00e87a20;color:var(--accent)}
+.bd{background:#3d9bff20;color:var(--blue)}
+.bx{background:#ffffff10;color:var(--text-mid)}
+.rc-players{font-size:13px;font-weight:600;margin-bottom:4px}
+.rc-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-mid)}
+.amt{color:var(--warn);font-weight:600}
+.no-retos{text-align:center;color:var(--text-mid);font-size:12px;padding:30px 10px;line-height:1.8}
  
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+.game-area{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;position:relative}
+.game-area::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.25;pointer-events:none}
+.game-box{width:100%;max-width:460px;position:relative;z-index:1}
+.g-title{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:4px;text-align:center;line-height:1}
+.g-sub{font-size:11px;color:var(--text-mid);letter-spacing:3px;text-transform:uppercase;text-align:center;margin:6px 0 24px}
+.vs-row{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:24px}
+.p-col{flex:1}.p-col.r{text-align:right}
+.p-lbl{font-size:10px;letter-spacing:2px;color:var(--text-mid);text-transform:uppercase;margin-bottom:4px}
+.p-name{font-size:15px;font-weight:600}
+.p-time{font-family:'DM Mono',monospace;font-size:18px;color:var(--text-mid);margin-top:4px}
+.p-time.done{color:var(--accent)}.p-time.win{color:var(--warn)}
+.vs{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text-dim)}
  
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
-}
+.clock-wrap{display:flex;flex-direction:column;align-items:center;gap:20px}
+.tgt{text-align:center}
+.tgt-lbl{font-size:10px;letter-spacing:3px;color:var(--text-mid);text-transform:uppercase;margin-bottom:6px}
+.tgt-num{font-family:'Bebas Neue',sans-serif;font-size:76px;color:var(--accent);line-height:1;text-shadow:0 0 40px var(--accent-mid)}
+.tgt-unit{font-size:11px;letter-spacing:2px;color:var(--text-mid);text-transform:uppercase}
  
-/* NAV */
-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: rgba(8,8,8,0.95);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-}
+.clock-ring{width:190px;height:190px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .3s,box-shadow .3s}
+.clock-ring.run{border-color:var(--accent);box-shadow:0 0 30px var(--accent-dim)}
+.clock-ring.good{border-color:var(--accent);box-shadow:0 0 60px var(--accent-mid);animation:gp .4s}
+.clock-ring.bad{border-color:var(--danger);box-shadow:0 0 40px #ff3d5a30;animation:bs .4s}
+@keyframes gp{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes bs{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.svg-r{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);transform:rotate(-90deg)}
+.rt{fill:none;stroke:var(--border);stroke-width:3}
+.rp{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:597;stroke-dashoffset:597;transition:stroke-dashoffset .1s linear}
+.cs{font-family:'Bebas Neue',sans-serif;font-size:50px;line-height:1}
+.cm{font-family:'DM Mono',monospace;font-size:17px;color:var(--text-mid)}
+.cl{font-size:10px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;margin-top:5px}
  
-.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--accent); }
+.n-input{width:100%;max-width:270px;height:46px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:0 14px;outline:none;transition:border-color .2s;text-align:center}
+.n-input:focus{border-color:var(--accent)}
+.n-input::placeholder{color:var(--text-mid)}
  
-.nav-tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 4px;
-}
+.g-btn{width:100%;max-width:270px;height:58px;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px;cursor:pointer;transition:all .15s}
+.gb-start{background:var(--accent);color:#000}
+.gb-start:active{transform:scale(.97)}
+.gb-stop{background:transparent;border:2px solid var(--accent);color:var(--accent);animation:sp 1s ease-in-out infinite}
+.gb-stop:active{transform:scale(.97);background:var(--accent-dim)}
+.gb-off{background:var(--border);color:var(--text-dim);cursor:not-allowed}
+@keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--accent-mid)}50%{box-shadow:0 0 0 10px transparent}}
+.done-msg{text-align:center;color:var(--text-mid);font-size:13px;line-height:1.8}
+.no-reto-msg{text-align:center;color:var(--text-mid);font-size:14px;line-height:2}
  
-.tab-btn {
-  padding: 8px 20px;
-  border: none;
-  border-radius: 7px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: transparent;
-  color: var(--text-mid);
-}
+/* Mobile button */
+.mob-wrap{display:none;padding:12px 16px 0}
+.mob-btn{width:100%;height:46px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.mob-btn.open{background:var(--accent);color:#000}
+.mob-drawer{display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 16px 0;max-height:45vh;overflow-y:auto;animation:din .2s ease-out}
+.mob-drawer.show{display:block}
+@keyframes din{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.drw-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.drw-lbl{font-size:10px;letter-spacing:3px;color:var(--text-mid);text-transform:uppercase}
+.drw-x{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-mid);padding:3px 10px;cursor:pointer;font-size:13px}
  
-.tab-btn.active { background: var(--accent); color: #000; }
- 
-.online-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-mid);
-}
- 
-.dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 2s infinite;
-}
- 
-@keyframes pulse {
-  0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
-}
- 
-/* VIEWS */
-.view { display: none; }
-.view.active { display: block; }
- 
-/* ==================== GAME VIEW ==================== */
-.game-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  min-height: calc(100vh - 57px);
-}
- 
-.sidebar {
-  border-right: 1px solid var(--border);
-  padding: 20px;
-  overflow-y: auto;
-}
- 
-.sidebar-label {
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--text-mid);
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
- 
-.reto-item {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
- 
-.reto-item:hover, .reto-item.active {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-}
- 
-.reto-item-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
- 
-.reto-id { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-mid); }
- 
-.badge {
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
- 
-.badge-wait { background: #ffb80020; color: var(--warn); }
-.badge-play { background: #00e87a20; color: var(--accent); animation: blinkBadge 1.5s infinite; }
-.badge-done { background: #3d9bff20; color: var(--blue); }
-.badge-disp { background: #ffffff10; color: var(--text-mid); }
- 
-@keyframes blinkBadge { 0%,100%{opacity:1} 50%{opacity:0.5} }
- 
-.reto-players { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-.reto-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-mid); }
-.amount { color: var(--warn); font-weight: 600; }
- 
-.no-retos {
-  text-align: center;
-  color: var(--text-mid);
-  font-size: 12px;
-  padding: 40px 20px;
-}
- 
-/* Game area */
-.game-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  position: relative;
-}
- 
-.game-area::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.25;
-  pointer-events: none;
-}
- 
-.game-box {
-  width: 100%;
-  max-width: 480px;
-  position: relative;
-  z-index: 1;
-}
- 
-.game-title-big {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 48px;
-  letter-spacing: 4px;
-  text-align: center;
-  line-height: 1;
-}
- 
-.game-sub {
-  font-size: 12px;
-  color: var(--text-mid);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  text-align: center;
-  margin: 6px 0 28px;
-}
- 
-.vs-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 28px;
-}
- 
-.p-side { flex: 1; }
-.p-side.right { text-align: right; }
-.p-label { font-size: 10px; letter-spacing: 2px; color: var(--text-mid); text-transform: uppercase; margin-bottom: 4px; }
-.p-name { font-size: 16px; font-weight: 600; }
-.p-time { font-family: 'DM Mono', monospace; font-size: 20px; color: var(--text-mid); margin-top: 4px; }
-.p-time.done { color: var(--accent); }
-.p-time.winner { color: var(--warn); }
-.vs-sep { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text-dim); }
- 
-/* Clock */
-.clock-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
- 
-.target-section { text-align: center; }
-.t-label { font-size: 10px; letter-spacing: 3px; color: var(--text-mid); text-transform: uppercase; margin-bottom: 6px; }
-.t-num { font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: var(--accent); line-height: 1; text-shadow: 0 0 40px var(--accent-mid); }
-.t-unit { font-size: 11px; letter-spacing: 2px; color: var(--text-mid); text-transform: uppercase; }
- 
-.clock-circle {
-  width: 200px; height: 200px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
- 
-.clock-circle.running { border-color: var(--accent); box-shadow: 0 0 30px var(--accent-dim); }
-.clock-circle.good { border-color: var(--accent); box-shadow: 0 0 60px var(--accent-mid); animation: goodPop 0.4s; }
-.clock-circle.bad { border-color: var(--danger); box-shadow: 0 0 40px #ff3d5a30; animation: badShake 0.4s; }
- 
-@keyframes goodPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-@keyframes badShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
- 
-.svg-ring { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); transform: rotate(-90deg); }
-.ring-bg { fill: none; stroke: var(--border); stroke-width: 3; }
-.ring-fg { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 628; stroke-dashoffset: 628; transition: stroke-dashoffset 0.1s linear; }
- 
-.c-sec { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; }
-.c-ms { font-family: 'DM Mono', monospace; font-size: 18px; color: var(--text-mid); }
-.c-status { font-size: 10px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-top: 6px; }
- 
-.name-input {
-  width: 100%;
-  max-width: 280px;
-  height: 48px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  padding: 0 16px;
-  outline: none;
-  transition: border-color 0.2s;
-  text-align: center;
-}
- 
-.name-input:focus { border-color: var(--accent); }
-.name-input::placeholder { color: var(--text-mid); }
- 
-.game-btn {
-  width: 100%;
-  max-width: 280px;
-  height: 60px;
-  border: none;
-  border-radius: 12px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 4px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
- 
-.btn-start { background: var(--accent); color: #000; }
-.btn-start:active { transform: scale(0.97); }
-.btn-stop {
-  background: transparent;
-  border: 2px solid var(--accent);
-  color: var(--accent);
-  animation: stopPulse 1s ease-in-out infinite;
-}
-.btn-stop:active { transform: scale(0.97); background: var(--accent-dim); }
-.btn-disabled { background: var(--border); color: var(--text-dim); cursor: not-allowed; }
- 
-@keyframes stopPulse { 0%,100%{box-shadow:0 0 0 0 var(--accent-mid)} 50%{box-shadow:0 0 0 10px transparent} }
- 
-.no-reto-msg {
-  text-align: center;
-  color: var(--text-mid);
-  font-size: 14px;
-  line-height: 2;
-}
- 
-/* ==================== ADMIN VIEW ==================== */
-.admin-wrap { padding: 24px; }
- 
-.admin-login-box {
-  max-width: 380px;
-  margin: 60px auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 36px;
-}
- 
-.al-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 4px; text-align: center; margin-bottom: 6px; }
-.al-sub { font-size: 11px; letter-spacing: 2px; color: var(--text-mid); text-align: center; margin-bottom: 28px; text-transform: uppercase; }
- 
-.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-.field label { font-size: 10px; letter-spacing: 2px; color: var(--text-mid); text-transform: uppercase; }
-.field input {
-  height: 46px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: 14px;
-  padding: 0 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.field input:focus { border-color: var(--accent); }
- 
-.btn-login {
-  width: 100%;
-  height: 50px;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 3px;
-  cursor: pointer;
-  margin-top: 6px;
-  transition: opacity 0.2s;
-}
- 
-.btn-login:hover { opacity: 0.9; }
-.hint { font-size: 11px; color: var(--text-mid); text-align: center; margin-top: 12px; }
- 
-.admin-panel { display: none; }
-.admin-panel.show { display: block; }
- 
-/* Stats grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 28px;
-}
- 
-.stat-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
-}
- 
-.stat-lbl { font-size: 10px; letter-spacing: 2px; color: var(--text-mid); text-transform: uppercase; margin-bottom: 6px; }
-.stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 2px; line-height: 1; }
-.green { color: var(--accent); }
-.yellow { color: var(--warn); }
-.blue { color: var(--blue); }
-.red { color: var(--danger); }
- 
-/* Section header */
-.sec-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
- 
-.sec-title {
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--text-mid);
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
- 
-.sec-title::after { content: ''; width: 80px; height: 1px; background: var(--border); }
- 
-/* Buttons */
-.btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.15s;
-  letter-spacing: 0.5px;
-}
- 
-.btn-green { background: var(--accent); color: #000; }
-.btn-green:hover { opacity: 0.85; }
-.btn-yellow { background: var(--warn); color: #000; }
-.btn-yellow:hover { opacity: 0.85; }
-.btn-red { background: var(--danger); color: #fff; }
-.btn-red:hover { opacity: 0.85; }
-.btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--text-mid); }
-.btn-ghost:hover { border-color: var(--text-mid); color: var(--text); }
- 
-/* Table */
-.table-wrap { overflow-x: auto; margin-bottom: 32px; }
- 
-table { width: 100%; border-collapse: collapse; }
-th {
-  text-align: left;
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--text-mid);
-  text-transform: uppercase;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-td {
-  padding: 14px;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-  vertical-align: middle;
-}
-tr:hover td { background: var(--surface2); }
-.mono { font-family: 'DM Mono', monospace; }
-.btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+/* ── ADMIN ── */
+.adm-wrap{padding:22px}
+.login-box{max-width:360px;margin:60px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:34px}
+.lt{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;text-align:center;margin-bottom:6px}
+.ls{font-size:11px;letter-spacing:2px;color:var(--text-mid);text-align:center;margin-bottom:26px;text-transform:uppercase}
+.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.fld label{font-size:10px;letter-spacing:2px;color:var(--text-mid);text-transform:uppercase}
+.fld input{height:44px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:0 12px;outline:none;transition:border-color .2s}
+.fld input:focus{border-color:var(--accent)}
+.btn-login{width:100%;height:48px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;cursor:pointer;margin-top:6px}
+.hint{font-size:11px;color:var(--text-mid);text-align:center;margin-top:10px}
+.adm-panel{display:none}.adm-panel.show{display:block}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.sl{font-size:10px;letter-spacing:2px;color:var(--text-mid);text-transform:uppercase;margin-bottom:6px}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1}
+.g{color:var(--accent)}.y{color:var(--warn)}.b{color:var(--blue)}.r{color:var(--danger)}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-lbl{font-size:10px;letter-spacing:3px;color:var(--text-mid);text-transform:uppercase}
+.btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;letter-spacing:.5px}
+.btn-g{background:var(--accent);color:#000}.btn-g:hover{opacity:.85}
+.btn-y{background:var(--warn);color:#000}.btn-y:hover{opacity:.85}
+.btn-r{background:var(--danger);color:#fff}.btn-r:hover{opacity:.85}
+.btn-gh{background:var(--surface2);border:1px solid var(--border);color:var(--text-mid)}.btn-gh:hover{border-color:var(--text-mid);color:var(--text)}
+.tbl-wrap{overflow-x:auto;margin-bottom:28px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;letter-spacing:2px;color:var(--text-mid);text-transform:uppercase;padding:11px 13px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:13px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:hover td{background:var(--surface2)}
+.mono{font-family:'DM Mono',monospace}
+.btn-row{display:flex;gap:5px;flex-wrap:wrap}
  
 /* Modal */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.88);
-  backdrop-filter: blur(4px);
-  z-index: 200;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-.overlay.show { display: flex; }
- 
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 16px;
-  padding: 32px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: modalIn 0.2s ease-out;
-}
- 
-@keyframes modalIn {
-  from { transform: scale(0.95) translateY(10px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
-}
- 
-.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; margin-bottom: 24px; }
- 
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-}
-.info-row:last-child { border: none; }
-.info-lbl { color: var(--text-mid); }
-.info-val { font-weight: 500; }
- 
-.info-box {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
- 
-.prize-box {
-  background: var(--accent-dim);
-  border: 1px solid var(--accent-mid);
-  border-radius: 10px;
-  padding: 16px;
-  margin: 16px 0;
-}
- 
-.prize-lbl { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
-.prize-amt { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--accent); letter-spacing: 2px; }
-.prize-to { font-size: 12px; color: var(--text-mid); margin-top: 4px; }
- 
-.modal-btns { display: flex; gap: 12px; margin-top: 20px; }
-.modal-btns button { flex: 1; height: 48px; border-radius: 10px; font-size: 13px; }
- 
-/* Form */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-.form-field { display: flex; flex-direction: column; gap: 6px; }
-.form-field label { font-size: 10px; letter-spacing: 2px; color: var(--text-mid); text-transform: uppercase; }
-.form-field input, .form-field select {
-  height: 44px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  padding: 0 12px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.form-field input:focus, .form-field select:focus { border-color: var(--accent); }
-.form-field select option { background: var(--surface2); }
-.form-full { grid-column: 1 / -1; }
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;margin:12px;animation:mi .2s ease-out}
+@keyframes mi{from{transform:scale(.95) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.mt{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin-bottom:20px}
+.ir{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px}
+.ir:last-child{border:none}
+.il{color:var(--text-mid)}.iv{font-weight:500}
+.ibox{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.pbox{background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:10px;padding:14px;margin:14px 0}
+.pl{font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.pa{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--accent);letter-spacing:2px}
+.pt{font-size:12px;color:var(--text-mid);margin-top:4px}
+.mbtns{display:flex;gap:10px;margin-top:18px}
+.mbtns button{flex:1;height:46px;border-radius:10px;font-size:13px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.ff{display:flex;flex-direction:column;gap:5px}
+.ff label{font-size:10px;letter-spacing:2px;color:var(--text-mid);text-transform:uppercase}
+.ff input,.ff select{height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 11px;outline:none;transition:border-color .2s}
+.ff input:focus,.ff select:focus{border-color:var(--accent)}
+.ff select option{background:var(--surface2)}
+.ff.full{grid-column:1/-1}
  
 /* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 10px;
-  padding: 14px 20px;
-  font-size: 13px;
-  z-index: 300;
-  display: none;
-  max-width: 320px;
-  box-shadow: 0 4px 24px rgba(0,232,122,0.15);
-  animation: toastIn 0.3s ease-out;
-}
-.toast.show { display: block; }
-@keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:13px 18px;font-size:13px;z-index:300;display:none;max-width:300px;box-shadow:0 4px 20px rgba(0,232,122,.15);animation:ti .3s ease-out}
+.toast.show{display:block}
+@keyframes ti{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
  
 /* Countdown */
-.countdown-wrap {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.92);
-  z-index: 150;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-}
-.countdown-wrap.show { display: flex; }
-.cd-num { font-family: 'Bebas Neue', sans-serif; font-size: 200px; color: var(--accent); text-shadow: 0 0 80px var(--accent-mid); animation: cdPop 0.8s ease-out; line-height: 1; }
-@keyframes cdPop { from{transform:scale(1.4);opacity:0} 30%{transform:scale(0.95);opacity:1} to{transform:scale(1);opacity:1} }
-.cd-sub { font-size: 13px; letter-spacing: 4px; color: var(--text-mid); text-transform: uppercase; }
+.cd-wrap{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.cd-wrap.show{display:flex}
+.cd-n{font-family:'Bebas Neue',sans-serif;font-size:190px;color:var(--accent);text-shadow:0 0 80px var(--accent-mid);animation:cdp .8s ease-out;line-height:1}
+@keyframes cdp{from{transform:scale(1.4);opacity:0}30%{transform:scale(.95);opacity:1}to{transform:scale(1);opacity:1}}
+.cd-s{font-size:13px;letter-spacing:4px;color:var(--text-mid);text-transform:uppercase}
  
-@media (max-width: 768px) {
-  .game-layout { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .game-area { padding: 20px 16px; }
-  .game-title-big { font-size: 36px; }
-  .t-num { font-size: 60px; }
-  .clock-circle { width: 165px; height: 165px; }
-  .c-sec { font-size: 42px; }
-  nav { padding: 12px 16px; }
-  .nav-logo { font-size: 22px; }
-  .tab-btn { padding: 7px 12px; font-size: 12px; }
-  .admin-wrap { padding: 16px; }
-  .modal { padding: 24px 16px; margin: 8px; max-width: calc(100vw - 16px); }
-  .mobile-btn-wrap { display: block; }
-}
- 
-/* ── MOBILE SIDEBAR BUTTON ── */
-.mobile-btn-wrap { display: none; padding: 12px 16px 0; }
- 
-.mobile-retos-btn {
-  width: 100%;
-  height: 48px;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 10px;
-  color: var(--accent);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
-  letter-spacing: 3px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
- 
-.mobile-retos-btn:active { opacity: 0.8; }
-.mobile-retos-btn.open { background: var(--accent); color: #000; }
- 
-.sidebar-drawer {
-  display: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 10px 16px 0;
-  animation: drawerIn 0.2s ease-out;
-  max-height: 50vh;
-  overflow-y: auto;
-}
- 
-.sidebar-drawer.show { display: block; }
- 
-@keyframes drawerIn {
-  from { transform: translateY(-8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
- 
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
- 
-.drawer-title {
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--text-mid);
-  text-transform: uppercase;
+@media(max-width:768px){
+  .game-wrap{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .mob-wrap{display:block}
+  .stats{grid-template-columns:1fr 1fr}
+  .fgrid{grid-template-columns:1fr}
+  .game-area{padding:18px 14px}
+  .g-title{font-size:34px}
+  .tgt-num{font-size:60px}
+  .clock-ring{width:165px;height:165px}
+  .cs{font-size:42px}
+  nav{padding:11px 14px}
+  .logo{font-size:22px}
+  .tab{padding:7px 12px;font-size:12px}
+  .adm-wrap{padding:14px}
+  .modal{padding:22px 16px}
 }
 </style>
 </head>
 <body>
  
-<!-- Toast -->
 <div class="toast" id="toast"></div>
+<div class="cd-wrap" id="cdWrap"><div class="cd-n" id="cdN">3</div><div class="cd-s">Prepárate...</div></div>
+<div class="overlay" id="overlay"><div class="modal" id="modalBody"></div></div>
  
-<!-- Countdown -->
-<div class="countdown-wrap" id="countdown">
-  <div class="cd-num" id="cdNum">3</div>
-  <div class="cd-sub">Prepárate...</div>
-</div>
- 
-<!-- Modal -->
-<div class="overlay" id="overlay">
-  <div class="modal" id="modalBody"></div>
-</div>
- 
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">RIVAL</div>
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="goTo('game', this)">🎮 Juegos</button>
-    <button class="tab-btn" onclick="goTo('admin', this)">⚙️ Admin</button>
+  <div class="logo">RIVAL</div>
+  <div class="tabs">
+    <button class="tab on" id="tab-game" onclick="goTo('game')">🎮 Juegos</button>
+    <button class="tab" id="tab-admin" onclick="goTo('admin')">⚙️ Admin</button>
   </div>
-  <div class="online-badge">
-    <div class="dot"></div>
-    <span id="onlineTxt">Cargando...</span>
-  </div>
+  <div class="badge-wrap"><div class="dot"></div><span id="onlineTxt">Cargando...</span></div>
 </nav>
  
-<!-- ==================== GAME VIEW ==================== -->
-<div id="view-game" class="view active">
+<!-- ══ GAME ══ -->
+<div id="view-game" class="view on">
  
-  <!-- MOBILE BUTTON -->
-  <div class="mobile-btn-wrap">
-    <button class="mobile-retos-btn" id="mobileBtn" onclick="toggleDrawer()">
-      ⚔️ VER RETOS ACTIVOS
-    </button>
+  <!-- Mobile btn -->
+  <div class="mob-wrap">
+    <button class="mob-btn" id="mobBtn" onclick="toggleDrawer()">⚔️ VER RETOS ACTIVOS</button>
   </div>
- 
-  <!-- MOBILE DRAWER -->
-  <div class="sidebar-drawer" id="sidebarDrawer">
-    <div class="drawer-header">
-      <div class="drawer-title">Retos activos</div>
-      <button onclick="toggleDrawer()" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-mid);padding:4px 10px;cursor:pointer;font-size:14px">✕</button>
+  <div class="mob-drawer" id="mobDrawer">
+    <div class="drw-hdr">
+      <div class="drw-lbl">Retos activos</div>
+      <button class="drw-x" onclick="toggleDrawer()">✕ Cerrar</button>
     </div>
     <div id="drawerList"></div>
   </div>
  
-  <div class="game-layout">
- 
-    <!-- Sidebar -->
+  <div class="game-wrap">
     <div class="sidebar">
-      <div class="sidebar-label">Retos activos</div>
-      <div id="sidebarList">
-        <div class="no-retos">Sin retos activos<br>Crea uno desde el Admin</div>
-      </div>
+      <div class="side-lbl">Retos activos</div>
+      <div id="sidebarList"><div class="no-retos">Sin retos activos<br>Crea uno desde Admin</div></div>
     </div>
- 
-    <!-- Game -->
     <div class="game-area">
       <div class="game-box" id="gameBox">
-        <div class="no-reto-msg">
-          Selecciona un reto del panel izquierdo<br>
-          <span style="font-size:12px;color:var(--text-dim)">o crea uno nuevo desde el Admin</span>
-        </div>
+        <div class="no-reto-msg">Selecciona un reto del panel izquierdo<br><span style="font-size:12px;color:var(--text-dim)">o crea uno desde el Admin</span></div>
       </div>
     </div>
- 
   </div>
 </div>
  
-<!-- ==================== ADMIN VIEW ==================== -->
+<!-- ══ ADMIN ══ -->
 <div id="view-admin" class="view">
-  <div class="admin-wrap">
- 
-    <!-- Login -->
-    <div id="loginBox" class="admin-login-box">
-      <div class="al-title">ADMIN RIVAL</div>
-      <div class="al-sub">Acceso restringido</div>
-      <div class="field">
-        <label>Usuario</label>
-        <input id="loginU" type="text" placeholder="admin">
-      </div>
-      <div class="field">
-        <label>Contraseña</label>
-        <input id="loginP" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
+  <div class="adm-wrap">
+    <div id="loginBox" class="login-box">
+      <div class="lt">ADMIN RIVAL</div>
+      <div class="ls">Acceso restringido</div>
+      <div class="fld"><label>Usuario</label><input id="lu" type="text" placeholder="admin"></div>
+      <div class="fld"><label>Contraseña</label><input id="lp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn-login" onclick="doLogin()">ENTRAR</button>
       <div class="hint">Demo: admin / rival2024</div>
     </div>
- 
-    <!-- Panel -->
-    <div id="adminPanel" class="admin-panel">
- 
-      <!-- Stats -->
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-lbl">Total retos</div>
-          <div class="stat-val green" id="stTotal">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-lbl">En juego</div>
-          <div class="stat-val yellow" id="stPlaying">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-lbl">Por dispersar</div>
-          <div class="stat-val red" id="stPending">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-lbl">Volumen total</div>
-          <div class="stat-val blue" id="stVolume">$0</div>
-        </div>
+    <div id="admPanel" class="adm-panel">
+      <div class="stats">
+        <div class="stat"><div class="sl">Total</div><div class="sv g" id="stT">0</div></div>
+        <div class="stat"><div class="sl">En juego</div><div class="sv y" id="stP">0</div></div>
+        <div class="stat"><div class="sl">Por dispersar</div><div class="sv r" id="stD">0</div></div>
+        <div class="stat"><div class="sl">Volumen</div><div class="sv b" id="stV">$0</div></div>
       </div>
- 
-      <!-- Table header -->
-      <div class="sec-header">
-        <div class="sec-title">Todos los retos</div>
-        <button class="btn btn-green" onclick="openCreateModal()">+ Nuevo reto</button>
+      <div class="sec-hdr">
+        <div class="sec-lbl">Todos los retos</div>
+        <button class="btn btn-g" onclick="openCreate()">+ Nuevo reto</button>
       </div>
- 
-      <!-- Table -->
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Jugadores</th>
-              <th>Tipo</th>
-              <th>Apuesta</th>
-              <th>Resultados</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="adminTable"></tbody>
-        </table>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>ID</th><th>Jugadores</th><th>Tipo</th><th>Apuesta</th><th>Resultados</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="admTable"></tbody></table>
       </div>
- 
     </div>
   </div>
 </div>
  
-<!-- ============================================================
-     CONFIGURACIÓN FIREBASE
-     Reemplaza estos valores con los de tu proyecto Firebase
-     ============================================================ -->
 <script>
+// ══ FIREBASE CONFIG ══
 const firebaseConfig = {
   apiKey: "AIzaSyB2cpU5WtMZ3DgaZv6viTDCXPvj8VHrTwE",
   authDomain: "rival-app-82470.firebaseapp.com",
@@ -826,806 +268,419 @@ const firebaseConfig = {
   appId: "1:669224883015:web:af16120105ee0504967262",
   measurementId: "G-DFPW5DZVS3"
 };
- 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
  
-// ============================================================
-// ESTADO LOCAL
-// ============================================================
-let retosData = {};
-let selectedRetoId = null;
-let gameState = 'idle';
-let startTime = null;
-let animFrame = null;
+// ══ STATE ══
+let retos = {};
+let selId = null;
+let gState = 'idle';
+let t0 = null;
+let raf = null;
 let elapsed = 0;
-let currentPlayer = 1;
-let isLoggedIn = false;
+let curP = 1;
+let loggedIn = false;
  
-// ============================================================
-// FIREBASE — ESCUCHAR CAMBIOS EN TIEMPO REAL
-// ============================================================
-db.ref('retos').on('value', (snap) => {
-  retosData = snap.val() || {};
+// ══ REALTIME LISTENER ══
+db.ref('retos').on('value', function(snap) {
+  retos = snap.val() || {};
   renderSidebar();
-  if (isLoggedIn) renderAdminTable();
+  renderDrawer();
   updateStats();
-  updateOnlineCount();
- 
-  // Actualizar juego activo si hay uno seleccionado
-  if (selectedRetoId && retosData[selectedRetoId]) {
-    renderGame(selectedRetoId);
-  }
+  updateOnline();
+  if (loggedIn) renderTable();
+  if (selId && retos[selId]) renderGame(selId);
 });
  
-// ============================================================
-// NAVEGACIÓN
-// ============================================================
-function goTo(view, btn) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + view).classList.add('active');
-  btn.classList.add('active');
+// ══ NAV ══
+function goTo(v) {
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('on'); });
+  document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('on'); });
+  document.getElementById('view-' + v).classList.add('on');
+  document.getElementById('tab-' + v).classList.add('on');
 }
  
-// ============================================================
-// SIDEBAR — LISTA DE RETOS
-// ============================================================
-function renderSidebar() {
-  const list = document.getElementById('sidebarList');
-  const retos = Object.entries(retosData);
+// ══ MOBILE DRAWER ══
+function toggleDrawer() {
+  var drawer = document.getElementById('mobDrawer');
+  var btn = document.getElementById('mobBtn');
+  if (drawer.classList.contains('show')) {
+    drawer.classList.remove('show');
+    btn.classList.remove('open');
+    btn.textContent = '⚔️ VER RETOS ACTIVOS';
+  } else {
+    drawer.classList.add('show');
+    btn.classList.add('open');
+    btn.textContent = '✕ CERRAR RETOS';
+    renderDrawer();
+  }
+}
  
-  if (retos.length === 0) {
-    list.innerHTML = '<div class="no-retos">Sin retos activos<br>Crea uno desde el Admin</div>';
+function renderDrawer() {
+  var list = document.getElementById('drawerList');
+  if (!list) return;
+  var keys = Object.keys(retos);
+  if (keys.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text-mid);font-size:12px;padding:20px">Sin retos activos</div>';
     return;
   }
- 
-  list.innerHTML = retos.map(([id, r]) => {
-    const badgeClass = r.status === 'waiting' ? 'badge-wait' :
-                       r.status === 'playing' ? 'badge-play' :
-                       r.status === 'done' ? 'badge-done' : 'badge-disp';
-    const badgeText = r.status === 'waiting' ? 'ESPERANDO' :
-                      r.status === 'playing' ? 'EN JUEGO' :
-                      r.status === 'done' ? 'TERMINADO' : 'DISPERSADO';
- 
-    return `<div class="reto-item ${selectedRetoId === id ? 'active' : ''}" onclick="selectReto('${id}')">
-      <div class="reto-item-top">
-        <span class="reto-id">#${id.slice(-4).toUpperCase()}</span>
-        <span class="badge ${badgeClass}">${badgeText}</span>
-      </div>
-      <div class="reto-players">${r.p1Name} vs ${r.p2Name}</div>
-      <div class="reto-meta">
-        <span>${r.tipo || '⏱️ Reloj'}</span>
-        <span class="amount">$${(r.apuesta || 0) * 2}</span>
-      </div>
-    </div>`;
-  }).join('');
+  var html = '';
+  keys.forEach(function(id) {
+    var r = retos[id];
+    var bc = r.status === 'waiting' ? 'bw' : r.status === 'playing' ? 'bp' : r.status === 'done' ? 'bd' : 'bx';
+    var bt = r.status === 'waiting' ? 'ESPERANDO' : r.status === 'playing' ? 'EN JUEGO' : r.status === 'done' ? 'TERMINADO' : 'DISPERSADO';
+    html += '<div class="reto-card' + (selId === id ? ' sel' : '') + '" onclick="selRetoMob(\'' + id + '\')">';
+    html += '<div class="rc-top"><span class="rc-id">#' + id.slice(-4).toUpperCase() + '</span><span class="bdg ' + bc + '">' + bt + '</span></div>';
+    html += '<div class="rc-players">' + r.p1Name + ' vs ' + r.p2Name + '</div>';
+    html += '<div class="rc-meta"><span>' + (r.tipo || '⏱️ Reloj') + '</span><span class="amt">$' + ((r.apuesta || 0) * 2) + '</span></div>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
 }
  
-// ============================================================
-// SELECCIONAR RETO Y MOSTRAR JUEGO
-// ============================================================
-function selectReto(id) {
-  selectedRetoId = id;
-  currentPlayer = 1;
-  gameState = 'idle';
-  cancelAnimationFrame(animFrame);
+function selRetoMob(id) {
+  selReto(id);
+  document.getElementById('mobDrawer').classList.remove('show');
+  document.getElementById('mobBtn').classList.remove('open');
+  document.getElementById('mobBtn').textContent = '⚔️ VER RETOS ACTIVOS';
+  document.getElementById('gameBox').scrollIntoView({ behavior: 'smooth' });
+}
+ 
+// ══ SIDEBAR ══
+function renderSidebar() {
+  var list = document.getElementById('sidebarList');
+  var keys = Object.keys(retos);
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="no-retos">Sin retos activos<br>Crea uno desde Admin</div>';
+    return;
+  }
+  var html = '';
+  keys.forEach(function(id) {
+    var r = retos[id];
+    var bc = r.status === 'waiting' ? 'bw' : r.status === 'playing' ? 'bp' : r.status === 'done' ? 'bd' : 'bx';
+    var bt = r.status === 'waiting' ? 'ESPERANDO' : r.status === 'playing' ? 'EN JUEGO' : r.status === 'done' ? 'TERMINADO' : 'DISPERSADO';
+    html += '<div class="reto-card' + (selId === id ? ' sel' : '') + '" onclick="selReto(\'' + id + '\')">';
+    html += '<div class="rc-top"><span class="rc-id">#' + id.slice(-4).toUpperCase() + '</span><span class="bdg ' + bc + '">' + bt + '</span></div>';
+    html += '<div class="rc-players">' + r.p1Name + ' vs ' + r.p2Name + '</div>';
+    html += '<div class="rc-meta"><span>' + (r.tipo || '⏱️ Reloj') + '</span><span class="amt">$' + ((r.apuesta || 0) * 2) + '</span></div>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+ 
+// ══ SELECT RETO ══
+function selReto(id) {
+  selId = id;
+  curP = 1;
+  gState = 'idle';
+  cancelAnimationFrame(raf);
   renderSidebar();
   renderGame(id);
 }
  
+// ══ RENDER GAME ══
 function renderGame(id) {
-  const r = retosData[id];
+  var r = retos[id];
   if (!r) return;
+  var box = document.getElementById('gameBox');
+  var target = parseFloat(r.objetivo) || 5.0;
+  var p1done = r.p1Time != null;
+  var p2done = r.p2Time != null;
+  var finished = r.status === 'done' || r.status === 'dispersado';
  
-  const box = document.getElementById('gameBox');
-  const target = parseFloat(r.objetivo) || 5.0;
-  const p1Done = r.p1Time != null;
-  const p2Done = r.p2Time != null;
+  var p1t = p1done ? ('<div class="p-time done">' + r.p1Time + 's ' + (r.winner === r.p1Name ? '🏆' : '') + '</div>') : '<div class="p-time">— —</div>';
+  var p2t = p2done ? ('<div class="p-time done">' + r.p2Time + 's ' + (r.winner === r.p2Name ? '🏆' : '') + '</div>') : '<div class="p-time">— —</div>';
  
-  let p1TimeDisplay = p1Done ? `<div class="p-time done">${r.p1Time}s ${r.winner === r.p1Name ? '🏆' : ''}</div>` : '<div class="p-time">— —</div>';
-  let p2TimeDisplay = p2Done ? `<div class="p-time done">${r.p2Time}s ${r.winner === r.p2Name ? '🏆' : ''}</div>` : '<div class="p-time">— —</div>';
+  var html = '<div class="g-title">PARA EL RELOJ</div>';
+  html += '<div class="g-sub">#' + id.slice(-4).toUpperCase() + ' — $' + ((r.apuesta||0)*2) + ' MXN en juego</div>';
+  html += '<div class="vs-row"><div class="p-col"><div class="p-lbl">Jugador 1</div><div class="p-name">' + r.p1Name + '</div>' + p1t + '</div>';
+  html += '<div class="vs">VS</div>';
+  html += '<div class="p-col r"><div class="p-lbl">Jugador 2</div><div class="p-name">' + r.p2Name + '</div>' + p2t + '</div></div>';
+  html += '<div class="clock-wrap">';
+  html += '<div class="tgt"><div class="tgt-lbl">Para exactamente en</div><div class="tgt-num">' + target.toFixed(3) + '</div><div class="tgt-unit">SEGUNDOS</div></div>';
+  html += '<div class="clock-ring" id="cRing"><svg class="svg-r" viewBox="0 0 198 198"><circle class="rt" cx="99" cy="99" r="95"/><circle class="rp" id="rp" cx="99" cy="99" r="95"/></svg>';
+  html += '<div class="cs" id="cS">0</div><div class="cm" id="cM">.000</div><div class="cl" id="cL">LISTO</div></div>';
+  if (!finished) {
+    html += '<input class="n-input" id="nInp" placeholder="' + (curP === 1 ? r.p1Name : r.p2Name) + '" value="' + (curP === 1 ? r.p1Name : r.p2Name) + '">';
+    html += '<button class="g-btn gb-start" id="gBtn" onclick="handleBtn(\'' + id + '\')">INICIAR</button>';
+  } else {
+    html += '<div class="done-msg">Reto finalizado<br>Ganador: <strong style="color:var(--accent)">' + (r.winner || '—') + '</strong></div>';
+  }
+  html += '</div>';
+  box.innerHTML = html;
  
-  const finished = r.status === 'done' || r.status === 'dispersado';
- 
-  box.innerHTML = `
-    <div class="game-title-big">PARA EL RELOJ</div>
-    <div class="game-sub">#${id.slice(-4).toUpperCase()} — $${(r.apuesta||0)*2} MXN en juego</div>
- 
-    <div class="vs-card">
-      <div class="p-side">
-        <div class="p-label">Jugador 1</div>
-        <div class="p-name">${r.p1Name}</div>
-        ${p1TimeDisplay}
-      </div>
-      <div class="vs-sep">VS</div>
-      <div class="p-side right">
-        <div class="p-label">Jugador 2</div>
-        <div class="p-name">${r.p2Name}</div>
-        ${p2TimeDisplay}
-      </div>
-    </div>
- 
-    <div class="clock-wrap">
-      <div class="target-section">
-        <div class="t-label">Para exactamente en</div>
-        <div class="t-num">${target.toFixed(3)}</div>
-        <div class="t-unit">SEGUNDOS</div>
-      </div>
- 
-      <div class="clock-circle" id="clockCircle">
-        <svg class="svg-ring" viewBox="0 0 208 208">
-          <circle class="ring-bg" cx="104" cy="104" r="100"/>
-          <circle class="ring-fg" id="ringFg" cx="104" cy="104" r="100"/>
-        </svg>
-        <div class="c-sec" id="cSec">0</div>
-        <div class="c-ms" id="cMs">.000</div>
-        <div class="c-status" id="cStatus">LISTO</div>
-      </div>
- 
-      ${finished ? '' : `
-        <input class="name-input" id="nameInput"
-          placeholder="${currentPlayer === 1 ? r.p1Name : r.p2Name}"
-          value="${currentPlayer === 1 ? r.p1Name : r.p2Name}">
-        <button class="game-btn btn-start" id="gameBtn" onclick="handleBtn('${id}')">
-          INICIAR
-        </button>
-      `}
- 
-      ${finished ? `<div style="text-align:center;color:var(--text-mid);font-size:13px">Reto finalizado — Ganador: <strong style="color:var(--accent)">${r.winner || '—'}</strong></div>` : ''}
-    </div>
-  `;
- 
-  // Si el jugador 1 ya jugó, preparar para jugador 2
-  if (p1Done && !p2Done && !finished) {
-    currentPlayer = 2;
-    const nameInput = document.getElementById('nameInput');
-    if (nameInput) {
-      nameInput.value = r.p2Name;
-      nameInput.placeholder = r.p2Name;
-    }
-    toast(`✅ ${r.p1Name}: ${r.p1Time}s — Turno de ${r.p2Name}`);
+  if (p1done && !p2done && !finished) {
+    curP = 2;
+    var ni = document.getElementById('nInp');
+    if (ni) { ni.value = r.p2Name; ni.placeholder = r.p2Name; }
+    toast('✅ ' + r.p1Name + ': ' + r.p1Time + 's — Turno de ' + r.p2Name);
   }
 }
  
-// ============================================================
-// JUEGO — LÓGICA DEL RELOJ
-// ============================================================
+// ══ GAME LOGIC ══
 function handleBtn(id) {
-  if (gameState === 'idle') startCountdown(id);
-  else if (gameState === 'running') stopClock(id);
+  if (gState === 'idle') startCD(id);
+  else if (gState === 'running') stopClock(id);
 }
  
-function startCountdown(id) {
-  gameState = 'countdown';
-  const btn = document.getElementById('gameBtn');
-  if (btn) { btn.className = 'game-btn btn-disabled'; btn.textContent = '...'; }
- 
-  const cd = document.getElementById('countdown');
-  const cdNum = document.getElementById('cdNum');
-  cd.classList.add('show');
- 
-  let n = 3;
-  const tick = () => {
+function startCD(id) {
+  gState = 'countdown';
+  var btn = document.getElementById('gBtn');
+  if (btn) { btn.className = 'g-btn gb-off'; btn.textContent = '...'; }
+  var wrap = document.getElementById('cdWrap');
+  var num = document.getElementById('cdN');
+  wrap.classList.add('show');
+  var n = 3;
+  function tick() {
     n--;
     if (n > 0) {
-      cdNum.style.animation = 'none';
-      cdNum.offsetHeight;
-      cdNum.style.animation = 'cdPop 0.8s ease-out';
-      cdNum.style.color = 'var(--accent)';
-      cdNum.textContent = n;
+      num.style.animation = 'none';
+      num.offsetHeight;
+      num.style.animation = 'cdp .8s ease-out';
+      num.style.color = 'var(--accent)';
+      num.textContent = n;
       setTimeout(tick, 800);
     } else {
-      cdNum.textContent = '¡YA!';
-      setTimeout(() => {
-        cd.classList.remove('show');
-        startRunning(id);
+      num.textContent = '¡YA!';
+      setTimeout(function() {
+        wrap.classList.remove('show');
+        startRun(id);
       }, 600);
     }
-  };
+  }
   setTimeout(tick, 800);
 }
  
-function startRunning(id) {
-  gameState = 'running';
-  startTime = performance.now();
+function startRun(id) {
+  gState = 'running';
+  t0 = performance.now();
   elapsed = 0;
- 
-  const btn = document.getElementById('gameBtn');
-  if (btn) { btn.className = 'game-btn btn-stop'; btn.textContent = 'PARAR'; }
- 
-  const circle = document.getElementById('clockCircle');
-  if (circle) { circle.className = 'clock-circle running'; }
- 
-  const cStatus = document.getElementById('cStatus');
-  if (cStatus) cStatus.textContent = 'CORRIENDO';
- 
-  animFrame = requestAnimationFrame(() => tick(id));
-}
- 
-function tick(id) {
-  if (gameState !== 'running') return;
-  elapsed = (performance.now() - startTime) / 1000;
- 
-  const cSec = document.getElementById('cSec');
-  const cMs = document.getElementById('cMs');
-  if (cSec) cSec.textContent = Math.floor(elapsed);
-  if (cMs) cMs.textContent = '.' + String(Math.floor((elapsed % 1) * 1000)).padStart(3, '0');
- 
-  const progress = Math.min(elapsed / 10, 1);
-  const ring = document.getElementById('ringFg');
-  if (ring) ring.style.strokeDashoffset = 628 - (628 * progress);
- 
-  if (elapsed >= 15) stopClock(id);
-  else animFrame = requestAnimationFrame(() => tick(id));
+  var btn = document.getElementById('gBtn');
+  if (btn) { btn.className = 'g-btn gb-stop'; btn.textContent = 'PARAR'; }
+  var ring = document.getElementById('cRing');
+  if (ring) ring.className = 'clock-ring run';
+  var cl = document.getElementById('cL');
+  if (cl) cl.textContent = 'CORRIENDO';
+  raf = requestAnimationFrame(function loop() {
+    if (gState !== 'running') return;
+    elapsed = (performance.now() - t0) / 1000;
+    var s = document.getElementById('cS');
+    var m = document.getElementById('cM');
+    if (s) s.textContent = Math.floor(elapsed);
+    if (m) m.textContent = '.' + String(Math.floor((elapsed % 1) * 1000)).padStart(3, '0');
+    var rp = document.getElementById('rp');
+    if (rp) rp.style.strokeDashoffset = 597 - (597 * Math.min(elapsed / 10, 1));
+    if (elapsed >= 15) stopClock(id);
+    else raf = requestAnimationFrame(loop);
+  });
 }
  
 function stopClock(id) {
-  cancelAnimationFrame(animFrame);
-  gameState = 'stopped';
- 
-  const r = retosData[id];
+  cancelAnimationFrame(raf);
+  gState = 'stopped';
+  var r = retos[id];
   if (!r) return;
- 
-  elapsed = (performance.now() - startTime) / 1000;
-  const target = parseFloat(r.objetivo) || 5.0;
-  const formatted = elapsed.toFixed(3);
-  const diff = Math.abs(elapsed - target);
- 
-  // Update display
-  const cSec = document.getElementById('cSec');
-  const cMs = document.getElementById('cMs');
-  const cStatus = document.getElementById('cStatus');
-  if (cSec) cSec.textContent = formatted.split('.')[0];
-  if (cMs) cMs.textContent = '.' + formatted.split('.')[1];
-  if (cStatus) cStatus.textContent = 'PARADO';
- 
-  const circle = document.getElementById('clockCircle');
-  if (circle) { circle.className = `clock-circle ${diff < 0.3 ? 'good' : 'bad'}`; }
- 
-  const btn = document.getElementById('gameBtn');
-  if (btn) { btn.className = 'game-btn btn-disabled'; btn.textContent = '...'; }
- 
-  setTimeout(() => saveResult(id, formatted, diff), 600);
+  elapsed = (performance.now() - t0) / 1000;
+  var target = parseFloat(r.objetivo) || 5.0;
+  var fmt = elapsed.toFixed(3);
+  var diff = Math.abs(elapsed - target);
+  var s = document.getElementById('cS');
+  var m = document.getElementById('cM');
+  var cl = document.getElementById('cL');
+  if (s) s.textContent = fmt.split('.')[0];
+  if (m) m.textContent = '.' + fmt.split('.')[1];
+  if (cl) cl.textContent = 'PARADO';
+  var ring = document.getElementById('cRing');
+  if (ring) ring.className = 'clock-ring ' + (diff < 0.3 ? 'good' : 'bad');
+  var btn = document.getElementById('gBtn');
+  if (btn) { btn.className = 'g-btn gb-off'; btn.textContent = '...'; }
+  setTimeout(function() { saveResult(id, fmt, diff); }, 600);
 }
  
 function saveResult(id, time, diff) {
-  const r = retosData[id];
+  var r = retos[id];
   if (!r) return;
- 
-  if (currentPlayer === 1) {
-    // Guardar resultado jugador 1 en Firebase
-    db.ref(`retos/${id}`).update({
-      p1Time: time,
-      status: 'playing'
-    }).then(() => {
-      toast(`✅ ${r.p1Name}: ${time}s — Guardado`);
-      currentPlayer = 2;
+  if (curP === 1) {
+    db.ref('retos/' + id).update({ p1Time: time, status: 'playing' }).then(function() {
+      toast('✅ ' + r.p1Name + ': ' + time + 's guardado');
+      curP = 2;
     });
- 
   } else {
-    // Guardar resultado jugador 2 y determinar ganador
-    const p1Diff = Math.abs(parseFloat(r.p1Time) - (parseFloat(r.objetivo) || 5.0));
-    const p2Diff = diff;
-    const winner = p1Diff <= p2Diff ? r.p1Name : r.p2Name;
- 
-    db.ref(`retos/${id}`).update({
-      p2Time: time,
-      winner: winner,
-      status: 'done'
-    }).then(() => {
-      toast(`🏆 Ganador: ${winner}`);
-      setTimeout(() => showWinnerModal(id), 800);
+    var target = parseFloat(r.objetivo) || 5.0;
+    var d1 = Math.abs(parseFloat(r.p1Time) - target);
+    var d2 = diff;
+    var winner = d1 <= d2 ? r.p1Name : r.p2Name;
+    db.ref('retos/' + id).update({ p2Time: time, winner: winner, status: 'done' }).then(function() {
+      toast('🏆 Ganador: ' + winner);
+      setTimeout(function() { showWinner(id); }, 800);
     });
   }
 }
  
-// ============================================================
-// ADMIN — LOGIN
-// ============================================================
+// ══ ADMIN ══
 function doLogin() {
-  const u = document.getElementById('loginU').value;
-  const p = document.getElementById('loginP').value;
- 
+  var u = document.getElementById('lu').value;
+  var p = document.getElementById('lp').value;
   if ((u === 'admin' || u === 'socio') && p === 'rival2024') {
-    isLoggedIn = true;
+    loggedIn = true;
     document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('adminPanel').classList.add('show');
-    renderAdminTable();
-    toast(`✅ Bienvenido, ${u === 'admin' ? 'Ricardo' : 'Socio'}`);
+    document.getElementById('admPanel').classList.add('show');
+    renderTable();
+    toast('✅ Bienvenido ' + u);
   } else {
-    toast('❌ Usuario o contraseña incorrectos');
+    toast('❌ Credenciales incorrectas');
   }
 }
  
-// ============================================================
-// ADMIN — TABLA DE RETOS
-// ============================================================
-function renderAdminTable() {
-  const tbody = document.getElementById('adminTable');
-  const retos = Object.entries(retosData);
- 
-  if (retos.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-mid);padding:40px">Sin retos — crea el primero</td></tr>';
+function renderTable() {
+  var tbody = document.getElementById('admTable');
+  var keys = Object.keys(retos);
+  if (keys.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-mid);padding:32px">Sin retos — crea el primero</td></tr>';
     return;
   }
- 
-  tbody.innerHTML = retos.map(([id, r]) => {
-    const shortId = id.slice(-4).toUpperCase();
- 
-    const badgeClass = r.status === 'waiting' ? 'badge-wait' :
-                       r.status === 'playing' ? 'badge-play' :
-                       r.status === 'done' ? 'badge-done' : 'badge-disp';
-    const badgeText = r.status === 'waiting' ? 'ESPERANDO' :
-                      r.status === 'playing' ? 'EN JUEGO' :
-                      r.status === 'done' ? 'TERMINADO' : '✅ DISPERSADO';
- 
-    const resultHtml = r.p1Time
-      ? `<span class="mono" style="font-size:11px">${r.p1Name}: ${r.p1Time}s<br>${r.p2Name}: ${r.p2Time || '—'}s</span>`
-      : '<span style="color:var(--text-mid);font-size:11px">Sin resultado</span>';
- 
-    let actions = '';
+  var html = '';
+  keys.forEach(function(id) {
+    var r = retos[id];
+    var sid = id.slice(-4).toUpperCase();
+    var bc = r.status === 'waiting' ? 'bw' : r.status === 'playing' ? 'bp' : r.status === 'done' ? 'bd' : 'bx';
+    var bt = r.status === 'waiting' ? 'ESPERANDO' : r.status === 'playing' ? 'EN JUEGO' : r.status === 'done' ? 'TERMINADO' : '✅ DISPERSADO';
+    var res = r.p1Time ? ('<span class="mono" style="font-size:11px">' + r.p1Name + ': ' + r.p1Time + 's<br>' + r.p2Name + ': ' + (r.p2Time || '—') + 's</span>') : '<span style="color:var(--text-mid);font-size:11px">Sin resultado</span>';
+    var acts = '';
     if (r.status === 'done') {
-      actions = `
-        <div class="btn-row">
-          <button class="btn btn-yellow" onclick="showWinnerModal('${id}')">🏆 Ganador</button>
-          <button class="btn btn-green" onclick="showDispersarModal('${id}')">💸 Dispersar</button>
-          <button class="btn btn-ghost" onclick="openEditModal('${id}')">✏️</button>
-          <button class="btn btn-red" onclick="confirmDelete('${id}')">🗑️</button>
-        </div>`;
+      acts = '<div class="btn-row"><button class="btn btn-y" onclick="showWinner(\'' + id + '\')">🏆 Ganador</button><button class="btn btn-g" onclick="showDispersar(\'' + id + '\')">💸 Dispersar</button><button class="btn btn-gh" onclick="openEdit(\'' + id + '\')">✏️</button><button class="btn btn-r" onclick="confirmDel(\'' + id + '\')">🗑️</button></div>';
     } else if (r.status === 'dispersado') {
-      actions = `
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="showDetail('${id}')">Ver</button>
-          <button class="btn btn-red" onclick="confirmDelete('${id}')">🗑️</button>
-        </div>`;
+      acts = '<div class="btn-row"><button class="btn btn-gh" onclick="showDetail(\'' + id + '\')">Ver</button><button class="btn btn-r" onclick="confirmDel(\'' + id + '\')">🗑️</button></div>';
     } else {
-      actions = `
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="openEditModal('${id}')">✏️ Editar</button>
-          <button class="btn btn-red" onclick="confirmDelete('${id}')">🗑️</button>
-        </div>`;
+      acts = '<div class="btn-row"><button class="btn btn-gh" onclick="openEdit(\'' + id + '\')">✏️ Editar</button><button class="btn btn-r" onclick="confirmDel(\'' + id + '\')">🗑️</button></div>';
     }
- 
-    return `<tr>
-      <td class="mono" style="color:var(--text-mid)">#${shortId}</td>
-      <td><strong>${r.p1Name}</strong><br><span style="color:var(--text-mid);font-size:11px">${r.p2Name}</span></td>
-      <td style="font-size:12px">${r.tipo || '⏱️ Reloj'}</td>
-      <td class="mono" style="color:var(--warn)">$${(r.apuesta||0)*2}</td>
-      <td>${resultHtml}</td>
-      <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-      <td>${actions}</td>
-    </tr>`;
-  }).join('');
+    html += '<tr><td class="mono" style="color:var(--text-mid)">#' + sid + '</td><td><strong>' + r.p1Name + '</strong><br><span style="color:var(--text-mid);font-size:11px">' + r.p2Name + '</span></td><td style="font-size:12px">' + (r.tipo||'⏱️ Reloj') + '</td><td class="mono" style="color:var(--warn)">$' + ((r.apuesta||0)*2) + '</td><td>' + res + '</td><td><span class="bdg ' + bc + '">' + bt + '</span></td><td>' + acts + '</td></tr>';
+  });
+  tbody.innerHTML = html;
 }
  
-// ============================================================
-// ADMIN — CREAR RETO
-// ============================================================
-function openCreateModal() {
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-title">➕ NUEVO RETO</div>
- 
-    <div class="form-grid">
-      <div class="form-field">
-        <label>Jugador 1</label>
-        <input id="f_p1" placeholder="Carlos R." type="text">
-      </div>
-      <div class="form-field">
-        <label>Jugador 2</label>
-        <input id="f_p2" placeholder="Diego M." type="text">
-      </div>
-      <div class="form-field">
-        <label>Apuesta por jugador ($MXN)</label>
-        <input id="f_apuesta" type="number" placeholder="200" min="10">
-      </div>
-      <div class="form-field">
-        <label>Objetivo (segundos)</label>
-        <input id="f_objetivo" type="number" placeholder="5.000" step="0.001" min="1" max="30">
-      </div>
-      <div class="form-field">
-        <label>Tipo de reto</label>
-        <select id="f_tipo">
-          <option value="⏱️ Reloj">⏱️ Reloj</option>
-          <option value="⚡ Reacción">⚡ Reacción</option>
-          <option value="🎯 Precisión">🎯 Precisión</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Cuenta del ganador</label>
-        <input id="f_cuenta" placeholder="Mercado Pago / CLABE" type="text">
-      </div>
-    </div>
- 
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-green" onclick="createReto()" style="font-size:14px;font-weight:700">✅ CREAR RETO</button>
-    </div>
-  `;
+// ══ CREATE ══
+function openCreate() {
+  document.getElementById('modalBody').innerHTML = '<div class="mt">➕ NUEVO RETO</div><div class="fgrid"><div class="ff"><label>Jugador 1</label><input id="fp1" placeholder="Carlos R."></div><div class="ff"><label>Jugador 2</label><input id="fp2" placeholder="Diego M."></div><div class="ff"><label>Apuesta por jugador ($MXN)</label><input id="fap" type="number" placeholder="200"></div><div class="ff"><label>Objetivo (segundos)</label><input id="fob" type="number" step="0.001" placeholder="5.000" value="5.000"></div><div class="ff"><label>Tipo</label><select id="fti"><option>⏱️ Reloj</option><option>⚡ Reacción</option><option>🎯 Precisión</option></select></div><div class="ff"><label>Cuenta del ganador</label><input id="fcu" placeholder="Mercado Pago / CLABE"></div></div><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="doCreate()" style="font-weight:700">✅ CREAR RETO</button></div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function createReto() {
-  const p1 = document.getElementById('f_p1').value.trim();
-  const p2 = document.getElementById('f_p2').value.trim();
-  const apuesta = parseInt(document.getElementById('f_apuesta').value);
-  const objetivo = parseFloat(document.getElementById('f_objetivo').value) || 5.0;
-  const tipo = document.getElementById('f_tipo').value;
-  const cuenta = document.getElementById('f_cuenta').value.trim();
+function doCreate() {
+  var p1 = document.getElementById('fp1').value.trim();
+  var p2 = document.getElementById('fp2').value.trim();
+  var ap = parseInt(document.getElementById('fap').value);
+  var ob = parseFloat(document.getElementById('fob').value) || 5.0;
+  var ti = document.getElementById('fti').value;
+  var cu = document.getElementById('fcu').value.trim();
+  if (!p1 || !p2 || !ap) { toast('❌ Llena los campos obligatorios'); return; }
+  db.ref('retos').push({ p1Name:p1, p2Name:p2, apuesta:ap, objetivo:ob, tipo:ti, cuenta:cu, status:'waiting', p1Time:null, p2Time:null, winner:null, dispersado:false, createdAt:Date.now() }).then(function() { closeModal(); toast('✅ Reto creado'); }).catch(function() { toast('❌ Error — revisa Firebase'); });
+}
  
-  if (!p1 || !p2 || !apuesta) {
-    toast('❌ Llena todos los campos obligatorios');
-    return;
-  }
+// ══ EDIT ══
+function openEdit(id) {
+  var r = retos[id];
+  document.getElementById('modalBody').innerHTML = '<div class="mt">✏️ EDITAR RETO</div><div class="fgrid"><div class="ff"><label>Jugador 1</label><input id="ep1" value="' + r.p1Name + '"></div><div class="ff"><label>Jugador 2</label><input id="ep2" value="' + r.p2Name + '"></div><div class="ff"><label>Apuesta</label><input id="eap" type="number" value="' + r.apuesta + '"></div><div class="ff"><label>Objetivo</label><input id="eob" type="number" step="0.001" value="' + (r.objetivo||5.0) + '"></div><div class="ff"><label>Tiempo J1 (manual)</label><input id="et1" placeholder="4.987" value="' + (r.p1Time||'') + '"></div><div class="ff"><label>Tiempo J2 (manual)</label><input id="et2" placeholder="5.012" value="' + (r.p2Time||'') + '"></div><div class="ff"><label>Estado</label><select id="est"><option value="waiting"' + (r.status==='waiting'?' selected':'') + '>Esperando</option><option value="playing"' + (r.status==='playing'?' selected':'') + '>En juego</option><option value="done"' + (r.status==='done'?' selected':'') + '>Terminado</option><option value="dispersado"' + (r.status==='dispersado'?' selected':'') + '>Dispersado</option></select></div><div class="ff"><label>Cuenta</label><input id="ecu" value="' + (r.cuenta||'') + '"></div></div><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doEdit(\'' + id + '\')" style="font-weight:700">💾 GUARDAR</button></div>';
+  document.getElementById('overlay').classList.add('show');
+}
  
-  const newReto = {
-    p1Name: p1,
-    p2Name: p2,
-    apuesta: apuesta,
-    objetivo: objetivo,
-    tipo: tipo,
-    cuenta: cuenta,
-    status: 'waiting',
-    p1Time: null,
-    p2Time: null,
-    winner: null,
-    dispersado: false,
-    createdAt: Date.now()
-  };
+function doEdit(id) {
+  var r = retos[id];
+  var t1 = document.getElementById('et1').value.trim() || null;
+  var t2 = document.getElementById('et2').value.trim() || null;
+  var st = document.getElementById('est').value;
+  var ob = parseFloat(document.getElementById('eob').value) || 5.0;
+  var win = r.winner;
+  if (t1 && t2) { var d1 = Math.abs(parseFloat(t1)-ob); var d2 = Math.abs(parseFloat(t2)-ob); win = d1 <= d2 ? r.p1Name : r.p2Name; }
+  db.ref('retos/' + id).update({ p1Name:document.getElementById('ep1').value.trim(), p2Name:document.getElementById('ep2').value.trim(), apuesta:parseInt(document.getElementById('eap').value), objetivo:ob, p1Time:t1, p2Time:t2, status:st, cuenta:document.getElementById('ecu').value.trim(), winner:win }).then(function() { closeModal(); toast('✅ Reto actualizado'); });
+}
  
-  // Guardar en Firebase
-  db.ref('retos').push(newReto).then(() => {
-    closeModal();
-    toast('✅ Reto creado exitosamente');
-  }).catch(() => {
-    toast('❌ Error al crear el reto — revisa Firebase');
+// ══ DELETE ══
+function confirmDel(id) {
+  var r = retos[id];
+  document.getElementById('modalBody').innerHTML = '<div class="mt">🗑️ CONFIRMAR</div><div class="ibox"><div class="ir"><span class="il">Reto</span><span class="iv">#' + id.slice(-4).toUpperCase() + '</span></div><div class="ir"><span class="il">Jugadores</span><span class="iv">' + r.p1Name + ' vs ' + r.p2Name + '</span></div><div class="ir"><span class="il">Apuesta</span><span class="iv" style="color:var(--warn)">$' + ((r.apuesta||0)*2) + ' MXN</span></div></div><p style="font-size:13px;color:var(--danger);margin-bottom:18px">⚠️ Esta acción no se puede deshacer.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-r" onclick="doDel(\'' + id + '\')" style="font-weight:700">🗑️ BORRAR</button></div>';
+  document.getElementById('overlay').classList.add('show');
+}
+ 
+function doDel(id) {
+  db.ref('retos/' + id).remove().then(function() {
+    if (selId === id) { selId = null; document.getElementById('gameBox').innerHTML = '<div class="no-reto-msg">Selecciona un reto del panel izquierdo</div>'; }
+    closeModal(); toast('🗑️ Reto eliminado');
   });
 }
  
-// ============================================================
-// ADMIN — EDITAR RETO
-// ============================================================
-function openEditModal(id) {
-  const r = retosData[id];
-  if (!r) return;
- 
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-title">✏️ EDITAR RETO</div>
- 
-    <div class="form-grid">
-      <div class="form-field">
-        <label>Jugador 1</label>
-        <input id="e_p1" value="${r.p1Name}" type="text">
-      </div>
-      <div class="form-field">
-        <label>Jugador 2</label>
-        <input id="e_p2" value="${r.p2Name}" type="text">
-      </div>
-      <div class="form-field">
-        <label>Apuesta por jugador</label>
-        <input id="e_apuesta" type="number" value="${r.apuesta}">
-      </div>
-      <div class="form-field">
-        <label>Objetivo (segundos)</label>
-        <input id="e_objetivo" type="number" step="0.001" value="${r.objetivo || 5.0}">
-      </div>
-      <div class="form-field">
-        <label>Tiempo J1 (manual)</label>
-        <input id="e_p1time" type="text" placeholder="ej: 4.987" value="${r.p1Time || ''}">
-      </div>
-      <div class="form-field">
-        <label>Tiempo J2 (manual)</label>
-        <input id="e_p2time" type="text" placeholder="ej: 5.012" value="${r.p2Time || ''}">
-      </div>
-      <div class="form-field">
-        <label>Estado</label>
-        <select id="e_status">
-          <option value="waiting" ${r.status==='waiting'?'selected':''}>Esperando</option>
-          <option value="playing" ${r.status==='playing'?'selected':''}>En juego</option>
-          <option value="done" ${r.status==='done'?'selected':''}>Terminado</option>
-          <option value="dispersado" ${r.status==='dispersado'?'selected':''}>Dispersado</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Cuenta del ganador</label>
-        <input id="e_cuenta" type="text" value="${r.cuenta || ''}">
-      </div>
-    </div>
- 
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-yellow" onclick="saveEdit('${id}')" style="font-size:13px;font-weight:700">💾 GUARDAR CAMBIOS</button>
-    </div>
-  `;
+// ══ WINNER ══
+function showWinner(id) {
+  var r = retos[id];
+  var ob = parseFloat(r.objetivo) || 5.0;
+  var d1 = r.p1Time ? Math.abs(parseFloat(r.p1Time)-ob) : null;
+  var d2 = r.p2Time ? Math.abs(parseFloat(r.p2Time)-ob) : null;
+  var p1w = d1 !== null && d2 !== null && d1 <= d2;
+  var html = '<div class="mt">🏆 RESULTADO — #' + id.slice(-4).toUpperCase() + '</div><div class="ibox">';
+  html += '<div class="ir"><span class="il">' + r.p1Name + (p1w?' 🏆':'') + '</span><span class="iv mono" style="color:' + (p1w?'var(--accent)':'var(--text-mid)') + '">' + (r.p1Time ? r.p1Time+'s (±'+(d1*1000).toFixed(0)+'ms)' : 'Sin resultado') + '</span></div>';
+  html += '<div class="ir"><span class="il">' + r.p2Name + (!p1w&&d2!==null?' 🏆':'') + '</span><span class="iv mono" style="color:' + (!p1w&&d2!==null?'var(--accent)':'var(--text-mid)') + '">' + (r.p2Time ? r.p2Time+'s (±'+(d2*1000).toFixed(0)+'ms)' : 'Sin resultado') + '</span></div>';
+  html += '</div><div class="pbox"><div class="pl">💸 Transferir al ganador</div><div class="pa">$' + Math.round((r.apuesta||0)*2*.9) + ' MXN</div><div class="pt">→ ' + (r.winner||'—') + '</div>' + (r.cuenta?'<div style="font-size:11px;color:var(--accent);margin-top:6px;opacity:.8">'+r.cuenta+'</div>':'') + '</div>';
+  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cerrar</button><button class="btn btn-g" onclick="closeModal();showDispersar(\'' + id + '\')" style="font-size:13px">💸 Dispersar</button></div>';
+  document.getElementById('modalBody').innerHTML = html;
   document.getElementById('overlay').classList.add('show');
 }
  
-function saveEdit(id) {
-  const p1Time = document.getElementById('e_p1time').value.trim() || null;
-  const p2Time = document.getElementById('e_p2time').value.trim() || null;
-  const status = document.getElementById('e_status').value;
- 
-  // Determinar ganador si hay ambos tiempos
-  let winner = retosData[id].winner;
-  const r = retosData[id];
-  if (p1Time && p2Time) {
-    const target = parseFloat(r.objetivo) || 5.0;
-    const d1 = Math.abs(parseFloat(p1Time) - target);
-    const d2 = Math.abs(parseFloat(p2Time) - target);
-    winner = d1 <= d2 ? r.p1Name : r.p2Name;
-  }
- 
-  const updates = {
-    p1Name: document.getElementById('e_p1').value.trim(),
-    p2Name: document.getElementById('e_p2').value.trim(),
-    apuesta: parseInt(document.getElementById('e_apuesta').value),
-    objetivo: parseFloat(document.getElementById('e_objetivo').value),
-    p1Time: p1Time,
-    p2Time: p2Time,
-    status: status,
-    cuenta: document.getElementById('e_cuenta').value.trim(),
-    winner: winner
-  };
- 
-  db.ref(`retos/${id}`).update(updates).then(() => {
-    closeModal();
-    toast('✅ Reto actualizado');
-  });
-}
- 
-// ============================================================
-// ADMIN — BORRAR RETO
-// ============================================================
-function confirmDelete(id) {
-  const r = retosData[id];
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-title">🗑️ CONFIRMAR</div>
-    <div class="info-box">
-      <div class="info-row"><span class="info-lbl">Reto</span><span class="info-val">#${id.slice(-4).toUpperCase()}</span></div>
-      <div class="info-row"><span class="info-lbl">Jugadores</span><span class="info-val">${r.p1Name} vs ${r.p2Name}</span></div>
-      <div class="info-row"><span class="info-lbl">Apuesta</span><span class="info-val" style="color:var(--warn)">$${(r.apuesta||0)*2} MXN</span></div>
-    </div>
-    <p style="font-size:13px;color:var(--danger);margin-bottom:20px">
-      ⚠️ Esta acción es permanente y no se puede deshacer.
-    </p>
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-red" onclick="deleteReto('${id}')" style="font-size:13px;font-weight:700">🗑️ BORRAR</button>
-    </div>
-  `;
+// ══ DISPERSAR ══
+function showDispersar(id) {
+  var r = retos[id];
+  var premio = Math.round((r.apuesta||0)*2*.9);
+  var com = (r.apuesta||0)*2 - premio;
+  var html = '<div class="mt">💸 DISPERSAR</div><div class="ibox"><div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--accent)">🏆 ' + (r.winner||'—') + '</span></div><div class="ir"><span class="il">Premio</span><span class="iv" style="color:var(--warn);font-size:17px;font-weight:700">$' + premio + ' MXN</span></div><div class="ir"><span class="il">Tu comisión</span><span class="iv" style="color:var(--blue)">$' + com + ' MXN</span></div><div class="ir"><span class="il">Cuenta</span><span class="iv">' + (r.cuenta||'No especificada') + '</span></div></div>';
+  html += '<div style="background:#17212b;border-radius:10px;padding:14px;margin:14px 0;font-family:DM Mono,monospace;font-size:12px;line-height:1.8;color:#aaa">🏆 <strong style="color:#fff">RIVAL — Resultado</strong>\n\n<span style="color:#4cd964">Ganador: ' + (r.winner||'—') + '</span>\n<span style="color:#ffcc00">Premio: $' + premio + ' MXN</span></div>';
+  html += '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-y" onclick="doDispersar(\'' + id + '\')" style="font-weight:700">✅ CONFIRMAR</button></div>';
+  document.getElementById('modalBody').innerHTML = html;
   document.getElementById('overlay').classList.add('show');
 }
  
-function deleteReto(id) {
-  db.ref(`retos/${id}`).remove().then(() => {
-    if (selectedRetoId === id) {
-      selectedRetoId = null;
-      document.getElementById('gameBox').innerHTML = '<div class="no-reto-msg">Selecciona un reto del panel izquierdo</div>';
-    }
-    closeModal();
-    toast('🗑️ Reto eliminado');
-  });
+function doDispersar(id) {
+  db.ref('retos/' + id).update({ status:'dispersado', dispersado:true, dispersadoAt:Date.now() }).then(function() { closeModal(); toast('✅ Dispersión confirmada'); });
 }
  
-// ============================================================
-// ADMIN — VER GANADOR
-// ============================================================
-function showWinnerModal(id) {
-  const r = retosData[id];
-  if (!r) return;
- 
-  const target = parseFloat(r.objetivo) || 5.0;
-  const p1Diff = r.p1Time ? Math.abs(parseFloat(r.p1Time) - target) : null;
-  const p2Diff = r.p2Time ? Math.abs(parseFloat(r.p2Time) - target) : null;
-  const p1Wins = p1Diff !== null && p2Diff !== null && p1Diff <= p2Diff;
- 
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-title">🏆 RESULTADO — #${id.slice(-4).toUpperCase()}</div>
- 
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-lbl">${r.p1Name} ${p1Wins ? '🏆' : ''}</span>
-        <span class="info-val mono" style="color:${p1Wins?'var(--accent)':'var(--text-mid)'}">
-          ${r.p1Time ? `${r.p1Time}s (±${p1Diff ? (p1Diff*1000).toFixed(0) : '—'}ms)` : 'Sin resultado'}
-        </span>
-      </div>
-      <div class="info-row">
-        <span class="info-lbl">${r.p2Name} ${!p1Wins && p2Diff !== null ? '🏆' : ''}</span>
-        <span class="info-val mono" style="color:${!p1Wins && p2Diff !== null?'var(--accent)':'var(--text-mid)'}">
-          ${r.p2Time ? `${r.p2Time}s (±${p2Diff ? (p2Diff*1000).toFixed(0) : '—'}ms)` : 'Sin resultado'}
-        </span>
-      </div>
-    </div>
- 
-    <div class="prize-box">
-      <div class="prize-lbl">💸 Transferir al ganador</div>
-      <div class="prize-amt">$${Math.round((r.apuesta||0)*2*0.9)} MXN</div>
-      <div class="prize-to">→ ${r.winner || '—'}</div>
-      ${r.cuenta ? `<div style="font-size:11px;color:var(--accent);margin-top:6px;opacity:0.8">${r.cuenta}</div>` : ''}
-    </div>
- 
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
-      <button class="btn btn-green" onclick="closeModal();showDispersarModal('${id}')" style="font-size:13px">💸 Ir a Dispersar</button>
-    </div>
-  `;
-  document.getElementById('overlay').classList.add('show');
-}
- 
-// ============================================================
-// ADMIN — DISPERSAR
-// ============================================================
-function showDispersarModal(id) {
-  const r = retosData[id];
-  if (!r) return;
- 
-  const premio = Math.round((r.apuesta||0) * 2 * 0.9);
-  const comision = (r.apuesta||0) * 2 - premio;
- 
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-title">💸 DISPERSAR PREMIO</div>
- 
-    <div class="info-box">
-      <div class="info-row"><span class="info-lbl">Ganador</span><span class="info-val" style="color:var(--accent)">🏆 ${r.winner || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Premio</span><span class="info-val" style="color:var(--warn);font-size:18px;font-weight:700">$${premio} MXN</span></div>
-      <div class="info-row"><span class="info-lbl">Tu comisión</span><span class="info-val" style="color:var(--blue)">$${comision} MXN</span></div>
-      <div class="info-row"><span class="info-lbl">Cuenta</span><span class="info-val">${r.cuenta || 'No especificada'}</span></div>
-    </div>
- 
-    <div style="background:#17212b;border-radius:10px;padding:16px;margin:16px 0;font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;color:#aaa">
-🏆 <strong style="color:#fff">RIVAL — Resultado</strong>
- 
-<span style="color:#4cd964">Ganador: ${r.winner}</span>
-<span style="color:#ffcc00">Premio: $${premio} MXN</span>
- 
-✅ Transferencia enviada
-    </div>
- 
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-yellow" onclick="confirmDispersar('${id}')" style="font-size:13px;font-weight:700">✅ CONFIRMAR DISPERSIÓN</button>
-    </div>
-  `;
-  document.getElementById('overlay').classList.add('show');
-}
- 
-function confirmDispersar(id) {
-  db.ref(`retos/${id}`).update({ status: 'dispersado', dispersado: true, dispersadoAt: Date.now() })
-    .then(() => {
-      closeModal();
-      toast('✅ Dispersión confirmada');
-    });
-}
- 
-// ============================================================
-// ADMIN — VER DETALLE
-// ============================================================
+// ══ DETAIL ══
 function showDetail(id) {
-  const r = retosData[id];
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-title">📋 DETALLE</div>
-    <div class="info-box">
-      <div class="info-row"><span class="info-lbl">ID</span><span class="info-val mono">#${id.slice(-4).toUpperCase()}</span></div>
-      <div class="info-row"><span class="info-lbl">Jugador 1</span><span class="info-val">${r.p1Name}</span></div>
-      <div class="info-row"><span class="info-lbl">Jugador 2</span><span class="info-val">${r.p2Name}</span></div>
-      <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val">${r.tipo}</span></div>
-      <div class="info-row"><span class="info-lbl">Apuesta total</span><span class="info-val" style="color:var(--warn)">$${(r.apuesta||0)*2} MXN</span></div>
-      <div class="info-row"><span class="info-lbl">Ganador</span><span class="info-val" style="color:var(--accent)">${r.winner || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Estado</span><span class="info-val">${r.status}</span></div>
-      <div class="info-row"><span class="info-lbl">Tiempo J1</span><span class="info-val mono">${r.p1Time || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Tiempo J2</span><span class="info-val mono">${r.p2Time || '—'}</span></div>
-    </div>
-    <button class="btn btn-ghost" onclick="closeModal()" style="width:100%;height:44px;border-radius:10px;margin-top:8px">Cerrar</button>
-  `;
+  var r = retos[id];
+  var html = '<div class="mt">📋 DETALLE</div><div class="ibox"><div class="ir"><span class="il">ID</span><span class="iv mono">#' + id.slice(-4).toUpperCase() + '</span></div><div class="ir"><span class="il">J1</span><span class="iv">' + r.p1Name + '</span></div><div class="ir"><span class="il">J2</span><span class="iv">' + r.p2Name + '</span></div><div class="ir"><span class="il">Tipo</span><span class="iv">' + (r.tipo||'—') + '</span></div><div class="ir"><span class="il">Total apostado</span><span class="iv" style="color:var(--warn)">$' + ((r.apuesta||0)*2) + ' MXN</span></div><div class="ir"><span class="il">Ganador</span><span class="iv" style="color:var(--accent)">' + (r.winner||'—') + '</span></div><div class="ir"><span class="il">Tiempo J1</span><span class="iv mono">' + (r.p1Time||'—') + '</span></div><div class="ir"><span class="il">Tiempo J2</span><span class="iv mono">' + (r.p2Time||'—') + '</span></div></div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:42px;border-radius:10px;margin-top:8px">Cerrar</button>';
+  document.getElementById('modalBody').innerHTML = html;
   document.getElementById('overlay').classList.add('show');
 }
  
-// ============================================================
-// STATS
-// ============================================================
+// ══ STATS ══
 function updateStats() {
-  const retos = Object.values(retosData);
-  document.getElementById('stTotal').textContent = retos.length;
-  document.getElementById('stPlaying').textContent = retos.filter(r => r.status === 'playing').length;
-  document.getElementById('stPending').textContent = retos.filter(r => r.status === 'done').length;
-  const vol = retos.reduce((acc, r) => acc + (r.apuesta || 0) * 2, 0);
-  document.getElementById('stVolume').textContent = `$${vol.toLocaleString()}`;
+  var vals = Object.values(retos);
+  document.getElementById('stT').textContent = vals.length;
+  document.getElementById('stP').textContent = vals.filter(function(r){ return r.status==='playing'; }).length;
+  document.getElementById('stD').textContent = vals.filter(function(r){ return r.status==='done'; }).length;
+  document.getElementById('stV').textContent = '$' + vals.reduce(function(a,r){ return a+(r.apuesta||0)*2; }, 0).toLocaleString();
 }
  
-function updateOnlineCount() {
-  const playing = Object.values(retosData).filter(r => r.status === 'playing').length;
-  document.getElementById('onlineTxt').textContent = playing > 0 ? `${playing * 2} jugando` : 'Sin partidas activas';
+function updateOnline() {
+  var n = Object.values(retos).filter(function(r){ return r.status==='playing'; }).length;
+  document.getElementById('onlineTxt').textContent = n > 0 ? (n*2) + ' jugando' : 'Sin partidas activas';
 }
  
-// ============================================================
-// UTILS
-// ============================================================
-function closeModal() {
-  document.getElementById('overlay').classList.remove('show');
-}
+// ══ MODAL ══
+function closeModal() { document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('overlay').addEventListener('click', function(e){ if(e.target===document.getElementById('overlay')) closeModal(); });
  
-document.getElementById('overlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('overlay')) closeModal();
-});
- 
-let toastTimer;
+// ══ TOAST ══
+var toastTimer;
 function toast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3500);
 }
  
-// ── MOBILE DRAWER ──
-function toggleDrawer() {
-  const drawer = document.getElementById('sidebarDrawer');
-  const btn = document.getElementById('mobileBtn');
-  const isOpen = drawer.classList.contains('show');
- 
-  if (isOpen) {
-    drawer.classList.remove('show');
-    btn.classList.remove('open');
-    btn.textContent = '';
-    btn.innerHTML = '⚔️ VER RETOS ACTIVOS';
-  } else {
-    drawer.classList.add('show');
-    btn.classList.add('open');
-    btn.innerHTML = '✕ CERRAR RETOS';
-    renderDrawerList();
-  }
-}
- 
-function renderDrawerList() {
-  const list = document.getElementById('drawerList');
-  if (!list) return;
-  const retos = Object.entries(retosData);
- 
-  if (retos.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--text-mid);font-size:12px;padding:20px">Sin retos activos</div>';
-    return;
-  }
- 
-  list.innerHTML = retos.map(([id, r]) => {
-    const badgeClass = r.status === 'waiting' ? 'badge-wait' :
-                       r.status === 'playing' ? 'badge-play' :
-                       r.status === 'done' ? 'badge-done' : 'badge-disp';
-    const badgeText = r.status === 'waiting' ? 'ESPERANDO' :
-                      r.status === 'playing' ? 'EN JUEGO' :
-                      r.status === 'done' ? 'TERMINADO' : 'DISPERSADO';
- 
-    return \`<div class="reto-item \${selectedRetoId === id ? 'active' : ''}" onclick="selectRetoMobile('\${id}')">
-      <div class="reto-item-top">
-        <span class="reto-id">#\${id.slice(-4).toUpperCase()}</span>
-        <span class="badge \${badgeClass}">\${badgeText}</span>
-      </div>
-      <div class="reto-players">\${r.p1Name} vs \${r.p2Name}</div>
-      <div class="reto-meta">
-        <span>\${r.tipo || '⏱️ Reloj'}</span>
-        <span class="amount">$\${(r.apuesta || 0) * 2}</span>
-      </div>
-    </div>\`;
-  }).join('');
-}
- 
-function selectRetoMobile(id) {
-  selectReto(id);
-  // Close drawer after selection
-  const drawer = document.getElementById('sidebarDrawer');
-  const btn = document.getElementById('mobileBtn');
-  drawer.classList.remove('show');
-  btn.classList.remove('open');
-  btn.innerHTML = '⚔️ VER RETOS ACTIVOS';
-  // Scroll to game
-  document.getElementById('gameBox').scrollIntoView({ behavior: 'smooth' });
-}
- 
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', function(e){
   if (e.key === 'Escape') closeModal();
-  if (e.code === 'Space' && document.getElementById('view-game').classList.contains('active') && gameState !== 'countdown') {
+  if (e.code === 'Space' && document.getElementById('view-game').classList.contains('on') && gState !== 'countdown') {
     e.preventDefault();
-    if (selectedRetoId) handleBtn(selectedRetoId);
+    if (selId) handleBtn(selId);
   }
 });
 </script>
