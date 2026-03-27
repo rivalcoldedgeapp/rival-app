@@ -747,6 +747,14 @@ db.ref('profiles').on('value', function(s) {
   if (admLoggedIn) updateAdmStats();
 });
  
+function dayKeyFromTimestamp(ts) {
+  if (!ts) return null;
+  var d = new Date(ts);
+  // Convert to CDMX
+  var cdmx = new Date(d.getTime() + d.getTimezoneOffset()*60000 + (-6*3600000));
+  return cdmx.getFullYear()+'-'+String(cdmx.getMonth()+1).padStart(2,'0')+'-'+String(cdmx.getDate()).padStart(2,'0');
+}
+ 
 function getScorePath(g) {
   var key = g === 'r' ? 'gr' : 'g' + g;
   return 'scores/' + weekKey + '/' + todayKey + '/' + key;
@@ -1402,14 +1410,33 @@ function renderAdmWeek(g) {
   }
  
   var today = getTodayKey();
+  // Also fetch legacy weekScores once (shared across all days)
+  var legacyFetch = db.ref('weekScores/'+weekKey+'/'+gkey).once('value');
+ 
   var fetches = days.map(function(dayObj) {
-    // Only read from day-specific path — no legacy fallback (legacy has no day info)
     return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
-      return { day:dayObj, scores:s.val()||{} };
+      return { day:dayObj, scores:s.val()||{}, hasNewData:!!(s.val()&&Object.keys(s.val()).length) };
     });
   });
  
-  Promise.all(fetches).then(function(results) {
+  // Resolve all together
+  fetches = [Promise.all(fetches), legacyFetch];
+ 
+  Promise.all(fetches).then(function(res) {
+    var results = res[0];
+    var legacyDataAdm = res[1].val() || {};
+    Object.entries(legacyDataAdm).forEach(function(e) {
+      var uid2=e[0], w=e[1];
+      if (!w||!w.lastPlayed) return;
+      var dayK = dayKeyFromTimestamp(w.lastPlayed);
+      if (!dayK) return;
+      var dayResult = results.find(function(r){ return r.day.key===dayK; });
+      if (dayResult && !dayResult.hasNewData && !dayResult.scores[uid2]) {
+        dayResult.scores[uid2] = w;
+        dayResult.isLegacy = true;
+      }
+    });
+ 
     var html = '';
     results.forEach(function(r) {
       var isToday = r.day.key === today;
@@ -1653,9 +1680,9 @@ function showHistory(g) {
         '</div>';
       } else if (!data || !data.bestTime) {
         if (isToday) {
-          rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px">'+
+          rowsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:9px">'+
             '<div style="font-size:12px;font-weight:700;color:var(--tx)">'+r.day.label+' · Hoy</div>'+
-            '<div style="font-size:11px;color:var(--td)">Sin jugar</div>'+
+            '<div style="font-size:11px;color:'+cfg.stroke+'">Jugando 🔴</div>'+
           '</div>';
         }
         // Past days with no data — don't show
@@ -1742,7 +1769,22 @@ function renderWeekDays(g) {
     });
   });
  
-  Promise.all(fetches).then(function(results) {
+  Promise.all(fetches).then(function(res) {
+    var results = res[0];
+    var legacyData = res[1].val() || {};
+    // Assign legacy scores to the correct day using lastPlayed timestamp
+    Object.entries(legacyData).forEach(function(e) {
+      var uid2=e[0], w=e[1];
+      if (!w || !w.lastPlayed) return;
+      var dayK = dayKeyFromTimestamp(w.lastPlayed);
+      if (!dayK) return;
+      var dayResult = results.find(function(r){ return r.day.key===dayK; });
+      if (dayResult && !dayResult.hasNewData && !dayResult.scores[uid2]) {
+        dayResult.scores[uid2] = w;
+        dayResult.isLegacy = true;
+      }
+    });
+ 
     var html = '';
     results.forEach(function(r) {
       var isToday = r.day.key === today;
