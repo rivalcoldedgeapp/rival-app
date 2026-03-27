@@ -519,7 +519,7 @@ body.playing{overflow:hidden}
 <!-- RANKING -->
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner" style="padding-top:18px">
-    <div class="rank-title">RANKING</div>
+    <div class="rank-title" id="rankTitle">RANKING DE HOY</div>
     <div class="rank-sub" id="rankSub">TOP 50 · Esta semana</div>
     <div class="rg-tabs">
       <button class="rgt" id="rgt5" onclick="setRankGame(5)">🟢 5s</button>
@@ -1740,12 +1740,11 @@ function renderWeekDays(g) {
   var isR = g === 'r';
   var gkey = g === 'r' ? 'gr' : 'g' + g;
   var uid = curUser ? curUser.uid : null;
-  var labels = {5:'RETO 1', 10:'RETO 2', 15:'RETO 3', r:'REACCIÓN'};
  
-  // Build week days array
+  // Build week days (Mon-Sun CDMX)
   var d = getCDMX();
-  var day = d.getDay();
-  var diff = day === 0 ? -6 : 1 - day;
+  var dayNum = d.getDay();
+  var diff = dayNum === 0 ? -6 : 1 - dayNum;
   var monday = new Date(d); monday.setDate(d.getDate() + diff);
   var days = [];
   for (var i = 0; i < 7; i++) {
@@ -1753,99 +1752,92 @@ function renderWeekDays(g) {
     var dk = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
     days.push({ key: dk, label: DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()] });
   }
- 
   var today = getTodayKey();
-  // Fetch all days
-  var fetches = days.map(function(dayObj) {
+ 
+  // Step 1: Fetch new-format day scores + legacy weekScores in parallel
+  var dayFetches = days.map(function(dayObj) {
     return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s) {
-      var data = s.val() || {};
-      // Also try legacy weekScores path if no new data and it's a past day
-      if (Object.keys(data).length === 0 && dayObj.key < today) {
-        return db.ref('weekScores/'+weekKey+'/'+gkey).once('value').then(function(s2) {
-          return { day: dayObj, scores: s2.val() || {}, isLegacy: true };
-        });
-      }
-      return { day: dayObj, scores: data, isLegacy: false };
+      return { day: dayObj, scores: s.val() || {} };
     });
   });
  
-  // Also fetch legacy weekScores — assign to correct day via lastPlayed
-  db.ref('weekScores/'+weekKey+'/'+gkey).once('value').then(function(legacySnap) {
-    var legacyData = legacySnap.val() || {};
-    Promise.all(fetches).then(function(results) {
-      // Merge legacy into correct day using lastPlayed timestamp
-      Object.entries(legacyData).forEach(function(e) {
-        var uid2=e[0], w=e[1];
-        if (!w||!w.lastPlayed) return;
-        var dayK = dayKeyFromTimestamp(w.lastPlayed);
-        if (!dayK) return;
-        var dayResult = results.find(function(r){ return r.day.key===dayK; });
-        if (dayResult && Object.keys(dayResult.scores).length===0 && !dayResult.scores[uid2]) {
-          dayResult.scores[uid2] = w;
-        }
-      });
+  var legacyFetch = db.ref('weekScores/'+weekKey+'/'+gkey).once('value');
  
+  Promise.all([Promise.all(dayFetches), legacyFetch]).then(function(res) {
+    var results = res[0];
+    var legacyData = res[1].val() || {};
+ 
+    // Step 2: Assign legacy scores to correct day using lastPlayed timestamp
+    Object.entries(legacyData).forEach(function(e) {
+      var uid2 = e[0], w = e[1];
+      if (!w || !w.lastPlayed) return;
+      var dayK = dayKeyFromTimestamp(w.lastPlayed);
+      if (!dayK) return;
+      var target = results.find(function(r) { return r.day.key === dayK; });
+      if (target && Object.keys(target.scores).length === 0) {
+        target.scores[uid2] = w;
+      }
+    });
+ 
+    // Step 3: Render
     var html = '';
     results.forEach(function(r) {
       var isToday = r.day.key === today;
       var isFuture = r.day.key > today;
-      var scores = r.scores;
-      var sorted = Object.entries(scores)
-        .filter(function(e){ return e[1].bestDiff != null; })
-        .sort(function(a,b){
+      var hasScores = Object.keys(r.scores).length > 0;
+ 
+      // Skip past days with no data
+      if (!isToday && !isFuture && !hasScores) return;
+ 
+      var sorted = Object.entries(r.scores)
+        .filter(function(e) { return e[1].bestDiff != null; })
+        .sort(function(a, b) {
           if (a[1].bestDiff !== b[1].bestDiff) return a[1].bestDiff - b[1].bestDiff;
           return (a[1].lastPlayed||0) - (b[1].lastPlayed||0);
         });
  
-      var top3 = sorted.slice(0, 3);
-      var myRank = uid ? sorted.findIndex(function(e){ return e[0]===uid; }) : -1;
-      var myScore = uid ? scores[uid] : null;
+      var myRank = uid ? sorted.findIndex(function(e) { return e[0] === uid; }) : -1;
+      var myScore = uid ? r.scores[uid] : null;
  
-      html += '<div class="week-day-card" style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:12px;padding:14px;margin-bottom:8px;opacity:'+(isFuture?'.3':'1')+'">';
-      // Day header
+      html += '<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:12px;padding:14px;margin-bottom:8px">';
+      // Header
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
-      var dayLabelHtml = r.day.label;
-      if (isToday) dayLabelHtml += ' · Hoy';
-      var dayColor = isToday ? 'var(--tx)' : 'var(--tm)';
-      html += '<div style="font-size:13px;font-weight:700;color:' + dayColor + '">' + dayLabelHtml + '</div>';
-      if (myRank >= 0 && myScore) {
+      html += '<div style="font-size:13px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+r.day.label+(isToday?' · Hoy':'')+'</div>';
+      if (isFuture) {
+        html += '<div style="font-size:10px;color:var(--td)">Por jugar</div>';
+      } else if (isToday && sorted.length === 0) {
+        html += '<div style="font-size:11px;color:'+cfg.stroke+'">Jugando 🔴</div>';
+      } else if (myRank >= 0) {
         html += '<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>';
-      } else if (!isFuture && sorted.length === 0) {
-        html += '<div style="font-size:10px;color:var(--td)">Sin partidas</div>';
-      } else if (!isFuture && myRank < 0) {
+      } else {
         html += '<div style="font-size:10px;color:var(--td)">No jugaste</div>';
       }
       html += '</div>';
  
       if (isFuture) {
-        html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:8px 0">Por jugar</div>';
+        // nothing extra
       } else if (sorted.length === 0) {
-        html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:8px 0">Nadie jugó este día</div>';
+        html += '<div style="font-size:11px;color:var(--td);text-align:center;padding:4px 0">Sin partidas aún</div>';
       } else {
-        // Top 3
         var medals = ['🥇','🥈','🥉'];
-        top3.forEach(function(e, i) {
-          var w = e[1];
-          var isMe = uid && e[0] === uid;
+        sorted.slice(0, 3).forEach(function(e, i) {
+          var w = e[1], isMe = uid && e[0] === uid;
           html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border-radius:8px;margin-bottom:4px;'+(isMe?'border:1px solid '+cfg.stroke+';':'')+'">';
-          html += '<span style="font-size:16px;width:22px">' + medals[i] + '</span>';
-          var avLetter = (w.name||'?')[0].toUpperCase();
-          html += '<div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">' + avLetter + '</div>';
+          html += '<span style="font-size:16px;width:22px">'+medals[i]+'</span>';
+          html += '<div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div>';
           html += '<div style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div>';
-          html += '<div style="font-family:DM Mono,monospace;font-size:12px;color:' + cfg.stroke + '">' + w.bestTime + (isR?'ms':'s') + '</div>';
+          html += '<div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+w.bestTime+(isR?'ms':'s')+'</div>';
           html += '<div style="font-size:10px;color:var(--tm)">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>';
           html += '</div>';
         });
- 
-        // Show my position if outside top 3
+        // My position if outside top 3
         if (myRank >= 3 && myScore && myScore.bestTime) {
           html += '<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div>';
-          html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px;">';
+          html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px">';
           html += '<span style="font-size:13px;font-weight:700;color:'+cfg.stroke+';width:22px">#'+(myRank+1)+'</span>';
-          var myLetter = (myScore.name||'?')[0].toUpperCase();
-          html += '<div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">' + myLetter + '</div>';
+          html += '<div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(myScore.name||'?')[0].toUpperCase()+'</div>';
           html += '<div style="flex:1;font-size:12px;font-weight:700">'+(myScore.name||'?')+' 👈</div>';
-          html += '<div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">' + myScore.bestTime + (isR?'ms':'s') + '</div>';
+          html += '<div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+myScore.bestTime+(isR?'ms':'s')+'</div>';
           html += '<div style="font-size:10px;color:var(--tm)">±'+(myScore.bestDiff*1000).toFixed(0)+'ms</div>';
           html += '</div>';
         }
@@ -1853,10 +1845,10 @@ function renderWeekDays(g) {
       html += '</div>';
     });
  
-    wrap.innerHTML = html || '<div style="text-align:center;color:var(--tm);padding:40px">Sin datos esta semana</div>';
-    }); // Promise.all
-  }); // legacySnap
+    wrap.innerHTML = html || '<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Sin datos esta semana</div>';
+  });
 }
+ 
  
 // ══ UTILS ══
 function showScreen(id) {
