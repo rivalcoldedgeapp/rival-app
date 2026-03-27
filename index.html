@@ -849,11 +849,11 @@ function updateLeaderBanner(r){
   var leadTime=document.getElementById('leadTime');
   if(!banner)return;
  
-  if(played>0&&played<joined){
+  if(played>0&&played<max){
     var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
     if(sorted.length>0){
       banner.classList.add('show');
-      leadTxt.textContent=sorted[0].name+' lleva el mejor tiempo — faltan '+(joined-played)+' por jugar';
+      leadTxt.textContent=sorted[0].name+' lleva el mejor tiempo — faltan '+(max-played)+' por jugar';
       leadTime.textContent=sorted[0].time.toFixed(3)+'s';
     }
   } else {
@@ -982,7 +982,7 @@ function renderResult(id,r){
  
   document.getElementById('resRN').textContent=r.titulo||'Reto';
   document.getElementById('resTitle').textContent=allDone?'RESULTADO FINAL':'EN CURSO';
-  document.getElementById('resSub').textContent=allDone?played+' jugadores — resultado oficial':'Esperando '+( joined-played)+' jugador(es) más';
+  document.getElementById('resSub').textContent=allDone?played+' jugadores — resultado oficial':'Esperando '+(max-played)+' jugador(es) más';
  
   var sorted=Object.entries(players).filter(function(e){return e[1]&&e[1].time!=null;}).map(function(e){return{name:e[0],time:parseFloat(e[1].time),diff:Math.abs(parseFloat(e[1].time)-target)};}).sort(function(a,b){return a.diff-b.diff;});
   var pending=Object.entries(players).filter(function(e){return !e[1]||e[1].time==null;});
@@ -997,7 +997,7 @@ function renderResult(id,r){
       '<div class="rpos">'+medal+'</div>'+
       '<div class="rinfo">'+
         '<div class="rname">'+p.name+(isMe?' 👈':'')+(isLead?' ⚡ mejor tiempo':isWin?' 🏆':'')+' </div>'+
-        '<div class="rdiff">±'+(p.diff*1000).toFixed(0)+'ms del objetivo'+(isLead&&!allDone?' — faltan '+(joined-played)+' por jugar':'')+' </div>'+
+        '<div class="rdiff">±'+(p.diff*1000).toFixed(0)+'ms del objetivo'+(isLead&&!allDone?' — famax+(max-played)+' por jugar':'')+' </div>'+
       '</div>'+
       '<div class="rtime">'+p.time.toFixed(3)+'s</div>'+
     '</div>';
@@ -1029,7 +1029,7 @@ function renderResult(id,r){
     credited.classList.remove('show');
     prizeBox.style.display='none';
     waitBox.style.display='block';
-    document.getElementById('waitTxt').textContent='Faltan '+(joined-played)+' jugador(es). El resultado final se muestra cuando todos jueguen.';
+    document.getElementById('waitTxt').textContent='Faltan '+(max-played)+' jugador(es). El resultado final se muestra cuando todos jueguen.';
   }
 }
  
@@ -1061,8 +1061,9 @@ function renderUsersTable(){
       '<td class="mono" style="color:var(--wn);font-size:12px">$'+(u.saldoGanancia||0)+'</td>'+
       '<td style="font-size:11px;color:var(--tm)">🏆'+(u.ganadas||0)+' 💀'+(u.perdidas||0)+'<br>Racha: '+(u.racha||0)+'</td>'+
       '<td><div class="btn-row">'+
-        '<button class="btn btn-g" onclick="openCargaSaldo(\''+uid+'\')">+ Saldo</button>'+
-        '<button class="btn btn-b" onclick="openVerJugador(\''+uid+'\')">Ver</button>'+
+        '<button class="btn btn-g" onclick="openCargaSaldo(\\''+uid+'\\',' + '\'cargar\')">+ Saldo</button>'+
+        '<button class="btn btn-r" onclick="openCargaSaldo(\\''+uid+'\\','\'restar\')">- Saldo</button>'+
+        '<button class="btn btn-b" onclick="openVerJugador(\\''+uid+'\\')">Ver</button>'+
       '</div></td>'+
     '</tr>';
   }).join('');
@@ -1119,34 +1120,45 @@ function genCode(){
   });
 }
  
-function openCargaSaldo(uid){
+function openCargaSaldo(uid, mode){
   var u=users[uid];
+  var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
+  var isRestar=mode==='restar';
+  var titulo=isRestar?'➖ RESTAR SALDO':'💰 CARGAR SALDO';
+  var btnClass=isRestar?'btn btn-r':'btn btn-g';
+  var btnTxt=isRestar?'➖ RESTAR':'✅ CARGAR';
   document.getElementById('modalBody').innerHTML=
-    '<div class="mt">💰 CARGAR SALDO</div>'+
+    '<div class="mt">'+titulo+'</div>'+
     '<div class="ibox">'+
     '<div class="ir"><span class="il">Jugador</span><span class="iv">'+u.alias+'</span></div>'+
-    '<div class="ir"><span class="il">Saldo actual</span><span class="iv" style="color:var(--ac)">$'+((u.saldoFondo||0)+(u.saldoGanancia||0))+'</span></div>'+
+    '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$'+total+'</span></div>'+
     '<div class="ir"><span class="il">Fondo</span><span class="iv">$'+(u.saldoFondo||0)+'</span></div>'+
+    '<div class="ir"><span class="il">Ganancia</span><span class="iv">$'+(u.saldoGanancia||0)+'</span></div>'+
     '</div>'+
     '<div class="ff" style="margin-bottom:14px">'+
-    '<label>Monto a cargar ($MXN)</label>'+
+    '<label>Monto ($MXN)</label>'+
     '<input id="cargaMonto" type="number" placeholder="200" style="height:46px;background:var(--sf2);border:1px solid var(--bo);border-radius:10px;color:var(--tx);font-family:DM Mono,monospace;font-size:16px;padding:0 14px;outline:none">'+
     '</div>'+
     '<div class="mbtns">'+
     '<button class="btn btn-gh" onclick="closeModal()">Cancelar</button>'+
-    '<button class="btn btn-g" onclick="doCargaSaldo(\''+uid+'\')" style="font-weight:700">✅ CARGAR</button>'+
+    '<button class="'+btnClass+'" onclick="doCargaSaldo(\''+uid+'\',\''+mode+'\')" style="font-weight:700">'+btnTxt+'</button>'+
     '</div>';
   document.getElementById('overlay').classList.add('show');
 }
  
-function doCargaSaldo(uid){
+function doCargaSaldo(uid, mode){
   var monto=parseInt(document.getElementById('cargaMonto').value)||0;
   if(!monto||monto<=0){toast('❌ Ingresa un monto válido');return;}
   var u=users[uid];
-  var nuevoFondo=(u.saldoFondo||0)+monto;
-  db.ref('users/'+uid+'/saldoFondo').set(nuevoFondo).then(function(){
-    closeModal();toast('✅ +$'+monto+' cargados a '+u.alias);
-  });
+  if(mode==='restar'){
+    var total=(u.saldoFondo||0)+(u.saldoGanancia||0);
+    if(monto>total){toast('❌ Solo tiene $'+total+' disponibles');return;}
+    var nf=u.saldoFondo||0, ng=u.saldoGanancia||0, r=monto;
+    if(nf>=r){nf-=r;}else{r-=nf;nf=0;ng=Math.max(0,ng-r);}
+    db.ref('users/'+uid).update({saldoFondo:nf,saldoGanancia:ng}).then(function(){closeModal();toast('➖ -$'+monto+' restados a '+u.alias);});
+  } else {
+    db.ref('users/'+uid+'/saldoFondo').set((u.saldoFondo||0)+monto).then(function(){closeModal();toast('✅ +$'+monto+' cargados a '+u.alias);});
+  }
 }
  
 function openVerJugador(uid){
@@ -1156,6 +1168,7 @@ function openVerJugador(uid){
     '<div class="mt">👤 '+u.alias+'</div>'+
     '<div class="ibox">'+
     '<div class="ir"><span class="il">Nombre</span><span class="iv">'+u.name+'</span></div>'+
+    '<div class="ir"><span class="il">PIN</span><span class="iv mono" style="color:var(--wn);letter-spacing:4px;font-size:18px">'+u.pin+'</span></div>'+
     '<div class="ir"><span class="il">Saldo total</span><span class="iv" style="color:var(--ac)">$'+total+'</span></div>'+
     '<div class="ir"><span class="il">Fondo</span><span class="iv">$'+(u.saldoFondo||0)+'</span></div>'+
     '<div class="ir"><span class="il">Ganancia</span><span class="iv" style="color:var(--wn)">$'+(u.saldoGanancia||0)+'</span></div>'+
