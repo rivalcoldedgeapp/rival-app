@@ -259,7 +259,7 @@ tr:hover td{background:var(--sf2)}
 <nav>
   <div class="logo">RIVAL</div>
   <div class="nav-right">
-    <div class="tabs" id="navTabs" style="display:none">
+    <div class="tabs" id="navTabs">
       <button class="tab on" id="tab-game" onclick="goTo('game')">🎮 Juegos</button>
       <button class="tab" id="tab-admin" onclick="goTo('admin')">⚙️ Admin</button>
     </div>
@@ -312,6 +312,9 @@ tr:hover td{background:var(--sf2)}
         </div>
         <button class="abtn" onclick="doLogin()">ENTRAR</button>
         <div class="ahint">¿No tienes cuenta? Pide un código de invitación</div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bo);text-align:center">
+        <button onclick="goTo('admin')" style="background:transparent;border:none;color:var(--tm);font-size:12px;cursor:pointer;letter-spacing:1px">⚙️ Acceso Admin</button>
+      </div>
       </div>
       <!-- REGISTER -->
       <div id="authReg" style="display:none">
@@ -555,7 +558,7 @@ function doLogout(){
   localStorage.removeItem('rival_user');
   myRetoId=null; gState='idle'; cancelAnimationFrame(raf);
   document.getElementById('profHeader').classList.remove('show');
-  document.getElementById('navTabs').style.display='none';
+  // keep navTabs visible
   document.getElementById('saldoPill').classList.remove('show');
   document.getElementById('view-auth').classList.add('on');
   document.getElementById('view-game').classList.remove('on');
@@ -570,7 +573,7 @@ function showLoggedIn(){
     localStorage.setItem('rival_user',JSON.stringify(curUser));
     document.getElementById('view-auth').classList.remove('on');
     document.getElementById('view-game').classList.add('on');
-    document.getElementById('navTabs').style.display='flex';
+    // navTabs already visible
     document.getElementById('profHeader').classList.add('show');
     document.getElementById('saldoPill').classList.add('show');
     updateProfileUI();
