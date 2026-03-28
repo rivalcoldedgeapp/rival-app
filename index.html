@@ -1070,7 +1070,7 @@ function toggleHistorial(){
 function renderTorneoHistorial(){
   var el=document.getElementById('secHistorial');if(!el)return;
   el.innerHTML='<div style="font-size:12px;color:var(--tm);padding:10px;text-align:center">Cargando...</div>';
-  db.ref('torneoHistorial').orderByChild('cerradoAt').once('value').then(function(s){
+  db.ref('torneoHistorial').once('value').then(function(s){
     var data=s.val();
     if(!data){el.innerHTML='<div style="font-size:12px;color:var(--td);padding:12px;text-align:center">Sin torneos anteriores</div>';return;}
     var lista=Object.entries(data).sort(function(a,b){return (b[1].cerradoAt||0)-(a[1].cerradoAt||0);});
@@ -1099,7 +1099,10 @@ function renderTorneoHistorial(){
         '</div>'+
       '</div>';
     }).join('');
-    el.innerHTML=html;
+    el.innerHTML=html||'<div style="font-size:12px;color:var(--td);padding:12px;text-align:center">Sin torneos anteriores</div>';
+  }).catch(function(err){
+    el.innerHTML='<div style="font-size:12px;color:var(--dg);padding:12px;text-align:center">Error al cargar: '+err.message+'</div>';
+    console.error('renderTorneoHistorial error:',err);
   });
 }
 function renderTorneoAdminPanel(){
