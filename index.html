@@ -1774,9 +1774,14 @@ function toggleAdmSection(id){
     if(id==='secGlobal')renderAdmGlobalTable();
     if(id==='secHistorial')renderTorneoHistorial();
     if(id.startsWith('secReto_')){
-      // Resetear a Cargando... antes de recargar
-      el.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div>';
-      renderAdmRetoSection(id.replace('secReto_',''));
+      var g2=id.replace('secReto_','');
+      if(g2!=='s'&&g2!=='r')g2=parseInt(g2);
+      // Solo recargar si está vacío
+      var elContent=document.getElementById(id);
+      if(elContent&&elContent.innerHTML.trim()===''){
+        elContent.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div>';
+      }
+      renderAdmRetoSection(g2);
     }
   }
 }
@@ -1798,9 +1803,11 @@ function buildRetosAccordion(){
         '<span style="font-size:9px;letter-spacing:3px;color:'+r.stroke+';text-transform:uppercase">'+r.label+'</span>'+
         '<span id="'+sid+'Arrow" style="color:var(--tm);font-size:12px">▶</span>'+
       '</button>'+
-      '<div id="'+sid+'" style="display:none;padding:0 14px 14px"><div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div></div>'+
+      '<div id="'+sid+'" style="display:none;padding:0 14px 14px"></div>'+
     '</div>';
   }).join('');
+  // Pre-cargar datos de todos los retos en background
+  retos.forEach(function(r){renderAdmRetoSection(r.g);});
 }
 
 function renderAdmRetoSection(g){
