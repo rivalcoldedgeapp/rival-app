@@ -1810,32 +1810,57 @@ function buildRetosAccordion(){
 }
 
 function renderAdmRetoSection(g){
-  // Convertir a número si es reto numérico
   if(g!=='s'&&g!=='r')g=parseInt(g);
   var sid='secReto_'+g;
   var el=document.getElementById(sid);if(!el)return;
-  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g===4,gkey=getGameKey(g);
+  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g);
+  var today=getTodayKey();
+
+  // Construir días de esta semana
   var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);
   monday.setDate(d.getDate()+diff);
   var days=[];
-  for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}
-  var today=getTodayKey();
-  Promise.all(days.map(function(dayObj){
-    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};});
-  })).then(function(results){
-    // Filtrar solo días con jugadas y tomar los 3 más recientes
-    var conJugadas=results.filter(function(r){
-      return Object.values(r.scores).some(function(w){return w.bestDiff!=null;})&&r.day.key<=today;
-    }).reverse().slice(0,3);
-    if(conJugadas.length===0){el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';return;}
-    var html=conJugadas.map(function(r){
-      var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
-      var isToday=r.day.key===today;
+  for(var i=0;i<7;i++){
+    var dd=new Date(monday);dd.setDate(monday.getDate()+i);
+    var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});
+  }
+
+  // Días pasados (sin hoy, sin futuros)
+  var pastDays=days.filter(function(d){return d.key<today;});
+  // Tomar los 2 más recientes para historia + hoy = 3 días max
+  var recentPast=pastDays.slice(-2);
+
+  function renderDias(dayDataMap){
+    // Agregar hoy desde wScores (ya cargado en memoria)
+    var todayScores=wScores[g]||{};
+    var allDays=[];
+    // Hoy primero
+    if(Object.keys(todayScores).length>0){
+      allDays.push({day:{key:today,label:DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]},scores:todayScores,isToday:true});
+    }
+    // Días anteriores
+    recentPast.forEach(function(dayObj){
+      var scores=dayDataMap[dayObj.key]||{};
+      if(Object.values(scores).some(function(w){return w.bestDiff!=null;})){
+        allDays.push({day:dayObj,scores:scores,isToday:false});
+      }
+    });
+
+    if(allDays.length===0){
+      el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';
+      return;
+    }
+
+    var html=allDays.map(function(item){
+      var r=item.day,scores=item.scores,isToday=item.isToday;
+      var sorted=Object.entries(scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      if(sorted.length===0)return '';
       return '<div style="margin-bottom:14px">'+
         '<div style="font-size:11px;font-weight:700;color:'+(isToday?cfg.stroke:'var(--tm)')+';margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bo)">'+
-          r.day.label+(isToday?' · Hoy':'')+' <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span>'+
+          r.label+(isToday?' · Hoy':'')+' <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span>'+
         '</div>'+
-        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:500px">'+
+        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px">'+
           '<thead><tr>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">#</th>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Jugador</th>'+
@@ -1849,7 +1874,7 @@ function renderAdmRetoSection(g){
             var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
             return '<tr style="border-top:1px solid var(--bo)">'+
               '<td style="padding:6px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
-              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+w.name+'</td>'+
+              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+( w.name||'—')+'</td>'+
               '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
               '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
               '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;color:var(--tm);text-align:center">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td>'+
@@ -1859,7 +1884,26 @@ function renderAdmRetoSection(g){
           '</tbody></table></div>'+
       '</div>';
     }).join('');
-    el.innerHTML=html;
+    el.innerHTML=html||'<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';
+  }
+
+  // Si no hay días pasados, solo usamos wScores (sin Firebase)
+  if(recentPast.length===0){
+    renderDias({});
+    return;
+  }
+  // Fetch solo días anteriores (no hoy)
+  Promise.all(recentPast.map(function(dayObj){
+    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){
+      return{key:dayObj.key,scores:s.val()||{}};
+    });
+  })).then(function(results){
+    var map={};
+    results.forEach(function(r){map[r.key]=r.scores;});
+    renderDias(map);
+  }).catch(function(){
+    // Si Firebase falla, mostrar al menos los datos de hoy
+    renderDias({});
   });
 }
 
