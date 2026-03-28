@@ -1186,20 +1186,53 @@ function renderTorneoAdminPanel(){
       '<div style="font-size:10px;color:var(--td);margin-top:4px">Al cerrar el torneo se revelará el ganador y su correo para que lo contactes.</div>'+
     '</div>';
   } else {
-    // mostrar ganador si hay
+    // Torneo cerrado — mostrar ganador + participantes del último torneo
+    var isR=torneoData&&torneoData.ganadorReto==='r';
     var ganadorHtml='';
     if(torneoData&&torneoData.ganadorUid&&profiles[torneoData.ganadorUid]){
       var gp=profiles[torneoData.ganadorUid];
-      el.innerHTML='<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-bottom:12px">'+
+      ganadorHtml='<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-bottom:12px">'+
         '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:var(--wn);margin-bottom:6px">🏆 ÚLTIMO GANADOR</div>'+
         '<div style="font-weight:700;font-size:14px">'+gp.name+'</div>'+
-        '<div style="font-size:12px;color:var(--tm);margin-top:2px">'+torneoData.ganadorTiempo+'s · '+GAME_LABELS[torneoData.ganadorReto]+'</div>'+
+        '<div style="font-size:12px;color:var(--tm);margin-top:2px">'+(torneoData.ganadorTiempo||'—')+(isR?'ms':'s')+' · '+(GAME_LABELS[torneoData.ganadorReto]||'—')+'</div>'+
         '<div style="font-size:12px;color:var(--wn);margin-top:4px;font-family:DM Mono,monospace">📧 '+gp.email+'</div>'+
-        '<div style="font-size:11px;color:var(--td);margin-top:6px">Premio: '+torneoData.ganadorPremio+' — Contáctalo para hacer la transferencia</div>'+
+        '<div style="font-size:11px;color:var(--td);margin-top:6px">Premio: '+(torneoData.ganadorPremio||'—')+' — Contáctalo para entregar el premio</div>'+
       '</div>';
-      ganadorHtml=el.innerHTML;
     }
-    el.innerHTML=ganadorHtml+
+    // Participantes del último torneo (datos en torneo/participantes hasta que se cree uno nuevo)
+    var partsHtml='';
+    var lastParts=torneoData&&torneoData.participantes?torneoData.participantes:{};
+    var lastSorted=Object.entries(lastParts)
+      .filter(function(e){return e[1].bestDiff!=null;})
+      .sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+    if(lastSorted.length>0){
+      partsHtml='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:12px">'+
+        '<div style="padding:10px 14px;border-bottom:1px solid var(--bo);display:flex;justify-content:space-between;align-items:center">'+
+          '<span style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">Participantes del último torneo</span>'+
+          '<span style="font-size:11px;color:var(--td)">'+lastSorted.length+' jugadores</span>'+
+        '</div>'+
+        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+          '<thead><tr>'+
+            '<th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">#</th>'+
+            '<th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Jugador</th>'+
+            '<th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Mejor tiempo</th>'+
+            '<th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Intentos</th>'+
+          '</tr></thead>'+
+          '<tbody>'+
+          lastSorted.map(function(e,i){
+            var uid2=e[0],w=e[1],p=profiles[uid2]||{};
+            var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+            return '<tr style="border-top:1px solid var(--bo);background:'+(i===0?'rgba(255,184,0,.05)':'')+'">'+
+              '<td style="padding:7px 8px;font-size:12px;color:'+(i===0?'var(--wn)':'var(--td)')+'">'+medal+'</td>'+
+              '<td style="padding:7px 8px;font-weight:'+(i===0?'700':'400')+';font-size:12px">'+w.name+'<div style="font-size:10px;color:var(--tm)">'+(p.email||'—')+'</div></td>'+
+              '<td style="padding:7px 8px;font-family:DM Mono,monospace;font-size:13px;color:'+(i===0?'var(--wn)':'var(--ct)')+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
+              '<td style="padding:7px 8px;font-size:12px;color:var(--tm);text-align:center">'+(w.intentos||0)+'/5</td>'+
+            '</tr>';
+          }).join('')+
+          '</tbody></table></div>'+
+      '</div>';
+    }
+    el.innerHTML=ganadorHtml+partsHtml+
       '<div style="display:flex;justify-content:center;padding:8px 0 4px">'+
         '<button class="btn btn-t" onclick="showNuevoTorneoForm()" style="height:44px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:#fff;padding:0 28px">🏆 NUEVO TORNEO RELÁMPAGO</button>'+
       '</div>'+
