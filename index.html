@@ -780,6 +780,7 @@ function autoCerrarTorneo(){
     ganadorEmail:ganadorEmail,
     participantesTotal:Object.keys(parts).length,
     participantes:parts
+  };
   var torneoId='torneo_'+ahora;
   // Marcar como inactivo primero para evitar que múltiples clientes lo cierren
   db.ref('torneo/activo').set(false).then(function(){
