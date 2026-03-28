@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>RIVAL</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -1752,11 +1755,15 @@ function toggleAdmSection(id){
   var hidden=el.style.display==='none'||el.style.display==='';
   el.style.display=hidden?'block':'none';
   if(arrow)arrow.textContent=hidden?'▼':'▶';
-  // lazy load contenido
+  // Cargar datos al abrir — siempre refresca para tener datos actualizados
   if(hidden){
     if(id==='secGlobal')renderAdmGlobalTable();
     if(id==='secHistorial')renderTorneoHistorial();
-    if(id.startsWith('secReto_'))renderAdmRetoSection(id.replace('secReto_',''));
+    if(id.startsWith('secReto_')){
+      // Resetear a Cargando... antes de recargar
+      el.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div>';
+      renderAdmRetoSection(id.replace('secReto_',''));
+    }
   }
 }
 
@@ -1783,6 +1790,8 @@ function buildRetosAccordion(){
 }
 
 function renderAdmRetoSection(g){
+  // Convertir a número si es reto numérico
+  if(g!=='s'&&g!=='r')g=parseInt(g);
   var sid='secReto_'+g;
   var el=document.getElementById(sid);if(!el)return;
   var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g===4,gkey=getGameKey(g);
