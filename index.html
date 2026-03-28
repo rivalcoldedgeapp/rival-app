@@ -780,24 +780,27 @@ function updateTorneoHomeCard(){
   var limite=torneoData.limite||null;
   var inscritos=torneoData.participantes?Object.keys(torneoData.participantes).length:0;
   var limitePlaces=limite!=null?(limite-inscritos):null;
-  el.innerHTML='<div class="torneo-card" onclick="goTorneo()">'+
+  el.innerHTML='<div class="torneo-card" onclick="goTorneo()" style="text-align:center">'+
     '<div class="torneo-pulse"></div>'+
     '<div class="torneo-badge">⚡ TORNEO RELÁMPAGO EN VIVO</div>'+
     '<div class="torneo-title">TORNEO DEL DÍA</div>'+
     '<div class="torneo-prize">'+torneoData.premio+'</div>'+
     '<div class="torneo-meta">'+gameLabel+' · 5 intentos por jugador</div>'+
-    '<div class="torneo-countdown" id="homeCountdown">'+fmtCountdown(remaining)+'</div>'+
+    '<div class="torneo-countdown" id="homeCountdown" style="font-size:32px;margin:10px 0">'+fmtCountdown(remaining)+'</div>'+
+    (limitePlaces!=null?'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:6px;color:'+(limitePlaces<=3?'var(--dg)':'var(--ct)')+'">'+
+      (limitePlaces>0?'🔥 '+limitePlaces+' lugar'+(limitePlaces===1?'':'es')+' disponible'+(limitePlaces===1?'':'s'):'🔴 TORNEO LLENO')+'</div>':'')+
     (canPlay?
-      '<div style="font-size:11px;color:var(--tm);margin-top:6px">Intentos restantes: <strong style="color:var(--ct)">'+intentosLeft+'</strong></div>':
-      '<div style="font-size:11px;color:var(--tm);margin-top:8px;line-height:1.6">Necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega RIVAL.</div>')+
-    (limitePlaces!=null?'<div style="font-size:12px;margin-top:6px;color:'+(limitePlaces<=3?'var(--dg)':'var(--ct)')+'">'+
-      (limitePlaces>0?'🔥 '+limitePlaces+' lugar'+(limitePlaces===1?'':'es')+' disponible'+(limitePlaces===1?'':'s'):'🔴 Torneo lleno')+'</div>':'')+ 
+      '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Intentos restantes: <strong style="color:var(--ct)">'+intentosLeft+'</strong></div>':
+      '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega.</div>')+
     (canPlay?
       '<button class="torneo-enter-btn" '+(intentosLeft>0&&limitePlaces!==0?'':'disabled')+' onclick="event.stopPropagation();goTorneo()">'+
       (intentosLeft>0?'ENTRAR AL TORNEO':'SIN INTENTOS')+'</button>':
-      '<button class="torneo-enter-btn" onclick="event.stopPropagation();goTorneo()" style="background:var(--ac);color:#000">'+
-      '🔑 INGRESAR CÓDIGO</button>')+
-    '</div>';
+      '<button class="torneo-enter-btn" onclick="event.stopPropagation();goTorneo()" style="background:var(--ac);color:#000">🔑 INGRESAR CÓDIGO</button>')+
+    '<div style="display:flex;gap:8px;margin-top:10px;justify-content:center">'+
+      '<button onclick="event.stopPropagation();showComoParticipar()" style="background:transparent;border:1px solid var(--bo);border-radius:7px;color:var(--tm);font-size:11px;padding:5px 10px;cursor:pointer">❓ ¿Cómo participar?</button>'+
+      '<button onclick="event.stopPropagation();showTerminos()" style="background:transparent;border:1px solid var(--bo);border-radius:7px;color:var(--tm);font-size:11px;padding:5px 10px;cursor:pointer">📋 Términos</button>'+
+    '</div>'+
+  '</div>';
   // countdown en home
   clearTimeout(torneoCountdownTO);
   function tickHome(){
@@ -809,6 +812,35 @@ function updateTorneoHomeCard(){
   torneoCountdownTO=setTimeout(tickHome,1000);
 }
  
+function showComoParticipar(){
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ac)">❓ CÓMO PARTICIPAR</div>'+
+    '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">'+
+      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:24px">1️⃣</span><div><strong style="color:var(--tx)">Pídele su código a alguien</strong><div style="font-size:12px;color:var(--tm);margin-top:3px;line-height:1.6">Cada jugador de RIVAL tiene un código único. Pídele el suyo a alguien que ya juegue.</div></div></div>'+
+      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:24px">2️⃣</span><div><strong style="color:var(--tx)">Ingrésalo aquí</strong><div style="font-size:12px;color:var(--tm);margin-top:3px;line-height:1.6">Toca el botón <strong style="color:var(--ac)">🔑 INGRESAR CÓDIGO</strong> y escríbelo. Solo funciona una vez por código.</div></div></div>'+
+      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:24px">3️⃣</span><div><strong style="color:var(--tx)">¡Ya puedes competir!</strong><div style="font-size:12px;color:var(--tm);margin-top:3px;line-height:1.6">Tienes <strong style="color:var(--ct)">5 intentos</strong> para hacer el mejor tiempo. El mejor al cerrar el torneo gana el premio en efectivo.</div></div></div>'+
+    '</div>'+
+    '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:9px;padding:10px 12px;font-size:11px;color:var(--td);margin-bottom:14px;line-height:1.6">'+
+      '💡 Tu propio código aparece abajo en la sección <strong style="color:var(--tm)">Tu código de invitación</strong>. Compártelo y cuando alguien lo use, también podrán jugar torneos.'+
+    '</div>'+
+    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+function showTerminos(){
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">📋 TÉRMINOS Y CONDICIONES</div>'+
+    '<div style="max-height:300px;overflow-y:auto;padding-right:4px">'+
+    '<div style="font-size:12px;color:var(--tm);line-height:1.8;display:flex;flex-direction:column;gap:10px">'+
+      '<div><strong style="color:var(--tx)">1. Participación</strong><br>Solo pueden participar usuarios registrados en RIVAL que hayan ingresado un código de invitación válido. Cada código es de un solo uso.</div>'+
+      '<div><strong style="color:var(--tx)">2. Intentos</strong><br>Cada jugador tiene 5 intentos por torneo. El mejor tiempo de todos tus intentos es el que cuenta para el ranking.</div>'+
+      '<div><strong style="color:var(--tx)">3. Premio</strong><br>El ganador es quien registre el mejor tiempo al momento del cierre del torneo. El organizador contactará al ganador por correo electrónico para coordinar la transferencia del premio.</div>'+
+      '<div><strong style="color:var(--tx)">4. Cierre del torneo</strong><br>El torneo puede cerrarse por tiempo (máximo 4 horas), por límite de jugadores alcanzado, o manualmente por el organizador en cualquier momento.</div>'+
+      '<div><strong style="color:var(--tx)">5. Decisiones</strong><br>Cualquier disputa o situación no prevista será resuelta por el organizador. Su decisión es final.</div>'+
+      '<div><strong style="color:var(--tx)">6. Conducta</strong><br>Queda prohibido cualquier intento de manipulación, trampa o uso de herramientas externas. El organizador se reserva el derecho de descalificar participantes.</div>'+
+    '</div></div>'+
+    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:14px">ACEPTAR</button>';
+  document.getElementById('overlay').classList.add('show');
+}
 function aplicarCodigoTorneo(){
   var inp=document.getElementById('modalRefInput');
   var msg=document.getElementById('modalRefMsg');
@@ -1059,7 +1091,15 @@ function renderTorneoAdminPanel(){
       '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:var(--ct);margin-bottom:10px">Crear nuevo torneo</div>'+
       '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">'+
         '<div class="fld"><label>Premio</label><input id="tornPremio" value="$100 pesos" style="height:36px;font-size:13px"></div>'+
-        '<div class="fld"><label>Límite de jugadores</label><input id="tornLimite" type="number" value="20" min="2" max="200" style="height:36px;font-size:13px"><div style="font-size:10px;color:var(--td);margin-top:2px">El torneo se cierra automáticamente cuando se llena</div></div>'+
+        '<div class="fld"><label>Límite de jugadores</label><input id="tornLimite" type="number" value="20" min="2" max="200" style="height:36px;font-size:13px"><div style="font-size:10px;color:var(--td);margin-top:2px">El torneo se cierra cuando se llena</div></div>'+
+        '<div class="fld"><label>Duración máxima</label>'+
+          '<select id="tornDuracion" style="height:36px;background:var(--sf2);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 10px;outline:none">'+
+            '<option value="1">1 hora</option>'+
+            '<option value="2">2 horas</option>'+
+            '<option value="3">3 horas</option>'+
+            '<option value="4" selected>4 horas</option>'+
+          '</select>'+
+        '</div>'+
       '</div>'+
       '<button class="btn btn-t" onclick="admActivarTorneo()" style="width:100%;height:42px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px">🏆 ACTIVAR TORNEO RELÁMPAGO</button>'+
       '<div style="font-size:10px;color:var(--td);margin-top:8px;text-align:center">El sistema elige el reto aleatoriamente · Duración máxima 4 horas</div>'+
@@ -1070,13 +1110,14 @@ function renderTorneoAdminPanel(){
 function admActivarTorneo(){
   var premio=document.getElementById('tornPremio')?document.getElementById('tornPremio').value.trim():'$100 pesos';
   var limite=document.getElementById('tornLimite')?parseInt(document.getElementById('tornLimite').value)||20:20;
+  var duracion=document.getElementById('tornDuracion')?parseInt(document.getElementById('tornDuracion').value)||4:4;
   var retos=[5,10,15,4,'s','r'];
   var reto=retos[Math.floor(Math.random()*retos.length)];
   var gameLabel=GAME_LABELS[reto];
-  // guardar en window para usarlos en confirmActivarTorneo
   window._tornPremio=premio;
   window._tornReto=reto;
   window._tornLimite=limite;
+  window._tornDuracion=duracion;
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">🏆 ACTIVAR TORNEO</div>'+
     '<div style="background:var(--ctd);border:1px solid var(--ctm);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center">'+
@@ -1084,11 +1125,11 @@ function admActivarTorneo(){
       '<div style="font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:3px">'+gameLabel+'</div>'+
       '<div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:var(--wn);margin-top:4px">'+premio+'</div>'+
     '</div>'+
-    '<div style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">'+
+    '<div style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.8">'+
       '• 5 intentos por usuario<br>'+
       '• Solo usuarios invitados pueden participar<br>'+
       '• Límite: <strong style="color:var(--tx)">'+limite+' jugadores</strong><br>'+
-      '• Cierra automáticamente en 4 horas o al llenarse<br>'+
+      '• Duración máxima: <strong style="color:var(--tx)">'+duracion+' hora'+(duracion>1?'s':'')+'</strong><br>'+
       '• Puedes cerrarlo antes desde admin'+
     '</div>'+
     '<div class="mbtns">'+
@@ -1107,7 +1148,7 @@ function confirmActivarTorneo(){
     premio:window._tornPremio||'$100 pesos',
     limite:window._tornLimite||20,
     inicioAt:ahora,
-    cierreAt:ahora+(4*60*60*1000),
+    cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
     participantes:{},
     ganadorUid:null
   }).then(function(){closeModal();toast('🏆 Torneo activado — '+GAME_LABELS[reto]);});
