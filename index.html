@@ -755,7 +755,24 @@ function getGameKey(g){if(g==='r')return 'gr';if(g===4)return 'g4b';if(g==='s')r
 function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g);}
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
-// Auto-cierre por tiempo — revisa cada minuto aunque no haya actividad
+// ══ VERSIÓN / FORCE RELOAD ══
+var APP_VERSION='v5.1';
+db.ref('appVersion').on('value',function(s){
+  var serverVersion=s.val();
+  if(!serverVersion)return;
+  if(serverVersion!==APP_VERSION){
+    // Mostrar banner de actualización
+    var existing=document.getElementById('updateBanner');
+    if(existing)return;
+    var banner=document.createElement('div');
+    banner.id='updateBanner';
+    banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--ac);color:#000;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;box-shadow:0 2px 20px rgba(0,230,122,.3)';
+    banner.innerHTML='<span>⚡ Hay una nueva versión de RIVAL disponible</span>'+
+      '<button onclick="window.location.reload(true)" style="background:#000;color:var(--ac);border:none;border-radius:7px;padding:6px 14px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;white-space:nowrap">ACTUALIZAR</button>';
+    document.body.prepend(banner);
+  }
+});
+
 setInterval(function(){
   if(torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
     db.ref('torneo/activo').set(false);
@@ -999,7 +1016,24 @@ function torneoRegistrarIntento(fmt,diff,g){
   var box=document.getElementById('torneoResultBox');
   if(box){
     box.style.display='block';
-    box.innerHTML='🏆 Torneo · Intento '+intentosUsados+'/5 registrado'+(intentosLeft>0?' · Te quedan <strong>'+intentosLeft+' intentos</strong>':' · <strong>Sin más intentos</strong>');
+    var esLider=torneoData&&torneoData.participantes&&function(){
+      var sorted=Object.entries(torneoData.participantes).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      return sorted.length>0&&sorted[0][0]===uid;
+    }();
+    if(esLider){
+      box.style.background='var(--adim)';
+      box.style.borderColor='var(--wn)';
+      box.style.color='var(--wn)';
+      box.innerHTML='🥇 <strong>¡Vas en primer lugar!</strong><br>'+
+        '<span style="font-size:11px;color:var(--tm);line-height:1.7;display:block;margin-top:6px">'+
+        'Si nadie te supera al cerrar el torneo, ganarás el premio.<br>'+
+        '📧 Revisa tu correo y carpeta de spam — te contactaremos ahí para enviarte el dinero.</span>';
+    } else {
+      box.style.background='var(--ctd)';
+      box.style.borderColor='var(--ctm)';
+      box.style.color='var(--ct)';
+      box.innerHTML='🏆 Torneo · Intento '+intentosUsados+'/5 registrado'+(intentosLeft>0?' · Te quedan <strong>'+intentosLeft+' intentos</strong>':' · <strong>Sin más intentos</strong>');
+    }
   }
   var paBtn=document.getElementById('paBtn');
   if(paBtn&&intentosLeft>0)paBtn.textContent='▶️ USAR OTRO INTENTO ('+intentosLeft+')';
