@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>RIVAL</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -1336,19 +1333,7 @@ db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.t5)GCFG[5
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
-function startListeners(){
-  // Cancelar listeners anteriores y re-registrar con auth activo
-  db.ref('gameConfig').off();
-  db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.t5)GCFG[5]=parseFloat(cfg.t5);if(cfg.t10)GCFG[10]=parseFloat(cfg.t10);if(cfg.t15)GCFG[15]=parseFloat(cfg.t15);if(cfg.t4)GCFG[4]=parseFloat(cfg.t4);updateConfigUI();if(admLoggedIn)updateAdmStats();});
-  db.ref('profiles').off();
-  db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
-  db.ref('weekPoints/'+weekKey).off();
-  db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();if(admLoggedIn)buildWinners();});
-  [5,10,15,4,'s','r'].forEach(function(g){
-    db.ref(getScorePath(g)).off();
-    listenWeekScore(g);
-  });
-}
+function listenWeekScore(g){db.ref(getScorePath(g)).on('value',function(s){wScores[g]=s.val()||{};updateHomecards();if(document.getElementById('sRanking').classList.contains('on')&&rankGame===g)renderTop10(g);if(admLoggedIn){updateAdmStats();buildWinners();if(admGame===g)renderAdmTable();}});}
 [5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});
 
 // ══ INVITE ══
@@ -1421,23 +1406,9 @@ function showApp(fu,profile){
   else av.textContent=(profile.name||'R')[0].toUpperCase();
   document.getElementById('navRight').classList.add('show');
   document.getElementById('navTabs').classList.add('show');
-  startListeners();
   updateConfigUI();updateHomecards();updateNavPoints();goTab('home');
 }
-function updateConfigUI(){
-  var tEl=document.getElementById('homeTitle'),dEl=document.getElementById('homeDate');
-  if(tEl)tEl.textContent=getTodayLabel();
-  if(dEl)dEl.textContent=getTodayDate();
-  var t5=document.getElementById('tgt5'),t10=document.getElementById('tgt10'),t15=document.getElementById('tgt15');
-  if(t5)t5.textContent=GCFG[5].toFixed(3);
-  if(t10)t10.textContent=GCFG[10].toFixed(3);
-  if(t15)t15.textContent=GCFG[15].toFixed(3);
-  var a5=document.getElementById('admT5'),a10=document.getElementById('admT10'),a15=document.getElementById('admT15'),a4=document.getElementById('admT4');
-  if(a5)a5.textContent=GCFG[5].toFixed(3)+'s';
-  if(a10)a10.textContent=GCFG[10].toFixed(3)+'s';
-  if(a15)a15.textContent=GCFG[15].toFixed(3)+'s';
-  if(a4)a4.textContent=GCFG[4].toFixed(3)+'s';
-}
+function updateConfigUI(){var tEl=document.getElementById('homeTitle'),dEl=document.getElementById('homeDate');if(tEl)tEl.textContent=getTodayLabel();if(dEl)dEl.textContent=getTodayDate();var t5=document.getElementById('tgt5'),t10=document.getElementById('tgt10'),t15=document.getElementById('tgt15');if(t5)t5.textContent=GCFG[5].toFixed(3);if(t10)t10.textContent=GCFG[10].toFixed(3);if(t15)t15.textContent=GCFG[15].toFixed(3);var a5=document.getElementById('admT5'),a10=document.getElementById('admT10'),a15=document.getElementById('admT15'),a4=document.getElementById('admT4');if(a5)a5.textContent=GCFG[5].toFixed(3)+'s';if(a10)a10.textContent=GCFG[10].toFixed(3)+'s';if(a15)a15.textContent=GCFG[15].toFixed(3)+'s';if(a4)a4.textContent=GCFG[4].toFixed(3)+'s';}
 function updateHomecards(){
   if(!curUser)return;
   var uid=curUser.uid;
@@ -1556,21 +1527,7 @@ function seqStartRun(){
 }
 function seqTap(n){if(seqState!=='running')return;var circles=document.getElementById('seqArea').querySelectorAll('.seq-circle'),target=null;circles.forEach(function(c){if(parseInt(c.textContent)===n)target=c;});if(n===seqCurrent){if(target){target.classList.add('done');target.onclick=null;}seqCurrent++;if(seqCurrent>9){seqFinish();return;}document.getElementById('seqNextNum').textContent=seqCurrent;}else{if(target){target.classList.add('wrong');setTimeout(function(){if(target)target.classList.remove('wrong');},300);}}}
 function seqFinish(){cancelAnimationFrame(seqRaf);seqState='done';var ms=performance.now()-seqT0;document.getElementById('seqTimerLbl').textContent=(ms/1000).toFixed(3)+'s';document.getElementById('seqNextHint').style.display='none';setTimeout(function(){saveSeqScore(ms);},400);}
-function saveSeqScore(ms){
-  if(!curUser)return;
-  curGame='s';
-  var uid=curUser.uid,ws=wScores['s'][uid]||{},bestTime=(ms/1000).toFixed(3),diff=ms,isRec=ws.bestDiff==null||diff<ws.bestDiff;
-  var pname=(profiles[uid]||{}).name||'?',pphoto=(profiles[uid]||{}).photoURL||null;
-  var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};
-  if(isRec){upd.bestTime=bestTime;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
-  // Actualizar local inmediatamente
-  wScores['s'][uid]=Object.assign({},ws,upd);
-  db.ref(getScorePath('s')+'/'+uid).update(upd).then(function(){
-    if(curTorneoMode)torneoRegistrarIntento(bestTime,diff,'s');
-    showResult(bestTime,diff,isRec,'s');
-    recalcPoints('s');
-  });
-}
+function saveSeqScore(ms){if(!curUser)return;curGame='s';var uid=curUser.uid,ws=wScores['s'][uid]||{},bestTime=(ms/1000).toFixed(3),diff=ms,isRec=ws.bestDiff==null||diff<ws.bestDiff;var pname=(profiles[uid]||{}).name||'?',pphoto=(profiles[uid]||{}).photoURL||null;var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};if(isRec){upd.bestTime=bestTime;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}db.ref(getScorePath('s')+'/'+uid).update(upd).then(function(){if(curTorneoMode)torneoRegistrarIntento(bestTime,diff,'s');showResult(bestTime,diff,isRec,'s');recalcPoints('s');});}
 
 // ══ REACTION ══
 function startReaction(){curGame='r';var uid=curUser?curUser.uid:null,ws=uid?wScores['r'][uid]:null;document.getElementById('srBestR').textContent=ws&&ws.bestTime?ws.bestTime+'ms':'—';document.getElementById('srPosR').textContent=ws&&ws.bestTime?'#'+getRank(uid,'r'):'—';reactState='idle';showReactIdle();showScreen('sReaction');}
@@ -1578,21 +1535,7 @@ function showReactIdle(){var z=document.getElementById('rZone');if(!z)return;z.c
 function reactTap(){if(reactState==='idle'){reactState='waiting';var z=document.getElementById('rZone');z.className='rzone waiting';z.innerHTML='<div class="rz-icon">⏳</div><div class="rz-t">ESPERA...</div><div class="rz-s">Toca cuando veas el verde</div>';var delay=1000+Math.random()*4000;reactTO=setTimeout(function(){reactState='ready';var rT0=performance.now();var z2=document.getElementById('rZone');if(!z2)return;z2.className='rzone ready';z2.innerHTML='<div class="rz-icon">🟢</div><div class="rz-t" style="color:#000;font-size:28px;letter-spacing:4px">¡TOCA!</div>';window._reactT0=rT0;},delay);}else if(reactState==='waiting'){clearTimeout(reactTO);reactState='early';var z=document.getElementById('rZone');z.className='rzone early';z.innerHTML='<div class="rz-icon">❌</div><div class="rz-t" style="color:#fff">MUY RÁPIDO</div><div class="rz-s" style="color:rgba(255,255,255,.7)">Toca para reintentar</div>';setTimeout(function(){reactState='idle';showReactIdle();},1500);}else if(reactState==='ready'){var ms=Math.round(performance.now()-window._reactT0);reactState='done';var z=document.getElementById('rZone');if(ms<=100){z.className='rzone early';z.innerHTML='<div class="rz-icon">🤨</div><div class="rz-t" style="color:#fff">SOSPECHOSO</div><div class="rz-s" style="color:rgba(255,255,255,.7)">'+ms+'ms imposible</div>';setTimeout(function(){reactState='idle';showReactIdle();},2000);return;}z.className='rzone done';z.innerHTML='<div class="react-ms-big">'+ms+'</div><div class="react-ms-lbl">MILISEGUNDOS</div>';setTimeout(function(){saveScore(String(ms),ms,'r');},800);}else if(reactState==='done'||reactState==='early'){reactState='idle';showReactIdle();}}
 
 // ══ SAVE SCORE ══
-function saveScore(fmt,diff,g){
-  if(!curUser)return;
-  var uid=curUser.uid,ws=wScores[g][uid]||{};
-  var isRec=ws.bestDiff==null||diff<ws.bestDiff;
-  var pname=(profiles[uid]||{}).name||'?',pphoto=(profiles[uid]||{}).photoURL||null;
-  var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};
-  if(isRec){upd.bestTime=fmt;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
-  // Actualizar local inmediatamente para que la UI refleje el nuevo score
-  wScores[g][uid]=Object.assign({},ws,upd);
-  db.ref(getScorePath(g)+'/'+uid).update(upd).then(function(){
-    if(curTorneoMode)torneoRegistrarIntento(fmt,diff,g);
-    showResult(fmt,diff,isRec,g);
-    recalcPoints(g);
-  });
-}
+function saveScore(fmt,diff,g){if(!curUser)return;var uid=curUser.uid,ws=wScores[g][uid]||{};var isRec=ws.bestDiff==null||diff<ws.bestDiff;var pname=(profiles[uid]||{}).name||'?',pphoto=(profiles[uid]||{}).photoURL||null;var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};if(isRec){upd.bestTime=fmt;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}db.ref(getScorePath(g)+'/'+uid).update(upd).then(function(){if(curTorneoMode)torneoRegistrarIntento(fmt,diff,g);showResult(fmt,diff,isRec,g);recalcPoints(g);});}
 function recalcPoints(g){var key=getGameKey(g);db.ref('scores/'+weekKey+'/'+todayKey+'/'+key).once('value').then(function(s){var dayScores=s.val()||{};var sorted=Object.entries(dayScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var updates={};sorted.forEach(function(e,i){var uid2=e[0],w=e[1],pts=i<POINTS.length?POINTS[i]:0,p=profiles[uid2]||{};updates['weekPoints/'+weekKey+'/'+uid2+'/days/'+todayKey+'/'+key]=pts;updates['weekPoints/'+weekKey+'/'+uid2+'/name']=w.name||p.name||'?';updates['weekPoints/'+weekKey+'/'+uid2+'/photoURL']=w.photoURL||p.photoURL||null;});if(Object.keys(updates).length>0){db.ref().update(updates).then(function(){sorted.map(function(e){return e[0];}).forEach(function(uid2){db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds){var days=ds.val()||{},total=0;Object.values(days).forEach(function(dg){Object.values(dg).forEach(function(pts){total+=(pts||0);});});db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);});});});}});}
 
 function showResult(fmt,diff,isRec,g){
@@ -1611,15 +1554,7 @@ function showResult(fmt,diff,isRec,g){
       if(recS)recS.style.display=isRec?'block':'none';
     }
     var btn=document.getElementById('seqBtn');
-    if(btn){
-      btn.className='gbtn gbs';btn.style.background='var(--cs)';btn.style.color='#000';btn.style.border='none';
-      btn.textContent='▶️ INTENTAR DE NUEVO';btn.disabled=false;btn.style.opacity='1';
-      btn.onclick=function(){
-        seqState='idle';
-        document.getElementById('inlineResultS').style.display='none';
-        handleSeqBtn();
-      };
-    }
+    if(btn){btn.className='gbtn gbs';btn.style.background='var(--cs)';btn.style.color='#000';btn.style.border='none';btn.textContent='▶️ INTENTAR DE NUEVO';btn.disabled=false;btn.style.opacity='1';}
     document.getElementById('srBestS').textContent=wScores['s'][uid]&&wScores['s'][uid].bestTime?wScores['s'][uid].bestTime+'s':'—';
     document.getElementById('srPosS').textContent='#'+rank+' de '+total;
     if(curTorneoMode){torneoRegistrarIntento(fmt,diff,g);curTorneoMode=false;}
@@ -1817,20 +1752,11 @@ function toggleAdmSection(id){
   var hidden=el.style.display==='none'||el.style.display==='';
   el.style.display=hidden?'block':'none';
   if(arrow)arrow.textContent=hidden?'▼':'▶';
-  // Cargar datos al abrir — siempre refresca para tener datos actualizados
+  // lazy load contenido
   if(hidden){
     if(id==='secGlobal')renderAdmGlobalTable();
     if(id==='secHistorial')renderTorneoHistorial();
-    if(id.startsWith('secReto_')){
-      var g2=id.replace('secReto_','');
-      if(g2!=='s'&&g2!=='r')g2=parseInt(g2);
-      // Solo recargar si está vacío
-      var elContent=document.getElementById(id);
-      if(elContent&&elContent.innerHTML.trim()===''){
-        elContent.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div>';
-      }
-      renderAdmRetoSection(g2);
-    }
+    if(id.startsWith('secReto_'))renderAdmRetoSection(id.replace('secReto_',''));
   }
 }
 
@@ -1851,65 +1777,36 @@ function buildRetosAccordion(){
         '<span style="font-size:9px;letter-spacing:3px;color:'+r.stroke+';text-transform:uppercase">'+r.label+'</span>'+
         '<span id="'+sid+'Arrow" style="color:var(--tm);font-size:12px">▶</span>'+
       '</button>'+
-      '<div id="'+sid+'" style="display:none;padding:0 14px 14px"></div>'+
+      '<div id="'+sid+'" style="display:none;padding:0 14px 14px"><div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div></div>'+
     '</div>';
   }).join('');
-  // Pre-cargar datos de todos los retos en background
-  retos.forEach(function(r){renderAdmRetoSection(r.g);});
 }
 
 function renderAdmRetoSection(g){
-  if(g!=='s'&&g!=='r')g=parseInt(g);
   var sid='secReto_'+g;
   var el=document.getElementById(sid);if(!el)return;
-  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g);
-  var today=getTodayKey();
-
-  // Construir días de esta semana
+  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g===4,gkey=getGameKey(g);
   var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);
   monday.setDate(d.getDate()+diff);
   var days=[];
-  for(var i=0;i<7;i++){
-    var dd=new Date(monday);dd.setDate(monday.getDate()+i);
-    var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
-    days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});
-  }
-
-  // Días pasados (sin hoy, sin futuros)
-  var pastDays=days.filter(function(d){return d.key<today;});
-  // Tomar los 2 más recientes para historia + hoy = 3 días max
-  var recentPast=pastDays.slice(-2);
-
-  function renderDias(dayDataMap){
-    // Agregar hoy desde wScores (ya cargado en memoria)
-    var todayScores=wScores[g]||{};
-    var allDays=[];
-    // Hoy primero
-    if(Object.keys(todayScores).length>0){
-      allDays.push({day:{key:today,label:DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]},scores:todayScores,isToday:true});
-    }
-    // Días anteriores
-    recentPast.forEach(function(dayObj){
-      var scores=dayDataMap[dayObj.key]||{};
-      if(Object.values(scores).some(function(w){return w.bestDiff!=null;})){
-        allDays.push({day:dayObj,scores:scores,isToday:false});
-      }
-    });
-
-    if(allDays.length===0){
-      el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';
-      return;
-    }
-
-    var html=allDays.map(function(item){
-      var r=item.day,scores=item.scores,isToday=item.isToday;
-      var sorted=Object.entries(scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
-      if(sorted.length===0)return '';
+  for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}
+  var today=getTodayKey();
+  Promise.all(days.map(function(dayObj){
+    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};});
+  })).then(function(results){
+    // Filtrar solo días con jugadas y tomar los 3 más recientes
+    var conJugadas=results.filter(function(r){
+      return Object.values(r.scores).some(function(w){return w.bestDiff!=null;})&&r.day.key<=today;
+    }).reverse().slice(0,3);
+    if(conJugadas.length===0){el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';return;}
+    var html=conJugadas.map(function(r){
+      var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      var isToday=r.day.key===today;
       return '<div style="margin-bottom:14px">'+
         '<div style="font-size:11px;font-weight:700;color:'+(isToday?cfg.stroke:'var(--tm)')+';margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bo)">'+
-          r.label+(isToday?' · Hoy':'')+' <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span>'+
+          r.day.label+(isToday?' · Hoy':'')+' <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span>'+
         '</div>'+
-        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px">'+
+        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:500px">'+
           '<thead><tr>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">#</th>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Jugador</th>'+
@@ -1923,7 +1820,7 @@ function renderAdmRetoSection(g){
             var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
             return '<tr style="border-top:1px solid var(--bo)">'+
               '<td style="padding:6px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
-              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+( w.name||'—')+'</td>'+
+              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+w.name+'</td>'+
               '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
               '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
               '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;color:var(--tm);text-align:center">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td>'+
@@ -1933,26 +1830,7 @@ function renderAdmRetoSection(g){
           '</tbody></table></div>'+
       '</div>';
     }).join('');
-    el.innerHTML=html||'<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';
-  }
-
-  // Si no hay días pasados, solo usamos wScores (sin Firebase)
-  if(recentPast.length===0){
-    renderDias({});
-    return;
-  }
-  // Fetch solo días anteriores (no hoy)
-  Promise.all(recentPast.map(function(dayObj){
-    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){
-      return{key:dayObj.key,scores:s.val()||{}};
-    });
-  })).then(function(results){
-    var map={};
-    results.forEach(function(r){map[r.key]=r.scores;});
-    renderDias(map);
-  }).catch(function(){
-    // Si Firebase falla, mostrar al menos los datos de hoy
-    renderDias({});
+    el.innerHTML=html;
   });
 }
 
@@ -1989,7 +1867,6 @@ function admLogin(){
   var u=document.getElementById('au').value,p=document.getElementById('ap').value;
   if((u==='admin'||u==='socio')&&p==='rival2024'){
     admLoggedIn=true;
-    startListeners();
     document.getElementById('admLC').style.display='none';
     var panel=document.getElementById('admP');
     panel.innerHTML=
@@ -1997,7 +1874,6 @@ function admLogin(){
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>'+
         '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
           '<button class="btn btn-r" onclick="confReset()">🗑️ Resetear día</button>'+
-          '<button class="btn" style="background:#ff6b00;color:#fff" onclick="confResetSemana()">⚠️ Resetear semana</button>'+
           '<button class="btn btn-gh" onclick="admLogout()">← Salir</button>'+
         '</div>'+
       '</div>'+
@@ -2127,37 +2003,6 @@ function setAdmTab(g){
 function renderAdmWeek(g){var wrap=document.getElementById('admWeekWrap');if(!wrap)return;wrap.innerHTML='<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Cargando...</div>';var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g);var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}var today=getTodayKey();Promise.all([Promise.all(days.map(function(dayObj){return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};})})),db.ref('weekScores/'+weekKey+'/'+gkey).once('value')]).then(function(res){var results=res[0],legacyDataAdm=res[1].val()||{},earliestAdm=null;Object.values(legacyDataAdm).forEach(function(w){if(w&&w.lastPlayed&&(!earliestAdm||w.lastPlayed<earliestAdm))earliestAdm=w.lastPlayed;});if(earliestAdm){var legDayK=dayKeyFromTimestamp(earliestAdm),legTarget=legDayK?results.find(function(r){return r.day.key===legDayK;}):null;if(legTarget&&Object.keys(legTarget.scores).length===0){Object.entries(legacyDataAdm).forEach(function(e){var uid2=e[0],w=e[1];if(w&&w.bestDiff!=null)legTarget.scores[uid2]=w;});}}var html='';results.forEach(function(r){var isToday=r.day.key===today,isFuture=r.day.key>today;if(isFuture)return;var sorted=Object.entries(r.scores||{}).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});if(sorted.length===0&&!isToday)return;html+='<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:700">'+r.day.label+(isToday?' · Hoy':'')+'</div><div style="font-size:11px;color:var(--tm)">'+sorted.length+' jugadores</div></div>';if(sorted.length===0){html+='<div style="font-size:11px;color:var(--td)">Sin partidas aún</div>';}else{html+='<table style="width:100%;border-collapse:collapse"><tr style="font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:1px"><th style="text-align:left;padding:3px 6px">#</th><th style="text-align:left;padding:3px 6px">Jugador</th><th style="text-align:left;padding:3px 6px">Email</th><th style="padding:3px 6px">Tiempo</th><th style="padding:3px 6px">Diff</th><th style="padding:3px 6px">Partidas</th></tr>';sorted.forEach(function(e,i){var uid2=e[0],w=e[1],p=profiles[uid2]||{},medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';html+='<tr style="border-top:1px solid var(--bo);font-size:11px"><td style="padding:5px 6px">'+medal+'</td><td style="padding:5px 6px;font-weight:600">'+(w.name||'—')+'</td><td style="padding:5px 6px;color:var(--tm);font-size:10px">'+(p.email||'—')+'</td><td style="padding:5px 6px;font-family:DM Mono,monospace;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td><td style="padding:5px 6px;font-family:DM Mono,monospace;color:var(--tm);text-align:center">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td><td style="padding:5px 6px;text-align:center;color:var(--tm)">'+(w.attempts||0)+'</td></tr>';});html+='</table>';}html+='</div>';});wrap.innerHTML=html||'<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Sin datos esta semana</div>';});}
 function renderAdmTable(){var tbody=document.getElementById('admTbl');if(!tbody)return;var g=admGame,isR=g==='r',isS=g==='s',sorted=getSorted(g,100),cfg=GCOLORS[g];if(sorted.length===0){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--tm);padding:24px">Sin partidas hoy</td></tr>';return;}tbody.innerHTML=sorted.map(function(e,i){var uid=e[0],w=e[1],p=profiles[uid]||{};var invCount=Object.values(profiles).filter(function(pr){return pr.referredBy===uid;}).length;return'<tr><td class="mono" style="color:var(--tm)">'+(i+1)+'</td><td><strong>'+(w.name||'—')+'</strong></td><td style="font-size:11px;color:var(--tm)">'+(p.email||'—')+'</td><td class="mono" style="color:'+cfg.color+'">'+(w.bestTime||'—')+(isR?'ms':'s')+'</td><td class="mono">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td><td class="mono">'+(w.attempts||0)+'</td><td class="mono" style="color:var(--wn)">'+(weekPoints[uid]&&weekPoints[uid].total?weekPoints[uid].total:'0')+'</td><td class="mono" style="color:var(--ac)">'+invCount+'</td><td><button class="btn btn-gh" onclick="admUserHist(this)" data-uid="'+uid+'" style="padding:4px 8px;font-size:10px">📅</button></td></tr>';}).join('');}
 function admUserHist(btn){var uid=btn.getAttribute('data-uid'),p=profiles[uid]||{},name=p.name||uid;var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()});}document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:4px">📅 '+name+'</div><div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Historial de la semana</div><div id="admHistRows">Cargando...</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-top:12px">Cerrar</button>';document.getElementById('overlay').classList.add('show');var games=[{g:5,label:'RETO 1',cfg:GCOLORS[5]},{g:10,label:'RETO 2',cfg:GCOLORS[10]},{g:15,label:'RETO 3',cfg:GCOLORS[15]},{g:4,label:'RETO 4 CIEGO',cfg:GCOLORS[4]},{g:'s',label:'SECUENCIA',cfg:GCOLORS['s']},{g:'r',label:'REACCIÓN',cfg:GCOLORS['r']}];var fetches=[],today=getTodayKey();days.forEach(function(dayObj){games.forEach(function(gObj){var key=getGameKey(gObj.g);fetches.push(db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+key+'/'+uid).once('value').then(function(s){return{day:dayObj,game:gObj,data:s.val()};}));});});Promise.all(fetches).then(function(results){var rowsHtml='',byDay={};results.forEach(function(r){if(!byDay[r.day.key])byDay[r.day.key]={dayObj:r.day,games:{}};byDay[r.day.key].games[r.game.g]={data:r.data,game:r.game};});days.forEach(function(dayObj){var dayData=byDay[dayObj.key],isToday=dayObj.key===today,isFuture=dayObj.key>today,anyPlayed=false,gameRows='';games.forEach(function(gObj){var info=dayData&&dayData.games[gObj.g],d2=info?info.data:null,isR=gObj.g==='r',isS=gObj.g==='s';if(d2&&d2.bestTime){anyPlayed=true;gameRows+='<div style="display:flex;justify-content:space-between;padding:4px 10px;background:var(--sf2);border-radius:6px;margin-top:4px;font-size:11px"><span style="color:'+gObj.cfg.stroke+'">'+gObj.label+'</span><span class="mono" style="color:'+gObj.cfg.stroke+'">'+d2.bestTime+(isR?'ms':'s')+'</span><span style="color:var(--tm)">'+(isS?(d2.bestDiff/1000).toFixed(3)+'s':'±'+(d2.bestDiff*1000).toFixed(0)+'ms')+'</span><span style="color:var(--tm)">'+d2.attempts+'x</span></div>';}});if(!isFuture){rowsHtml+='<div style="padding:10px 12px;background:var(--sf);border:1px solid '+(isToday?'var(--ac)':'var(--bo)')+';border-radius:10px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+dayObj.label+(isToday?' · Hoy':'')+'</div>'+(anyPlayed?gameRows:'<div style="font-size:11px;color:var(--td);margin-top:4px">Sin partidas</div>')+'</div>';}});var el=document.getElementById('admHistRows');if(el)el.innerHTML=rowsHtml||'<div style="color:var(--tm);font-size:12px;text-align:center;padding:20px">Sin datos esta semana</div>';});}
-function confResetSemana(){
-  document.getElementById('modalBody').innerHTML=
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:#ff6b00">⚠️ RESETEAR SEMANA COMPLETA</div>'+
-    '<p style="font-size:13px;color:var(--tx);margin-bottom:8px;line-height:1.7">Esto borrará <strong>todos los scores y puntos</strong> de todos los jugadores en la semana actual.</p>'+
-    '<div style="background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.4);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#ff6b00;line-height:1.7">'+
-      '🗑 Scores de todos los retos esta semana<br>'+
-      '🗑 Puntos acumulados de todos los jugadores<br>'+
-      '✅ Perfiles y cuentas intactos<br>'+
-      '✅ Historial de torneos intacto'+
-    '</div>'+
-    '<p style="font-size:11px;color:var(--dg);margin-bottom:14px">Esta acción no se puede deshacer.</p>'+
-    '<div class="mbtns">'+
-      '<button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button>'+
-      '<button class="btn" onclick="doResetSemana()" style="height:42px;background:#ff6b00;color:#fff;font-weight:700">⚠️ RESETEAR TODO</button>'+
-    '</div>';
-  document.getElementById('overlay').classList.add('show');
-}
-function doResetSemana(){
-  Promise.all([
-    db.ref('scores/'+weekKey).remove(),
-    db.ref('weekPoints/'+weekKey).remove()
-  ]).then(function(){
-    wScores={5:{},10:{},15:{},4:{},s:{},r:{}};
-    weekPoints={};
-    closeModal();
-    toast('✅ Semana reseteada — todos empiezan de 0');
-    updateHomecards();
-    updateAdmStats();
-    buildWinners();
-  });
-}
 function confReset(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px">🗑️ RESETEAR DÍA</div><p style="font-size:12px;color:var(--tm);margin-bottom:6px">Borra todos los tiempos de hoy en los 6 juegos.</p><p style="font-size:11px;color:var(--dg);margin-bottom:14px">⚠️ Los perfiles y cuentas no se borran.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-r" onclick="doReset()" style="height:40px;border-radius:9px;font-weight:700">🗑️ RESETEAR</button></div>';document.getElementById('overlay').classList.add('show');}
 function doReset(){var key='scores/'+weekKey+'/'+todayKey;db.ref(key).remove().then(function(){wScores={5:{},10:{},15:{},4:{},s:{},r:{}};closeModal();toast('✅ Día reseteado');updateHomecards();updateAdmStats();buildWinners();renderAdmTable();});}
 var weekGame=5;
