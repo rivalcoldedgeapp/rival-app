@@ -801,7 +801,7 @@ function updateTorneoHomeCard(){
   if(remaining<=0){el.style.display='none';return;}
   el.style.display='block';
   var gameLabel=GAME_LABELS[torneoData.reto]||'—';
-  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
+  var canPlay=curUser&&((profiles[curUser.uid]&&profiles[curUser.uid].torneoAdmitido===true)||(torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true));
   var intentosUsados=torneoData.participantes&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
   var intentosLeft=5-intentosUsados;
   var limite=torneoData.limite||null;
@@ -874,32 +874,30 @@ function aplicarCodigoTorneo(){
   if(!inp||!msg)return;
   var code=inp.value.trim().toUpperCase();
   if(!code){msg.style.color='var(--dg)';msg.textContent='Escribe un código';return;}
-  var refOwner=findRef(code);
-  if(!refOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
-  if(refOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
+  // Buscar dueño por torneoCode
+  var codeOwner=findTorneoRef(code);
+  if(!codeOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
+  if(codeOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
   msg.style.color='var(--tm)';msg.textContent='Verificando...';
-  // Verificar que el código no haya sido usado ya en este torneo
-  db.ref('torneo/codesUsed/'+code).once('value').then(function(s){
-    if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado en este torneo — pide otro';return;}
-    // Admitir al usuario en este torneo específico
+  // Verificar que el código no haya sido usado antes (global, permanente)
+  db.ref('torneoInvites/'+code).once('value').then(function(s){
+    if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;}
+    // Admitir al usuario permanentemente y quemar el código
     var updates={};
-    updates['torneo/admitidos/'+curUser.uid]=true;
-    updates['torneo/codesUsed/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:refOwner};
-    // Guardar referredBy en perfil si aún no tiene (primera vez)
-    var profile=profiles[curUser.uid]||{};
-    if(!profile.referredBy){
-      updates['profiles/'+curUser.uid+'/referredBy']=refOwner;
-    }
+    updates['profiles/'+curUser.uid+'/torneoAdmitido']=true;
+    updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
+    // Limpiar torneoCode del dueño para que no se pueda volver a usar
+    updates['profiles/'+codeOwner+'/torneoCode']=null;
     db.ref().update(updates).then(function(){
       closeModal();
-      toast('✅ Código aceptado — ya puedes entrar al torneo');
+      toast('✅ Código aceptado — ya puedes entrar a todos los torneos');
       setTimeout(function(){goTorneo();},400);
     });
   });
 }
 function goTorneo(){
   if(!torneoData||!torneoData.activo){toast('No hay torneo activo');return;}
-  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
+  var canPlay=curUser&&((profiles[curUser.uid]&&profiles[curUser.uid].torneoAdmitido===true)||(torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true));
   if(!canPlay){
     document.getElementById('modalBody').innerHTML=
       '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
@@ -1409,8 +1407,8 @@ function emailReg(){
 function doCreateAccount(name,email,pass,refCode,refOwnerUid){
   auth.createUserWithEmailAndPassword(email,pass).then(function(r){
     return r.user.updateProfile({displayName:name}).then(function(){return r.user.sendEmailVerification();}).then(function(){
-      var uid=r.user.uid,rc=genRef(name);
-      var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,referredBy:refOwnerUid||null,createdAt:Date.now()};
+      var uid=r.user.uid,rc=genRef(name),tc=genTorneoCode();
+      var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,torneoCode:tc,referredBy:refOwnerUid||null,createdAt:Date.now()};
       if(refOwnerUid&&refCode){
         // referral ilimitado — solo guardamos referredBy en el perfil
       }
@@ -1422,7 +1420,8 @@ function forgotPw(){var e=document.getElementById('inE').value.trim();if(!e){set
 function chkVerified(){document.getElementById('vMsg').textContent='Verificando...';curUser.reload().then(function(){if(curUser.emailVerified){document.getElementById('vMsg').textContent='';loadAndEnter(curUser);}else document.getElementById('vMsg').textContent='❌ Aún no verificado';});}
 function resendV(){curUser.sendEmailVerification().then(function(){document.getElementById('vMsg').textContent='✅ Reenviado';}).catch(function(){document.getElementById('vMsg').textContent='❌ Espera antes de reenviar';});}
 function doLogout(){gState='idle';cancelAnimationFrame(raf);cancelAnimationFrame(seqRaf);clearTimeout(reactTO);setMsg('lMsg','','');setMsg('rMsg','','');auth.signOut();}
-function loadAndEnter(fu){checkDailyReset();backfillLegacyPoints();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
+function loadAndEnter(fu){checkDailyReset();backfillLegacyPoints();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}
+          if(!p.torneoCode){var tc2=genTorneoCode();db.ref('profiles/'+fu.uid+'/torneoCode').set(tc2);p.torneoCode=tc2;}showApp(fu,p);}});}
 function showApp(fu,profile){
   var av=document.getElementById('navAv');
   if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
@@ -1495,14 +1494,31 @@ function showPerfilModal(){
       '<div><div style="font-weight:700;font-size:16px">'+(p.name||'—')+'</div><div style="font-size:11px;color:var(--tm)">'+(p.email||'—')+'</div></div>'+
     '</div>'+
     '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:14px;margin-bottom:12px;text-align:center">'+
-      '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">🔗 Tu código de invitación</div>'+
+      '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">🔗 Tu código de referido</div>'+
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:34px;letter-spacing:8px;color:var(--ac);margin-bottom:4px">'+code+'</div>'+
-      '<div style="font-size:11px;color:var(--td);margin-bottom:10px">Invitados: <strong style="color:var(--ac)">'+count+'</strong></div>'+
+      '<div style="font-size:11px;color:var(--td);margin-bottom:10px">Invitados: <strong style="color:var(--ac)">'+count+'</strong> · Uso ilimitado</div>'+
       '<div style="display:flex;gap:8px">'+
         '<button onclick="copyInviteCode()" style="flex:1;height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tm);font-size:12px;cursor:pointer">📋 Copiar</button>'+
         '<button onclick="shareInviteCode()" style="flex:1;height:38px;background:var(--ac);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:700;cursor:pointer">📤 Compartir</button>'+
       '</div>'+
     '</div>'+
+    // Código de torneo
+    (function(){
+      var tc=p.torneoCode;
+      if(tc){
+        return '<div style="background:var(--sf2);border:1px solid var(--ctm);border-radius:10px;padding:14px;margin-bottom:12px;text-align:center">'+
+          '<div style="font-size:9px;letter-spacing:3px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">🏆 Tu código de torneo</div>'+
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;letter-spacing:6px;color:var(--ct);margin-bottom:4px">'+tc+'</div>'+
+          '<div style="font-size:11px;color:var(--td);margin-bottom:10px;line-height:1.6">Un solo uso · Quien lo use entra a todos los torneos</div>'+
+          '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+tc+'\').then(function(){toast(\'✅ Código de torneo copiado\');})" style="width:100%;height:36px;background:var(--sf);border:1px solid var(--ctm);border-radius:8px;color:var(--ct);font-size:12px;cursor:pointer">📋 Copiar código de torneo</button>'+
+        '</div>';
+      } else {
+        return '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px 14px;margin-bottom:12px;text-align:center">'+
+          '<div style="font-size:9px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-bottom:4px">🏆 Código de torneo</div>'+
+          '<div style="font-size:12px;color:var(--td)">Ya fue usado — no disponible</div>'+
+        '</div>';
+      }
+    })()+
     '<div style="font-size:11px;color:var(--td);text-align:center;margin-bottom:12px;line-height:1.6">Comparte tu código — quien lo use puede entrar a torneos con premio 🏆</div>'+
     '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-bottom:8px">Cerrar</button>'+
     '<button onclick="closeModal();doLogout()" style="width:100%;height:38px;background:transparent;border:1px solid var(--dg);border-radius:9px;color:var(--dg);font-size:12px;cursor:pointer">Cerrar sesión</button>';
@@ -2213,6 +2229,8 @@ function setWeekGame(g){weekGame=g;[5,10,15,4,'s','r'].forEach(function(x){var e
 function renderWeekDays(g){var wrap=document.getElementById('weekDaysWrap');if(!wrap)return;wrap.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g),uid=curUser?curUser.uid:null;var d=getCDMX(),dayNum=d.getDay(),diff=dayNum===0?-6:1-dayNum,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}var today=getTodayKey();Promise.all([Promise.all(days.map(function(dayObj){return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};})})),db.ref('weekScores/'+weekKey+'/'+gkey).once('value')]).then(function(res){var results=res[0],legacyData=res[1].val()||{},earliestTs=null;Object.values(legacyData).forEach(function(w){if(w&&w.lastPlayed){if(!earliestTs||w.lastPlayed<earliestTs)earliestTs=w.lastPlayed;}});if(earliestTs){var legacyDayK=dayKeyFromTimestamp(earliestTs),legacyTarget=legacyDayK?results.find(function(r){return r.day.key===legacyDayK;}):null;if(legacyTarget&&Object.keys(legacyTarget.scores).length===0){Object.entries(legacyData).forEach(function(e){var uid2=e[0],w=e[1];if(w&&w.bestDiff!=null)legacyTarget.scores[uid2]=w;});}}var html='';results.forEach(function(r){var isToday=r.day.key===today,isFuture=r.day.key>today,hasScores=Object.keys(r.scores).length>0;if(isFuture||isToday)return;if(!hasScores)return;var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1,myScore=uid?r.scores[uid]:null;html+='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:700;color:var(--tm)">'+r.day.label+'</div>'+(myRank>=0?'<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>':'<div style="font-size:10px;color:var(--td)">No jugaste</div>')+'</div>';var medals=['🥇','🥈','🥉'];sorted.slice(0,3).forEach(function(e,i){var w=e[1],isMe=uid&&e[0]===uid;html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border-radius:8px;margin-bottom:4px;'+(isMe?'border:1px solid '+cfg.stroke+';':'')+'"><span style="font-size:16px;width:22px">'+medals[i]+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});if(myRank>=3&&myScore&&myScore.bestTime){html+='<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div><div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px"><span style="font-size:13px;font-weight:700;color:'+cfg.stroke+';width:22px">#'+(myRank+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(myScore.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:700">'+(myScore.name||'?')+' 👈</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+myScore.bestTime+(isR?'ms':'s')+'</div></div>';}html+='</div>';});if(curUser&&weekPoints[curUser.uid]&&weekPoints[curUser.uid].total>0){var myTotalPts=weekPoints[curUser.uid].total||0;html+='<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Tu total esta semana</div><div style="font-size:11px;color:var(--td)">Suma de todos los juegos y días</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:var(--wn);line-height:1">'+myTotalPts+' <span style="font-size:14px">pts</span></div></div>';}wrap.innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Sin datos esta semana</div>';});}
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});var el=document.getElementById(id);el.classList.add('on');el.style.display='flex';}
 function findRef(code){return Object.keys(profiles).find(function(uid){return profiles[uid].referralCode===code;})||null;}
+function findTorneoRef(code){return Object.keys(profiles).find(function(uid){return profiles[uid].torneoCode===code;})||null;}
+function genTorneoCode(){return Math.random().toString(36).slice(2,6).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase();}
 function genRef(name){var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase();}
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera'};return m[code]||('Error: '+code);}
