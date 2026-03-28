@@ -1236,11 +1236,12 @@ function admActivarTorneo(){
 
 function confirmActivarTorneo(){
   var reto=window._tornReto;
+  if(!reto){toast('❌ Error: reto no definido');return;}
   var ahora=Date.now();
   db.ref('torneo').set({
     activo:true,
     reto:reto,
-    premio:window._tornPremio||'$100 pesos',
+    premio:window._tornPremio||'$50 pesos',
     limite:window._tornLimite||20,
     inicioAt:ahora,
     cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
@@ -1248,7 +1249,14 @@ function confirmActivarTorneo(){
     admitidos:{},
     codesUsed:{},
     ganadorUid:null
-  }).then(function(){closeModal();toast('🏆 Torneo activado — '+GAME_LABELS[reto]);});
+  }).then(function(){
+    closeModal();
+    toast('🏆 Torneo activado — '+GAME_LABELS[reto]);
+  }).catch(function(err){
+    closeModal();
+    toast('❌ Error al activar: '+err.message);
+    console.error('confirmActivarTorneo error:',err);
+  });
 }
 
 function admCerrarTorneo(){
