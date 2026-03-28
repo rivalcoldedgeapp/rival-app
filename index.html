@@ -742,7 +742,7 @@ var reactState='idle',reactTO=null;
 var seqState='idle',seqCurrent=1,seqRaf=null,seqT0=null;
 var weekKey=getWeekKey(),todayKey=getTodayKey();
 // torneo state
-var torneoData=null,torneoCountdownTO=null,curTorneoMode=false;
+var torneoData=null,torneoCountdownTO=null,curTorneoMode=false,lastWasTorneo=false;
 
 function getCDMX(){var n=new Date();return new Date(n.getTime()+n.getTimezoneOffset()*60000+(-6*3600000));}
 function getWeekKey(){var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day;var m=new Date(d);m.setDate(d.getDate()+diff);return m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');}
@@ -1011,7 +1011,7 @@ function torneoRegistrarIntento(fmt,diff,g){
     }
   });
   curTorneoMode=false;
-  // mostrar box resultado torneo
+  lastWasTorneo=true;
   var intentosLeft=5-intentosUsados;
   var box=document.getElementById('torneoResultBox');
   if(box){
@@ -1418,15 +1418,41 @@ function showResult(fmt,diff,isRec,g){
   else if(isR)document.getElementById('lbHdr').textContent='🏆 TOP 10 — REACCIÓN';
   else if(isBlind)document.getElementById('lbHdr').textContent='🏆 TOP 10 — RETO 4 CIEGO';
   else document.getElementById('lbHdr').textContent='🏆 TOP 10 — RETO '+g+'s';
+  if(lastWasTorneo&&torneoData&&torneoData.participantes){
+    // Mostrar ranking exclusivo del torneo
+    document.getElementById('lbHdr').textContent='🏆 RANKING DEL TORNEO';
+    var tParts=torneoData.participantes||{};
+    var tSorted=Object.entries(tParts).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+    var lbEl=document.getElementById('lbList');
+    if(lbEl){
+      if(tSorted.length===0){lbEl.innerHTML='<div style="text-align:center;color:var(--tm);padding:20px">Sé el primero en marcar tiempo</div>';}
+      else{
+        lbEl.innerHTML=tSorted.slice(0,10).map(function(e,i){
+          var uid2=e[0],w=e[1],isMe=uid2===uid,isTop=i===0;
+          var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+          var avHtml=w.photoURL?'<div class="li-av"><img src="'+w.photoURL+'"></div>':'<div class="li-av">'+(w.name||'?')[0].toUpperCase()+'</div>';
+          return '<div class="li'+(isTop?' top1':'')+(isMe?' me':'')+'" style="border-color:'+(isMe?'var(--ct)':isTop?'var(--wn)':'var(--bo)')+'">'+
+            '<div class="li-pos" style="color:'+(isTop?'var(--wn)':'var(--td)')+'">'+medal+'</div>'+avHtml+
+            '<div class="li-info"><div class="li-name">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
+            (isR||isSeq?'':'<div class="li-diff">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div>'+
+            '<div class="li-time" style="color:'+(isTop?'var(--ct)':'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';
+        }).join('');
+      }
+    }
+  } else {
+    renderLB(uid,g);
+  }
   var ptsEarned=rank>0&&rank<=POINTS.length?POINTS[rank-1]:0,totalPts=weekPoints[uid]?(weekPoints[uid].total||0):0;
   var ptsEl=document.getElementById('resPts');
-  if(ptsEl){if(ptsEarned>0){ptsEl.innerHTML='<span style="color:var(--wn)">+'+ptsEarned+' pts 🏅</span> &nbsp;·&nbsp; Total semana: <strong style="color:var(--wn)">'+totalPts+' pts</strong>';ptsEl.style.display='block';ptsEl.classList.remove('pts-pop');void ptsEl.offsetWidth;ptsEl.classList.add('pts-pop');}else ptsEl.style.display='none';}
+  if(ptsEl&&!lastWasTorneo){if(ptsEarned>0){ptsEl.innerHTML='<span style="color:var(--wn)">+'+ptsEarned+' pts 🏅</span> &nbsp;·&nbsp; Total semana: <strong style="color:var(--wn)">'+totalPts+' pts</strong>';ptsEl.style.display='block';ptsEl.classList.remove('pts-pop');void ptsEl.offsetWidth;ptsEl.classList.add('pts-pop');}else ptsEl.style.display='none';}
+  else if(ptsEl&&lastWasTorneo){ptsEl.style.display='none';}
   // limpiar box torneo
-  var tb=document.getElementById('torneoResultBox');if(tb&&!curTorneoMode)tb.style.display='none';
+  var tb=document.getElementById('torneoResultBox');if(tb&&!lastWasTorneo)tb.style.display='none';
   // botón jugar de nuevo
   var paBtn=document.getElementById('paBtn');
   if(paBtn){paBtn.textContent='▶️ JUGAR DE NUEVO';paBtn.onclick=playAgain;}
-  renderLB(uid,g);showScreen('sResult');
+  showScreen('sResult');
+  lastWasTorneo=false;
 }
 function playAgain(){
   if(curTorneoMode||document.getElementById('torneoResultBox').style.display==='block'){var intentosUsados=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;if(intentosUsados<5){torneoJugar();return;}else{renderTorneoScreen();showScreen('sTorneo');return;}}
