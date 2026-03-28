@@ -530,7 +530,7 @@ body.playing{overflow:hidden}
       <div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px">Cierra en</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--ct);text-shadow:0 0 20px var(--ctm)" id="torneoCuentaT">—</div>
     </div>
-    <button class="gbtn" id="torneoJugarBtn" onclick="torneoJugar()" style="background:var(--ct);color:#fff;border:none;max-width:280px">JUGAR INTENTO</button>
+    <button class="gbtn" id="torneoJugarBtn" onclick="torneoJugar()" style="background:var(--ct);color:#fff;border:none;max-width:280px;line-height:1.4">JUGAR INTENTO</button>
     <!-- ranking torneo en vivo -->
     <div style="width:100%">
       <div style="font-size:10px;letter-spacing:3px;color:var(--ct);text-transform:uppercase;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--ctm)">🏆 RANKING EN VIVO</div>
@@ -950,7 +950,7 @@ function renderTorneoScreen(){
   var btn=document.getElementById('torneoJugarBtn');
   var btnDisabled=intentosLeft<=0||torneoLleno;
   btn.disabled=btnDisabled;
-  btn.textContent=torneoLleno?'TORNEO LLENO':intentosLeft>0?'JUGAR INTENTO ('+intentosLeft+' restantes)':'SIN INTENTOS';
+  btn.innerHTML=torneoLleno?'TORNEO LLENO':intentosLeft>0?'JUGAR INTENTO<br><span style="font-size:12px;letter-spacing:1px">('+intentosLeft+' restantes)</span>':'SIN INTENTOS';
   // lugares restantes
   var lugaresEl=document.getElementById('torLugares');
   if(lugaresEl){
