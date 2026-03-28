@@ -244,6 +244,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .fld input:focus{border-color:var(--ac)}
 .adm-lbtn{width:100%;height:44px;background:var(--ac);color:#000;border:none;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;cursor:pointer;margin-top:4px}
 .ap{display:none}.ap.show{display:block}
+.adm-hidden{display:none!important}
+.adm-visible{display:block!important}
 .ap-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
 .ast{background:var(--sf);border:1px solid var(--bo);border-radius:11px;padding:12px}
 .asl{font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:4px}
@@ -644,8 +646,7 @@ body.playing{overflow:hidden}
       <button class="adm-lbtn" onclick="admLogin()">ENTRAR</button>
       <div style="margin-top:10px;text-align:center"><button onclick="admLogout()" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer">← Volver</button></div>
     </div>
-    <div id="admP" class="ap">
-      <!-- Header -->
+    <div id="admP" class="ap adm-hidden">      <!-- Header -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1582,8 +1583,8 @@ function goTab(t){
     setRankGame('global');showScreen('sRanking');
   }
 }
-function showAdmin(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').style.display='none';document.getElementById('au').value='';document.getElementById('ap').value='';showScreen('sAdmin');}
-function admLogout(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').style.display='none';showScreen('sAuth');}
+function showAdmin(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').className='ap adm-hidden';document.getElementById('au').value='';document.getElementById('ap').value='';showScreen('sAdmin');}
+function admLogout(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').className='ap adm-hidden';showScreen('sAuth');}
 function renderAdmGlobalTable(){
   var tbody=document.getElementById('admTbl');if(!tbody)return;
   var allUids=new Set(Object.keys(weekPoints));
@@ -1726,7 +1727,7 @@ function renderAdmGlobalTable(){
     '</tr>';
   }).join('');
 }
-function admLogin(){var u=document.getElementById('au').value,p=document.getElementById('ap').value;if((u==='admin'||u==='socio')&&p==='rival2024'){admLoggedIn=true;document.getElementById('admLC').style.display='none';document.getElementById('admP').style.display='block';updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();renderTorneoAdminPanel();toast('✅ Bienvenido '+u);}else toast('❌ Credenciales incorrectas');}
+function admLogin(){var u=document.getElementById('au').value,p=document.getElementById('ap').value;if((u==='admin'||u==='socio')&&p==='rival2024'){admLoggedIn=true;document.getElementById('admLC').style.display='none';document.getElementById('admP').className='ap adm-visible';updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();renderTorneoAdminPanel();toast('✅ Bienvenido '+u);}else toast('❌ Credenciales incorrectas');}
 function genTargets(){var t5=Math.round((3+Math.random()*4)*1000)/1000,t10=Math.round((7+Math.random()*6)*1000)/1000,t15=Math.round((12+Math.random()*6)*1000)/1000,t4=Math.round((15+Math.random()*10)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c5);border-radius:9px"><span style="color:var(--c5)">🟢 Reto 1</span><span style="font-family:DM Mono,monospace;color:var(--c5)">'+t5.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c10);border-radius:9px"><span style="color:var(--c10)">🔵 Reto 2</span><span style="font-family:DM Mono,monospace;color:var(--c10)">'+t10.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c15);border-radius:9px"><span style="color:var(--c15)">🟣 Reto 3</span><span style="font-family:DM Mono,monospace;color:var(--c15)">'+t15.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto 4</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+t4.toFixed(3)+'s</span></div></div><p style="font-size:11px;color:var(--tm);margin-bottom:12px">⚠️ Cambia el objetivo para todos al instante.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-g" onclick="saveTargets('+t5+','+t10+','+t15+','+t4+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
 function saveTargets(t5,t10,t15,t4){db.ref('gameConfig').set({t5:t5,t10:t10,t15:t15,t4:t4,lastDay:getTodayKey(),updatedAt:Date.now()}).then(function(){closeModal();toast('✅ Tiempos actualizados');});}
 function updateAdmStats(){
