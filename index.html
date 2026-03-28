@@ -783,12 +783,15 @@ function updateTorneoHomeCard(){
     '<div class="torneo-countdown" id="homeCountdown">'+fmtCountdown(remaining)+'</div>'+
     (canPlay?
       '<div style="font-size:11px;color:var(--tm);margin-top:6px">Intentos restantes: <strong style="color:var(--ct)">'+intentosLeft+'</strong></div>':
-      '<div style="font-size:11px;color:var(--tm);margin-top:6px;line-height:1.6">Para participar necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega.</div>')+
+      '<div style="font-size:11px;color:var(--tm);margin-top:8px;line-height:1.6">Necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega RIVAL.</div>')+
     (limitePlaces!=null?'<div style="font-size:12px;margin-top:6px;color:'+(limitePlaces<=3?'var(--dg)':'var(--ct)')+'">'+
       (limitePlaces>0?'🔥 '+limitePlaces+' lugar'+(limitePlaces===1?'':'es')+' disponible'+(limitePlaces===1?'':'s'):'🔴 Torneo lleno')+'</div>':'')+ 
-    '<button class="torneo-enter-btn" '+(canPlay&&intentosLeft>0&&limitePlaces!==0?'':'disabled')+' onclick="event.stopPropagation();goTorneo()">'+
-    (canPlay?(intentosLeft>0?'ENTRAR AL TORNEO':'SIN INTENTOS'):'🔑 INGRESAR CÓDIGO')+
-    '</button></div>';
+    (canPlay?
+      '<button class="torneo-enter-btn" '+(intentosLeft>0&&limitePlaces!==0?'':'disabled')+' onclick="event.stopPropagation();goTorneo()">'+
+      (intentosLeft>0?'ENTRAR AL TORNEO':'SIN INTENTOS')+'</button>':
+      '<button class="torneo-enter-btn" onclick="event.stopPropagation();goTorneo()" style="background:var(--ac);color:#000">'+
+      '🔑 INGRESAR CÓDIGO</button>')+
+    '</div>';
   // countdown en home
   clearTimeout(torneoCountdownTO);
   function tickHome(){
