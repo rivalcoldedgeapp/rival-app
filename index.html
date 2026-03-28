@@ -1712,7 +1712,8 @@ function setRankGame(g){
   if(activeEl){
     if(g==='global'){activeEl.style.background='var(--wn)';activeEl.style.color='#000';activeEl.style.borderColor='var(--wn)';}
     else if(g==='t'){activeEl.style.background='var(--ct)';activeEl.style.color='#fff';activeEl.style.borderColor='var(--ct)';}
-    else if(g==='yo'){activeEl.style.background='var(--tx)';activeEl.style.color='#000';activeEl.style.borderColor='var(--tx)';}else{var cfg=GCOLORS[g];activeEl.style.background=cfg.stroke;activeEl.style.color='#000';activeEl.style.borderColor=cfg.stroke;}
+    else if(g==='yo'){activeEl.style.background='var(--tx)';activeEl.style.color='#000';activeEl.style.borderColor='var(--tx)';}
+    else{var cfg=GCOLORS[g];activeEl.style.background=cfg.stroke;activeEl.style.color='#000';activeEl.style.borderColor=cfg.stroke;}
   }
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
   if(g==='t'){renderTorneosRanking();return;}
@@ -1790,7 +1791,6 @@ function renderYoRanking(){
   var totalHoy=Object.values(todayPts).reduce(function(a,b){return a+(b||0);},0);
   var p=profiles[uid]||{};
   var html='';
-  // Header personal
   html+='<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--sf2);border:1px solid var(--bo);border-radius:12px;margin-bottom:12px">'+
     (p.photoURL?'<img src="'+p.photoURL+'" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0">':
       '<div style="width:44px;height:44px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--ac);flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>')+
@@ -1799,15 +1799,14 @@ function renderYoRanking(){
       '<div style="font-size:11px;color:var(--tm);margin-top:2px">'+(p.email||'')+'</div>'+
     '</div>'+
     '<div style="text-align:right;flex-shrink:0">'+
-      '<div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--wn);line-height:1">'+totalSemana+'</div>'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--wn);line-height:1">'+totalSemana+'</div>'+
       '<div style="font-size:9px;color:var(--tm);letter-spacing:1px;text-transform:uppercase">pts semana</div>'+
     '</div>'+
   '</div>';
-  // Tabla de retos de hoy
   html+='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:12px">'+
     '<div style="padding:10px 14px;border-bottom:1px solid var(--bo);display:flex;justify-content:space-between;align-items:center">'+
       '<span style="font-size:9px;letter-spacing:3px;color:var(--wn);text-transform:uppercase">🏅 Puntos hoy</span>'+
-      '<span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--wn)">+'+totalHoy+' pts</span>'+
+      '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--wn)">+'+(totalHoy||0)+' pts</span>'+
     '</div>';
   gameList.forEach(function(item){
     var gkey=item.g===4?'g4b':item.g==='r'?'gr':item.g==='s'?'gs':'g'+item.g;
@@ -1826,11 +1825,9 @@ function renderYoRanking(){
           (isR||isS?'':'<div style="font-size:10px;color:var(--tm)">±'+(ws.bestDiff*1000).toFixed(0)+'ms</div>')+
         '</div>':
         '<div style="text-align:right;margin-right:12px;font-size:11px;color:var(--td)">Sin jugar</div>')+
-      '<div style="text-align:right;min-width:60px">'+
-        (ws&&ws.bestTime?'<div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--bl)">#'+rank+' / '+total+'</div>':'') +
-        '<div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:'+ptsColor+'">'+
-          (pts>0?'+'+pts+' pts':'0 pts')+
-        '</div>'+
+      '<div style="text-align:right;min-width:64px">'+
+        (ws&&ws.bestTime?'<div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--bl)">#'+rank+' / '+total+'</div>':'')+
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:'+ptsColor+'">'+(pts>0?'+'+pts+' pts':'0 pts')+'</div>'+
       '</div>'+
     '</div>';
   });
