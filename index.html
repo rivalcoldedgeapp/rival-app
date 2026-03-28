@@ -887,8 +887,9 @@ function aplicarCodigoTorneo(){
     var updates={};
     updates['profiles/'+curUser.uid+'/torneoAdmitido']=true;
     updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
-    // Limpiar torneoCode del dueño para que no se pueda volver a usar
+    // Limpiar torneoCode del dueño y marcarlo como usado permanentemente
     updates['profiles/'+codeOwner+'/torneoCode']=null;
+    updates['profiles/'+codeOwner+'/torneoCodeUsed']=true;
     db.ref().update(updates).then(function(){
       closeModal();
       toast('✅ Código aceptado — ya puedes entrar a todos los torneos');
@@ -1499,7 +1500,7 @@ function chkVerified(){document.getElementById('vMsg').textContent='Verificando.
 function resendV(){curUser.sendEmailVerification().then(function(){document.getElementById('vMsg').textContent='✅ Reenviado';}).catch(function(){document.getElementById('vMsg').textContent='❌ Espera antes de reenviar';});}
 function doLogout(){gState='idle';cancelAnimationFrame(raf);cancelAnimationFrame(seqRaf);clearTimeout(reactTO);setMsg('lMsg','','');setMsg('rMsg','','');auth.signOut();}
 function loadAndEnter(fu){checkDailyReset();backfillLegacyPoints();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}
-          if(!p.torneoCode){var tc2=genTorneoCode();db.ref('profiles/'+fu.uid+'/torneoCode').set(tc2);p.torneoCode=tc2;}showApp(fu,p);}});}
+          if(!p.torneoCode&&!p.torneoCodeUsed){var tc2=genTorneoCode();db.ref('profiles/'+fu.uid+'/torneoCode').set(tc2);p.torneoCode=tc2;}showApp(fu,p);}});}
 function showApp(fu,profile){
   var av=document.getElementById('navAv');
   if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
