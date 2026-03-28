@@ -1660,6 +1660,16 @@ function admLogin(){
           '<button class="btn btn-gh" onclick="admLogout()">← Salir</button>'+
         '</div>'+
       '</div>'+
+      // TIEMPOS OBJETIVO — arriba, sin botón generar, siempre visible
+      '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:14px">'+
+        '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">🎲 Tiempos objetivo de hoy</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+
+          '<div style="background:var(--sf2);border:1px solid var(--c5);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c5);margin-bottom:4px">🟢 Reto 1</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c5)" id="admT5">—</div></div>'+
+          '<div style="background:var(--sf2);border:1px solid var(--c10);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c10);margin-bottom:4px">🔵 Reto 2</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c10)" id="admT10">—</div></div>'+
+          '<div style="background:var(--sf2);border:1px solid var(--c15);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c15);margin-bottom:4px">🟣 Reto 3</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c15)" id="admT15">—</div></div>'+
+          '<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c4b);margin-bottom:4px">🟡 Reto 4</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c4b)" id="admT4">—</div></div>'+
+        '</div>'+
+      '</div>'+
       // STATS
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">'+
         '<div class="ast"><div class="asl">👥 Jugadores totales</div><div class="asv g" id="stU">0</div></div>'+
@@ -1670,22 +1680,6 @@ function admLogin(){
       '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:14px">'+
         '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">🏆 Líderes actuales</div>'+
         '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px" id="winnersWrap"></div>'+
-      '</div>'+
-      // TIEMPOS OBJETIVO
-      '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:10px">'+
-        '<button onclick="toggleAdmSection(\'secTargets\')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">'+
-          '<span style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎲 Tiempos objetivo de hoy</span>'+
-          '<div style="display:flex;align-items:center;gap:8px" onclick="event.stopPropagation()">'+
-            '<button class="btn btn-g" onclick="genTargets()" style="font-size:10px;padding:4px 10px">🎲 Generar</button>'+
-            '<span id="secTargetsArrow" style="color:var(--tm);font-size:12px;pointer-events:none">▼</span>'+
-          '</div>'+
-        '</button>'+
-        '<div id="secTargets" style="padding:0 14px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+
-          '<div style="background:var(--sf2);border:1px solid var(--c5);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c5);margin-bottom:4px">🟢 Reto 1</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c5)" id="admT5">—</div></div>'+
-          '<div style="background:var(--sf2);border:1px solid var(--c10);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c10);margin-bottom:4px">🔵 Reto 2</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c10)" id="admT10">—</div></div>'+
-          '<div style="background:var(--sf2);border:1px solid var(--c15);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c15);margin-bottom:4px">🟣 Reto 3</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c15)" id="admT15">—</div></div>'+
-          '<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c4b);margin-bottom:4px">🟡 Reto 4</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c4b)" id="admT4">—</div></div>'+
-        '</div>'+
       '</div>'+
       // TORNEO RELÁMPAGO
       '<div style="background:var(--sf);border:2px solid var(--ct);border-radius:12px;overflow:hidden;margin-bottom:10px">'+
