@@ -181,7 +181,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .gbo{background:var(--bo);color:var(--td);cursor:not-allowed;border:none}
 @keyframes spp{0%,100%{box-shadow:0 0 0 0 var(--amid)}50%{box-shadow:0 0 0 12px transparent}}
 /* TORNEO intentos badge */
-.torneo-intentos{background:var(--ctd);border:1px solid var(--ctm);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ct);text-align:center;width:100%}
+.torneo-intentos{background:var(--ctd);border:1px solid var(--ctm);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ct);text-align:center;width:100%;line-height:1.5}
 /* SECUENCIA */
 #sSeq{padding:18px;position:relative}
 #sSeq::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.2;pointer-events:none}
@@ -547,7 +547,7 @@ body.playing{overflow:hidden}
       <div class="gh-title" id="ghTitle">RETO 5s</div>
       <div class="gh-sub" id="ghSub" style="color:var(--c5)">—</div>
     </div>
-    <div id="torneoIntentosBar" style="display:none" class="torneo-intentos">🏆 Torneo · <span id="torIntentosLeft">5</span> intentos restantes</div>
+    <div id="torneoIntentosBar" style="display:none" class="torneo-intentos">🏆 Torneo<br><span id="torIntentosLeft">5</span> intentos restantes</div>
     <div class="score-row">
       <div><div class="sr-lbl">Tu mejor</div><div class="sr-val" id="srBest" style="color:var(--ac)">—</div></div>
       <div style="text-align:right"><div class="sr-lbl">Posición</div><div class="sr-val" id="srPos" style="color:var(--wn)">—</div></div>
