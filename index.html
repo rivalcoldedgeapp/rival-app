@@ -802,7 +802,7 @@ function updateTorneoHomeCard(){
   if(remaining<=0){el.style.display='none';return;}
   el.style.display='block';
   var gameLabel=GAME_LABELS[torneoData.reto]||'—';
-  var canPlay=curUser&&((profiles[curUser.uid]&&profiles[curUser.uid].torneoAdmitido===true)||(torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true));
+  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   var intentosUsados=torneoData.participantes&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
   var intentosLeft=5-intentosUsados;
   var limite=torneoData.limite||null;
@@ -899,7 +899,7 @@ function aplicarCodigoTorneo(){
 }
 function goTorneo(){
   if(!torneoData||!torneoData.activo){toast('No hay torneo activo');return;}
-  var canPlay=curUser&&((profiles[curUser.uid]&&profiles[curUser.uid].torneoAdmitido===true)||(torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true));
+  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   if(!canPlay){
     document.getElementById('modalBody').innerHTML=
       '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
@@ -1308,17 +1308,18 @@ function confirmActivarTorneo(){
   var reto=window._tornReto;
   if(!reto){toast('❌ Error: reto no definido');return;}
   var ahora=Date.now();
-  db.ref('torneo').set({
-    activo:true,
-    reto:reto,
-    premio:window._tornPremio||'$50 pesos',
-    limite:window._tornLimite||20,
-    inicioAt:ahora,
-    cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
-    participantes:{},
-    admitidos:{},
-    codesUsed:{},
-    ganadorUid:null
+  // Primero borrar admitidos del torneo anterior para que no persistan
+  db.ref('torneo/admitidos').remove().then(function(){
+    return db.ref('torneo').set({
+      activo:true,
+      reto:reto,
+      premio:window._tornPremio||'$50 pesos',
+      limite:window._tornLimite||20,
+      inicioAt:ahora,
+      cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
+      participantes:{},
+      ganadorUid:null
+    });
   }).then(function(){
     closeModal();
     toast('🏆 Torneo activado — '+GAME_LABELS[reto]);
