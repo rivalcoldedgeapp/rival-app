@@ -755,7 +755,12 @@ function getGameKey(g){if(g==='r')return 'gr';if(g===4)return 'g4b';if(g==='s')r
 function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g);}
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
-// ══ TORNEO ══
+// Auto-cierre por tiempo — revisa cada minuto aunque no haya actividad
+setInterval(function(){
+  if(torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
+    db.ref('torneo/activo').set(false);
+  }
+},60000);
 db.ref('torneo').on('value',function(s){
   torneoData=s.val();
   updateTorneoHomeCard();
@@ -774,7 +779,7 @@ function updateTorneoHomeCard(){
   if(remaining<=0){el.style.display='none';return;}
   el.style.display='block';
   var gameLabel=GAME_LABELS[torneoData.reto]||'—';
-  var canPlay=curUser&&profiles[curUser.uid]&&profiles[curUser.uid].referredBy;
+  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   var intentosUsados=torneoData.participantes&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
   var intentosLeft=5-intentosUsados;
   var limite=torneoData.limite||null;
@@ -791,7 +796,7 @@ function updateTorneoHomeCard(){
       (limitePlaces>0?'🔥 '+limitePlaces+' lugar'+(limitePlaces===1?'':'es')+' disponible'+(limitePlaces===1?'':'s'):'🔴 TORNEO LLENO')+'</div>':'')+
     (canPlay?
       '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Intentos restantes: <strong style="color:var(--ct)">'+intentosLeft+'</strong></div>':
-      '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega.</div>')+
+      '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Necesitas un <strong style="color:var(--tx)">código de invitación</strong> de alguien que se registre en RIVAL.</div>')+
     (canPlay?
       '<button class="torneo-enter-btn" '+(intentosLeft>0&&limitePlaces!==0?'':'disabled')+' onclick="event.stopPropagation();goTorneo()">'+
       (intentosLeft>0?'ENTRAR AL TORNEO':'SIN INTENTOS')+'</button>':
@@ -851,28 +856,32 @@ function aplicarCodigoTorneo(){
   if(!refOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
   if(refOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
   msg.style.color='var(--tm)';msg.textContent='Verificando...';
-  db.ref('usedCodes/'+code).once('value').then(function(s){
-    if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado — pide otro';return;}
-    // Código válido — guardar referredBy y marcar código como usado
-    db.ref('profiles/'+curUser.uid+'/referredBy').set(refOwner).then(function(){
-      db.ref('usedCodes/'+code).set({usedBy:curUser.uid,usedAt:Date.now(),ownerUid:refOwner});
+  // Verificar que el código no haya sido usado ya en este torneo
+  db.ref('torneo/codesUsed/'+code).once('value').then(function(s){
+    if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado en este torneo — pide otro';return;}
+    // Admitir al usuario en este torneo específico
+    var updates={};
+    updates['torneo/admitidos/'+curUser.uid]=true;
+    updates['torneo/codesUsed/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:refOwner};
+    // Guardar referredBy en perfil si aún no tiene (primera vez)
+    var profile=profiles[curUser.uid]||{};
+    if(!profile.referredBy){
+      updates['profiles/'+curUser.uid+'/referredBy']=refOwner;
+    }
+    db.ref().update(updates).then(function(){
       closeModal();
       toast('✅ Código aceptado — ya puedes entrar al torneo');
-      // recargar perfil y entrar al torneo
-      db.ref('profiles/'+curUser.uid).once('value').then(function(ps){
-        if(ps.val())profiles[curUser.uid]=ps.val();
-        setTimeout(function(){goTorneo();},400);
-      });
+      setTimeout(function(){goTorneo();},400);
     });
   });
 }
 function goTorneo(){
   if(!torneoData||!torneoData.activo){toast('No hay torneo activo');return;}
-  var canPlay=curUser&&profiles[curUser.uid]&&profiles[curUser.uid].referredBy;
+  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   if(!canPlay){
     document.getElementById('modalBody').innerHTML=
       '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
-      '<p style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">Para participar necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega RIVAL. Ingrésalo aquí:</p>'+
+      '<p style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">Para participar necesitas un <strong style="color:var(--tx)">código de invitación</strong> de alguien que se registre en RIVAL. Ingrésalo aquí:</p>'+
       '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">'+
         '<input id="modalRefInput" placeholder="Ej. CARL4X" maxlength="8" style="height:46px;background:var(--sf2);border:2px solid var(--ac);border-radius:10px;color:var(--tx);font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:6px;text-align:center;outline:none;text-transform:uppercase">'+
         '<div id="modalRefMsg" style="font-size:11px;text-align:center;min-height:14px;color:var(--tm)">Pídele su código a alguien que ya juega</div>'+
@@ -1150,6 +1159,8 @@ function confirmActivarTorneo(){
     inicioAt:ahora,
     cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
     participantes:{},
+    admitidos:{},
+    codesUsed:{},
     ganadorUid:null
   }).then(function(){closeModal();toast('🏆 Torneo activado — '+GAME_LABELS[reto]);});
 }
