@@ -545,6 +545,27 @@ body.playing{overflow:hidden}
       <div class="blind-overlay" id="blindOverlay" style="display:none"><div class="blind-question">?</div><div class="blind-lbl">CORRIENDO</div></div>
     </div>
     <button class="gbtn gbs" id="gBtn" onclick="handleBtn()">INICIAR</button>
+    <!-- Resultado inline -->
+    <div id="inlineResult" style="display:none;width:100%;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Tu tiempo</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1" id="irTime">—</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--bo)"></div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Diferencia</div>
+          <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700" id="irDiff">—</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--bo)"></div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Posición</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--wn);line-height:1" id="irPos">—</div>
+        </div>
+      </div>
+      <div id="irRec" style="display:none;font-size:12px;padding:6px 12px;background:var(--adim);border:1px solid var(--amid);border-radius:8px;color:var(--ac);margin-bottom:8px">🎉 ¡Nuevo récord personal!</div>
+      <div id="irTorneo" style="display:none;font-size:12px;padding:6px 12px;background:var(--ctd);border:1px solid var(--ctm);border-radius:8px;color:var(--ct);margin-bottom:8px"></div>
+    </div>
   </div>
 </div>
 
@@ -564,6 +585,14 @@ body.playing{overflow:hidden}
     <div class="seq-area" id="seqArea"></div>
     <div class="seq-timer" id="seqTimerLbl">—</div>
     <button class="gbtn gbs" id="seqBtn" onclick="handleSeqBtn()" style="background:var(--cs);color:#000;border:none">INICIAR</button>
+    <div id="inlineResultS" style="display:none;width:100%;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:var(--sf);border:1px solid var(--cs);border-radius:12px;margin-bottom:8px">
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Tu tiempo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cs);line-height:1" id="irTimeS">—</div></div>
+        <div style="width:1px;height:40px;background:var(--bo)"></div>
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Posición</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--wn);line-height:1" id="irPosS">—</div></div>
+      </div>
+      <div id="irRecS" style="display:none;font-size:12px;padding:6px 12px;background:var(--csd);border:1px solid var(--csm);border-radius:8px;color:var(--cs);margin-bottom:8px">🎉 ¡Nuevo récord!</div>
+    </div>
   </div>
 </div>
 
@@ -582,6 +611,14 @@ body.playing{overflow:hidden}
     <div style="text-align:center"><div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px">Promedio mundial</div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--td)">~250ms</div></div>
     <div class="rzone waiting" id="rZone" onclick="reactTap()"><div class="rz-icon">👁️</div><div class="rz-t">LISTO</div><div class="rz-s">Toca aquí para comenzar</div></div>
     <div style="font-size:11px;color:var(--td);text-align:center;max-width:240px">Espera el flash y toca lo más rápido posible.</div>
+    <div id="inlineResultR" style="display:none;width:100%;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:var(--sf);border:1px solid var(--cr);border-radius:12px;margin-bottom:8px">
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Tu tiempo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cr);line-height:1" id="irTimeR">—</div></div>
+        <div style="width:1px;height:40px;background:var(--bo)"></div>
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Posición</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--wn);line-height:1" id="irPosR">—</div></div>
+      </div>
+      <div id="irRecR" style="display:none;font-size:12px;padding:6px 12px;background:var(--crd);border:1px solid var(--crm);border-radius:8px;color:var(--cr);margin-bottom:8px">🎉 ¡Nuevo récord!</div>
+    </div>
   </div>
 </div>
 
@@ -1485,14 +1522,32 @@ function handleBtn(){if(gState==='idle')startCD();else if(gState==='running')sto
 function startCD(){gState='countdown';var btn=document.getElementById('gBtn');if(btn){btn.className='gbtn gbo';btn.textContent='...';}var num=document.getElementById('cdN');num.style.color=GCOLORS[curGame].stroke;document.getElementById('cdWrap').classList.add('show');var n=3;function tick(){n--;if(n>0){num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.textContent=n;setTimeout(tick,800);}else{num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');startRun();},600);}}setTimeout(tick,800);}
 function startRun(){gState='running';t0=performance.now();elapsed=0;var btn=document.getElementById('gBtn'),cfg=GCOLORS[curGame],isBlind=curGame===4;if(btn){btn.className='gbtn gbp';btn.textContent='PARAR';btn.style.background='transparent';btn.style.border='3px solid '+cfg.stroke;btn.style.color=cfg.stroke;}var ring=document.getElementById('cRing');if(ring){ring.className='cring run';ring.style.borderColor=cfg.stroke;}document.getElementById('cL').textContent='CORRIENDO';document.body.classList.add('playing');if(isBlind){document.getElementById('cS').style.display='none';document.getElementById('cM').style.display='none';document.getElementById('cL').style.display='none';document.getElementById('blindOverlay').style.display='flex';}var maxT=GMAXTIME[curGame];raf=requestAnimationFrame(function loop(){if(gState!=='running')return;elapsed=(performance.now()-t0)/1000;if(!isBlind){document.getElementById('cS').textContent=Math.floor(elapsed);document.getElementById('cM').textContent='.'+String(Math.floor((elapsed%1)*1000)).padStart(3,'0');var rfgEl=document.getElementById('rfg');if(rfgEl)rfgEl.style.strokeDashoffset=565-(565*Math.min(elapsed/maxT,1));}if(elapsed>=maxT)stopClock();else raf=requestAnimationFrame(loop);});}
 function stopClock(){cancelAnimationFrame(raf);gState='stopped';document.body.classList.remove('playing');elapsed=(performance.now()-t0)/1000;var target=GCFG[curGame],fmt=elapsed.toFixed(3),diff=Math.abs(elapsed-target),isBlind=curGame===4;if(isBlind){document.getElementById('blindOverlay').style.display='none';document.getElementById('cS').style.display='';document.getElementById('cM').style.display='';document.getElementById('cL').style.display='';document.getElementById('rfg').style.stroke=GCOLORS[4].stroke;document.getElementById('rfg').style.strokeDashoffset=565-(565*Math.min(elapsed/GMAXTIME[4],1));}document.getElementById('cS').textContent=fmt.split('.')[0];document.getElementById('cM').textContent='.'+fmt.split('.')[1];document.getElementById('cL').textContent=isBlind?'REVELADO':'PARADO';document.getElementById('tNum').textContent=isBlind?GCFG[4].toFixed(3):GCFG[curGame].toFixed(3);document.getElementById('tUnit').textContent='SEGUNDOS';var ring=document.getElementById('cRing'),cfg=GCOLORS[curGame];if(ring){ring.className='cring '+(diff<target*0.1?'good':'bad');if(diff<target*0.1)ring.style.borderColor=cfg.stroke;}var btn=document.getElementById('gBtn');if(btn){btn.className='gbtn gbo';btn.textContent='...';btn.style.borderColor='';btn.style.color='';btn.style.background='';btn.style.border='';}setTimeout(function(){saveScore(fmt,diff,curGame);},700);}
-function resetClock(){gState='idle';cancelAnimationFrame(raf);document.body.classList.remove('playing');document.getElementById('cS').style.display='';document.getElementById('cM').style.display='';document.getElementById('cL').style.display='';document.getElementById('blindOverlay').style.display='none';document.getElementById('cS').textContent='0';document.getElementById('cM').textContent='.000';document.getElementById('cL').textContent='LISTO';document.getElementById('cRing').className='cring';document.getElementById('cRing').style.borderColor='';document.getElementById('rfg').style.strokeDashoffset='565';var btn=document.getElementById('gBtn');if(btn){btn.className='gbtn gbs';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.borderColor='';btn.style.border='none';}}
+function resetClock(){
+  gState='idle';cancelAnimationFrame(raf);document.body.classList.remove('playing');
+  document.getElementById('cS').style.display='';document.getElementById('cM').style.display='';
+  document.getElementById('cL').style.display='';document.getElementById('blindOverlay').style.display='none';
+  document.getElementById('cS').textContent='0';document.getElementById('cM').textContent='.000';
+  document.getElementById('cL').textContent='LISTO';document.getElementById('cRing').className='cring';
+  document.getElementById('cRing').style.borderColor='';document.getElementById('rfg').style.strokeDashoffset='565';
+  var ir=document.getElementById('inlineResult');if(ir)ir.style.display='none';
+  var btn=document.getElementById('gBtn');
+  if(btn){btn.className='gbtn gbs';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.borderColor='';btn.style.border='none';btn.onclick=handleBtn;}
+}
 
 // ══ SECUENCIA ══
 function startSeq(){seqState='idle';seqCurrent=1;var uid=curUser?curUser.uid:null,ws=uid?wScores['s'][uid]:null;document.getElementById('srBestS').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';document.getElementById('srPosS').textContent=ws&&ws.bestTime?'#'+getRank(uid,'s'):'—';document.getElementById('seqNextHint').style.display='none';document.getElementById('seqTimerLbl').textContent='—';document.getElementById('seqArea').innerHTML='';var btn=document.getElementById('seqBtn');btn.textContent='INICIAR';btn.disabled=false;btn.style.opacity='1';showScreen('sSeq');}
 function handleSeqBtn(){if(seqState==='idle'){seqState='countdown';var btn=document.getElementById('seqBtn');btn.disabled=true;btn.style.opacity='.5';var num=document.getElementById('cdN');num.style.color='#00c2e0';document.getElementById('cdWrap').classList.add('show');var n=3;function tick(){n--;if(n>0){num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.textContent=n;setTimeout(tick,800);}else{num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');seqStartRun();},600);}}setTimeout(tick,800);}}
 function seqAbort(){cancelAnimationFrame(seqRaf);seqState='idle';seqCurrent=1;document.getElementById('cdWrap').classList.remove('show');if(curTorneoMode){curTorneoMode=false;renderTorneoScreen();showScreen('sTorneo');}else goTab('home');}
 function seqBuildBoard(){var area=document.getElementById('seqArea');area.innerHTML='';var W=area.offsetWidth||300,H=area.offsetHeight||340,r=31,positions=[],nums=[1,2,3,4,5,6,7,8,9];for(var i=nums.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=nums[i];nums[i]=nums[j];nums[j]=tmp;}nums.forEach(function(n){var x,y,ok,tries=0;do{ok=true;x=r+Math.random()*(W-2*r);y=r+Math.random()*(H-2*r);for(var p=0;p<positions.length;p++){var dx=positions[p].x-x,dy=positions[p].y-y;if(Math.sqrt(dx*dx+dy*dy)<r*2+6){ok=false;break;}}tries++;}while(!ok&&tries<200);positions.push({x:x,y:y});var el=document.createElement('div');el.className='seq-circle';el.textContent=n;el.style.left=x+'px';el.style.top=y+'px';el.onclick=(function(num){return function(){seqTap(num);};})(n);area.appendChild(el);});}
-function seqStartRun(){seqState='running';seqCurrent=1;seqBuildBoard();seqT0=performance.now();document.getElementById('seqNextHint').style.display='block';document.getElementById('seqNextNum').textContent='1';document.getElementById('seqTimerLbl').textContent='Corriendo...';var btn=document.getElementById('seqBtn');btn.disabled=true;btn.style.opacity='.4';seqRaf=requestAnimationFrame(function loop(){if(seqState!=='running')return;document.getElementById('seqTimerLbl').textContent=((performance.now()-seqT0)/1000).toFixed(2)+'s';seqRaf=requestAnimationFrame(loop);});}
+function seqStartRun(){
+  seqState='running';seqCurrent=1;seqBuildBoard();seqT0=performance.now();
+  document.getElementById('seqNextHint').style.display='block';
+  document.getElementById('seqNextNum').textContent='1';
+  document.getElementById('seqTimerLbl').textContent='Corriendo...';
+  var irS=document.getElementById('inlineResultS');if(irS)irS.style.display='none';
+  var btn=document.getElementById('seqBtn');btn.disabled=true;btn.style.opacity='.4';
+  seqRaf=requestAnimationFrame(function loop(){if(seqState!=='running')return;document.getElementById('seqTimerLbl').textContent=((performance.now()-seqT0)/1000).toFixed(2)+'s';seqRaf=requestAnimationFrame(loop);});
+}
 function seqTap(n){if(seqState!=='running')return;var circles=document.getElementById('seqArea').querySelectorAll('.seq-circle'),target=null;circles.forEach(function(c){if(parseInt(c.textContent)===n)target=c;});if(n===seqCurrent){if(target){target.classList.add('done');target.onclick=null;}seqCurrent++;if(seqCurrent>9){seqFinish();return;}document.getElementById('seqNextNum').textContent=seqCurrent;}else{if(target){target.classList.add('wrong');setTimeout(function(){if(target)target.classList.remove('wrong');},300);}}}
 function seqFinish(){cancelAnimationFrame(seqRaf);seqState='done';var ms=performance.now()-seqT0;document.getElementById('seqTimerLbl').textContent=(ms/1000).toFixed(3)+'s';document.getElementById('seqNextHint').style.display='none';setTimeout(function(){saveSeqScore(ms);},400);}
 function saveSeqScore(ms){if(!curUser)return;curGame='s';var uid=curUser.uid,ws=wScores['s'][uid]||{},bestTime=(ms/1000).toFixed(3),diff=ms,isRec=ws.bestDiff==null||diff<ws.bestDiff;var pname=(profiles[uid]||{}).name||'?',pphoto=(profiles[uid]||{}).photoURL||null;var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};if(isRec){upd.bestTime=bestTime;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}db.ref(getScorePath('s')+'/'+uid).update(upd).then(function(){if(curTorneoMode)torneoRegistrarIntento(bestTime,diff,'s');showResult(bestTime,diff,isRec,'s');recalcPoints('s');});}
@@ -1508,52 +1563,84 @@ function recalcPoints(g){var key=getGameKey(g);db.ref('scores/'+weekKey+'/'+toda
 
 function showResult(fmt,diff,isRec,g){
   var uid=curUser.uid,isR=g==='r',isBlind=g===4,isSeq=g==='s',cfg=GCOLORS[g];
-  var rhTime=document.getElementById('rhTime');rhTime.textContent=fmt+(isR?'ms':'s');rhTime.style.color=cfg.color;rhTime.classList.remove('anim');void rhTime.offsetWidth;rhTime.classList.add('anim');
-  if(isR)document.getElementById('rhDiff').textContent=diff<200?'⚡ Velocidad de rayo':diff<300?'🟢 Muy bueno':diff<400?'🟡 Promedio':'🔴 Sigue practicando';
-  else if(isSeq)document.getElementById('rhDiff').textContent='Completado en '+(diff/1000).toFixed(3)+'s';
-  else if(isBlind)document.getElementById('rhDiff').textContent='±'+(diff*1000).toFixed(0)+'ms del objetivo oculto ('+GCFG[4].toFixed(3)+'s)';
-  else document.getElementById('rhDiff').textContent='±'+(diff*1000).toFixed(0)+'ms del objetivo ('+GCFG[g].toFixed(3)+'s)';
-  var rank=getRank(uid,g),total=Object.values(wScores[g]).filter(function(w){return w.bestDiff!=null;}).length;
-  document.getElementById('rhRank').innerHTML='Posición <span style="color:'+cfg.color+'">#'+rank+'</span> de '+total;
-  document.getElementById('nrBox').classList.toggle('show',isRec);document.getElementById('nrBox').style.color=cfg.color;document.getElementById('nrBox').style.borderColor=cfg.color;document.getElementById('nrBox').style.background=cfg.glow;
-  if(isSeq)document.getElementById('lbHdr').textContent='🏆 TOP 10 — SECUENCIA';
-  else if(isR)document.getElementById('lbHdr').textContent='🏆 TOP 10 — REACCIÓN';
-  else if(isBlind)document.getElementById('lbHdr').textContent='🏆 TOP 10 — RETO 4 CIEGO';
-  else document.getElementById('lbHdr').textContent='🏆 TOP 10 — RETO '+g+'s';
-  if(lastWasTorneo&&torneoData&&torneoData.participantes){
-    // Mostrar ranking exclusivo del torneo
-    document.getElementById('lbHdr').textContent='🏆 RANKING DEL TORNEO';
-    var tParts=torneoData.participantes||{};
-    var tSorted=Object.entries(tParts).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
-    var lbEl=document.getElementById('lbList');
-    if(lbEl){
-      if(tSorted.length===0){lbEl.innerHTML='<div style="text-align:center;color:var(--tm);padding:20px">Sé el primero en marcar tiempo</div>';}
-      else{
-        lbEl.innerHTML=tSorted.slice(0,10).map(function(e,i){
-          var uid2=e[0],w=e[1],isMe=uid2===uid,isTop=i===0;
-          var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
-          var avHtml=w.photoURL?'<div class="li-av"><img src="'+w.photoURL+'"></div>':'<div class="li-av">'+(w.name||'?')[0].toUpperCase()+'</div>';
-          return '<div class="li'+(isTop?' top1':'')+(isMe?' me':'')+'" style="border-color:'+(isMe?'var(--ct)':isTop?'var(--wn)':'var(--bo)')+'">'+
-            '<div class="li-pos" style="color:'+(isTop?'var(--wn)':'var(--td)')+'">'+medal+'</div>'+avHtml+
-            '<div class="li-info"><div class="li-name">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
-            (isR||isSeq?'':'<div class="li-diff">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div>'+
-            '<div class="li-time" style="color:'+(isTop?'var(--ct)':'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';
-        }).join('');
-      }
+  var rank=getRank(uid,g);
+  var total=Object.values(wScores[g]).filter(function(w){return w.bestDiff!=null;}).length;
+
+  if(isSeq){
+    // Resultado inline en sSeq
+    var irS=document.getElementById('inlineResultS');
+    if(irS){
+      irS.style.display='block';
+      document.getElementById('irTimeS').textContent=fmt+'s';
+      document.getElementById('irPosS').textContent='#'+rank;
+      var recS=document.getElementById('irRecS');
+      if(recS)recS.style.display=isRec?'block':'none';
     }
-  } else {
-    renderLB(uid,g);
+    var btn=document.getElementById('seqBtn');
+    if(btn){btn.className='gbtn gbs';btn.style.background='var(--cs)';btn.style.color='#000';btn.style.border='none';btn.textContent='▶️ INTENTAR DE NUEVO';btn.disabled=false;btn.style.opacity='1';}
+    document.getElementById('srBestS').textContent=wScores['s'][uid]&&wScores['s'][uid].bestTime?wScores['s'][uid].bestTime+'s':'—';
+    document.getElementById('srPosS').textContent='#'+rank+' de '+total;
+    if(curTorneoMode){torneoRegistrarIntento(fmt,diff,g);curTorneoMode=false;}
+    return;
   }
-  var ptsEarned=rank>0&&rank<=POINTS.length?POINTS[rank-1]:0,totalPts=weekPoints[uid]?(weekPoints[uid].total||0):0;
-  var ptsEl=document.getElementById('resPts');
-  if(ptsEl&&!lastWasTorneo){if(ptsEarned>0){ptsEl.innerHTML='<span style="color:var(--wn)">+'+ptsEarned+' pts 🏅</span> &nbsp;·&nbsp; Total semana: <strong style="color:var(--wn)">'+totalPts+' pts</strong>';ptsEl.style.display='block';ptsEl.classList.remove('pts-pop');void ptsEl.offsetWidth;ptsEl.classList.add('pts-pop');}else ptsEl.style.display='none';}
-  else if(ptsEl&&lastWasTorneo){ptsEl.style.display='none';}
-  // limpiar box torneo
-  var tb=document.getElementById('torneoResultBox');if(tb&&!lastWasTorneo)tb.style.display='none';
-  // botón jugar de nuevo
-  var paBtn=document.getElementById('paBtn');
-  if(paBtn){paBtn.textContent='▶️ JUGAR DE NUEVO';paBtn.onclick=playAgain;}
-  showScreen('sResult');
+
+  if(isR){
+    // Resultado inline en sReaction
+    var irR=document.getElementById('inlineResultR');
+    if(irR){
+      irR.style.display='block';
+      document.getElementById('irTimeR').textContent=fmt+'ms';
+      document.getElementById('irPosR').textContent='#'+rank;
+      var recR=document.getElementById('irRecR');
+      if(recR)recR.style.display=isRec?'block':'none';
+    }
+    document.getElementById('srBestR').textContent=wScores['r'][uid]&&wScores['r'][uid].bestTime?wScores['r'][uid].bestTime+'ms':'—';
+    document.getElementById('srPosR').textContent='#'+rank+' de '+total;
+    if(curTorneoMode){torneoRegistrarIntento(fmt,diff,g);curTorneoMode=false;}
+    return;
+  }
+
+  // Retos 1-4: resultado inline en sGame
+  var ir=document.getElementById('inlineResult');
+  if(ir){
+    ir.style.display='block';
+    var irTime=document.getElementById('irTime');
+    var irDiff=document.getElementById('irDiff');
+    var irPos=document.getElementById('irPos');
+    var irRec=document.getElementById('irRec');
+    var irTorneo=document.getElementById('irTorneo');
+    if(irTime){irTime.textContent=fmt+'s';irTime.style.color=cfg.stroke;}
+    if(irDiff){
+      if(isBlind)irDiff.textContent='±'+(diff*1000).toFixed(0)+'ms';
+      else irDiff.textContent='±'+(diff*1000).toFixed(0)+'ms';
+      irDiff.style.color=diff<0.05?'var(--ac)':diff<0.15?'var(--wn)':'var(--dg)';
+    }
+    if(irPos)irPos.textContent='#'+rank+' de '+total;
+    if(irRec)irRec.style.display=isRec?'block':'none';
+    // Torneo
+    if(irTorneo&&lastWasTorneo){
+      var intentosUsados=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
+      var intentosLeft=5-intentosUsados;
+      irTorneo.style.display='block';
+      irTorneo.innerHTML='🏆 Torneo · Intento '+(intentosUsados)+'/5'+(intentosLeft>0?' · <strong>'+intentosLeft+' restantes</strong>':' · Sin más intentos');
+    } else if(irTorneo){irTorneo.style.display='none';}
+  }
+  // Actualizar score row
+  var ws=wScores[g][uid];
+  document.getElementById('srBest').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';
+  document.getElementById('srPos').textContent='#'+rank+' de '+total;
+  // Cambiar botón
+  var btn=document.getElementById('gBtn');
+  if(btn){
+    btn.className='gbtn gbs';btn.textContent='▶️ INTENTAR DE NUEVO';
+    btn.style.background='var(--ac)';btn.style.color='#000';btn.style.border='none';
+    btn.onclick=function(){
+      document.getElementById('inlineResult').style.display='none';
+      if(curTorneoMode||lastWasTorneo){torneoJugar();return;}
+      resetClock();
+    };
+  }
+  if(curTorneoMode)torneoRegistrarIntento(fmt,diff,g);
   lastWasTorneo=false;
 }
 function playAgain(){
