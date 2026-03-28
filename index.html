@@ -247,7 +247,14 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .rg-chips::-webkit-scrollbar{display:none}
 .rgc{padding:7px 13px;border-radius:20px;border:1px solid var(--bo);background:var(--sf2);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .rgc:active{transform:scale(.95)}
-.rank-inner{width:100%;max-width:500px;margin:0 auto}
+@media(min-width:768px){
+  #sRanking{padding:24px}
+  .rank-inner{max-width:860px;display:grid;grid-template-columns:180px 1fr;gap:24px;align-items:start;padding:0}
+  .rank-hdr-desktop{grid-column:1/-1;margin-bottom:4px}
+  .rg-chips{flex-direction:column;overflow-x:visible;padding-bottom:0;margin-bottom:0;position:sticky;top:76px;background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:8px!important}
+  .rgc{border-radius:9px;white-space:normal;text-align:left}
+  .rank-list-col{min-width:0}
+}
 .rank-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;margin-bottom:2px}
 .rank-sub{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:14px}
 .rg-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
@@ -647,11 +654,14 @@ body.playing{overflow:hidden}
 <!-- RANKING -->
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;margin-top:2px">
-      <div class="rank-title" id="rankTitle">RANKING</div>
-      <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+    <!-- Header — span completo en desktop -->
+    <div class="rank-hdr-desktop">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;margin-top:2px">
+        <div class="rank-title" id="rankTitle">RANKING</div>
+        <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+      </div>
     </div>
-    <!-- Chips scroll horizontal -->
+    <!-- Chips — sidebar en desktop, scroll horizontal en móvil -->
     <div class="rg-chips" id="rgChips">
       <button class="rgc" id="rgcG" onclick="setRankGame('global')">🏅 Global</button>
       <button class="rgc" id="rgc5" onclick="setRankGame(5)">🟢 R1</button>
@@ -662,9 +672,11 @@ body.playing{overflow:hidden}
       <button class="rgc" id="rgcr" onclick="setRankGame('r')">⚡ Reac</button>
       <button class="rgc" id="rgct" onclick="setRankGame('t')">🏆 Torneos</button>
     </div>
-    <div id="rankList"></div>
-    <!-- Tu posición si no estás en top 10 -->
-    <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
+    <!-- Lista -->
+    <div class="rank-list-col">
+      <div id="rankList"></div>
+      <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
+    </div>
   </div>
 </div>
 
@@ -1360,9 +1372,9 @@ function checkDailyReset(){var currentDay=getTodayKey();db.ref('gameConfig').onc
 setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();[5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});wScores={5:{},10:{},15:{},4:{},s:{},r:{}};}},60000);
 db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.t5)GCFG[5]=parseFloat(cfg.t5);if(cfg.t10)GCFG[10]=parseFloat(cfg.t10);if(cfg.t15)GCFG[15]=parseFloat(cfg.t15);if(cfg.t4)GCFG[4]=parseFloat(cfg.t4);updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
-db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&document.getElementById('rankTitle').textContent.indexOf('GLOBAL')>=0)renderGlobalRank();updateNavPoints();});
+db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
-function listenWeekScore(g){db.ref(getScorePath(g)).on('value',function(s){wScores[g]=s.val()||{};updateHomecards();if(document.getElementById('sResult').classList.contains('on')&&curGame===g)renderLB(curUser?curUser.uid:null,g);if(document.getElementById('sRanking').classList.contains('on')&&rankGame===g)renderFullRank(g);if(admLoggedIn){updateAdmStats();buildWinners();if(admGame===g)renderAdmTable();}});}
+function listenWeekScore(g){db.ref(getScorePath(g)).on('value',function(s){wScores[g]=s.val()||{};updateHomecards();if(document.getElementById('sRanking').classList.contains('on')&&rankGame===g)renderTop10(g);if(admLoggedIn){updateAdmStats();buildWinners();if(admGame===g)renderAdmTable();}});}
 [5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});
 
 // ══ INVITE ══
@@ -1679,7 +1691,7 @@ function setRankGame(g){
 }
 function renderTop10(g){
   var uid=curUser?curUser.uid:null,cfg=GCOLORS[g],isR=g==='r',isS=g==='s';
-  var sorted=getSorted(g,50),top10=sorted.slice(0,10),myIdx=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
+  var sorted=getSorted(g,50);var top10=sorted.slice(0,10),myIdx=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
   var html='';
   if(top10.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}
   else{top10.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=uid&&uid2===uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',num=i+1;
@@ -1725,7 +1737,20 @@ function renderTorneosRanking(){
     }).join('');
   });
 }
-function renderGlobalRank(){var allUids=new Set(Object.keys(weekPoints));[5,10,15,4,'s','r'].forEach(function(g){Object.keys(wScores[g]).forEach(function(u){allUids.add(u);});});var allUsers=Array.from(allUids).map(function(uid2){var wp=weekPoints[uid2]||{};var name=wp.name||(profiles[uid2]&&profiles[uid2].name)||'?';var photoURL=wp.photoURL||(profiles[uid2]&&profiles[uid2].photoURL)||null;if(name==='?'){[5,10,15,4,'s','r'].forEach(function(g){if(wScores[g][uid2]&&wScores[g][uid2].name)name=wScores[g][uid2].name;});}return[uid2,{total:wp.total||0,name:name,photoURL:photoURL}];});var sorted=allUsers.sort(function(a,b){return b[1].total!==a[1].total?b[1].total-a[1].total:a[1].name.localeCompare(b[1].name);}).slice(0,50);var uid=curUser?curUser.uid:null,html='';if(sorted.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Aún no hay puntos.<br>¡Juega para aparecer aquí!</div>';}else{sorted.forEach(function(e,i){var uid2=e[0],p=e[1],isMe=uid&&uid2===uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',pos=i+1;var avHtml=p.photoURL?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+p.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>';html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?'var(--wn)':'var(--bo)')+';border-radius:11px;margin-bottom:5px"><div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+avHtml+'<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</div><div style="font-size:10px;color:var(--tm);margin-top:1px">puntos esta semana</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'22':'16')+'px;color:'+(isTop3?'var(--wn)':'var(--tx)')+'">'+( p.total||0)+'</div></div>';});}if(uid&&weekPoints[uid]&&weekPoints[uid].total>0){var myRank=sorted.findIndex(function(e){return e[0]===uid;});var myData=document.getElementById('rankMy');if(myData){myData.classList.add('show');myData.style.borderColor='var(--wn)';document.getElementById('rmyPos').textContent='#'+(myRank+1)+' de '+sorted.length;document.getElementById('rmyPos').style.color='var(--wn)';document.getElementById('rmyTime').textContent=(weekPoints[uid].total||0)+' puntos esta semana';}}document.getElementById('rankList').innerHTML=html;}
+function renderGlobalRank(){var allUids=new Set(Object.keys(weekPoints));[5,10,15,4,'s','r'].forEach(function(g){Object.keys(wScores[g]).forEach(function(u){allUids.add(u);});});var allUsers=Array.from(allUids).map(function(uid2){var wp=weekPoints[uid2]||{};var name=wp.name||(profiles[uid2]&&profiles[uid2].name)||'?';var photoURL=wp.photoURL||(profiles[uid2]&&profiles[uid2].photoURL)||null;if(name==='?'){[5,10,15,4,'s','r'].forEach(function(g){if(wScores[g][uid2]&&wScores[g][uid2].name)name=wScores[g][uid2].name;});}return[uid2,{total:wp.total||0,name:name,photoURL:photoURL}];});var sorted=allUsers.sort(function(a,b){return b[1].total!==a[1].total?b[1].total-a[1].total:a[1].name.localeCompare(b[1].name);}).slice(0,10);var uid=curUser?curUser.uid:null,html='';if(sorted.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Aún no hay puntos.<br>¡Juega para aparecer aquí!</div>';}else{sorted.forEach(function(e,i){var uid2=e[0],p=e[1],isMe=uid&&uid2===uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',pos=i+1;var avHtml=p.photoURL?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+p.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>';html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?'var(--wn)':'var(--bo)')+';border-radius:11px;margin-bottom:5px"><div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+avHtml+'<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</div><div style="font-size:10px;color:var(--tm);margin-top:1px">puntos esta semana</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'22':'16')+'px;color:'+(isTop3?'var(--wn)':'var(--tx)')+'">'+( p.total||0)+'</div></div>';});}var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}): -1;
+  var myDiv2=document.getElementById('rankMy');
+  if(myDiv2){
+    if(myRank>=10&&uid&&weekPoints[uid]&&weekPoints[uid].total>0){
+      myDiv2.classList.add('show');myDiv2.style.borderColor='var(--wn)';
+      myDiv2.innerHTML='<div style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Tu posición</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,184,0,.08);border:1px solid var(--wn);border-radius:11px">'+
+        '<div style="width:28px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--wn)">'+(myRank+1)+'</div>'+
+        '<div style="flex:1;font-size:13px;font-weight:700">'+(weekPoints[uid].name||'?')+' 👈</div>'+
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--wn)">'+(weekPoints[uid].total||0)+' pts</div></div>'+
+        '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">de '+sorted.length+' jugadores</div>';
+    }else{myDiv2.classList.remove('show');}
+  }
+  document.getElementById('rankList').innerHTML=html;}
 function renderFullRank(g){var sorted=getSorted(g,50),cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g===4;var gameLabel=isBlind?'Reto 4 Ciego':isR?'Reacción':isS?'Secuencia':'Reto '+g+'s';document.getElementById('rankSub').textContent='TOP 50 · '+gameLabel+' · '+getWeekLabel();var html='';if(sorted.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}else{sorted.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=curUser&&uid2===curUser.uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',pos=i+1;var avHtml=w.photoURL?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+w.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div>';html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?cfg.stroke:'var(--bo)')+';border-radius:11px;margin-bottom:5px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+avHtml+'<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+(isR||isS?'':'<div style="font-size:10px;color:var(--tm);margin-top:1px">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div style="font-family:\'DM Mono\',monospace;font-size:'+(isTop3?'14':'12')+'px;color:'+(isTop3?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});}document.getElementById('rankList').innerHTML=html;if(curUser){var rank=getRank(curUser.uid,g),myW=wScores[g][curUser.uid],myDiv=document.getElementById('rankMy');myDiv.classList.toggle('show',!!(myW&&myW.bestTime));myDiv.style.borderColor=cfg.stroke;document.getElementById('rmyPos').textContent=myW&&myW.bestTime?'#'+rank+' de '+sorted.length:'—';document.getElementById('rmyPos').style.color=cfg.color;document.getElementById('rmyTime').textContent=myW&&myW.bestTime?myW.bestTime+'s'+(isR||isS?'':'  ±'+(myW.bestDiff*1000).toFixed(0)+'ms'):'Juega para aparecer aquí';}}
 function getSorted(g,max){return Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);}).slice(0,max);}
 function getRank(uid,g){var sorted=Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});var idx=sorted.findIndex(function(e){return e[0]===uid;});return idx>=0?idx+1:'—';}
