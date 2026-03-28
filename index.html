@@ -793,18 +793,46 @@ function updateTorneoHomeCard(){
   torneoCountdownTO=setTimeout(tickHome,1000);
 }
  
+function aplicarCodigoTorneo(){
+  var inp=document.getElementById('modalRefInput');
+  var msg=document.getElementById('modalRefMsg');
+  if(!inp||!msg)return;
+  var code=inp.value.trim().toUpperCase();
+  if(!code){msg.style.color='var(--dg)';msg.textContent='Escribe un código';return;}
+  var refOwner=findRef(code);
+  if(!refOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
+  if(refOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
+  msg.style.color='var(--tm)';msg.textContent='Verificando...';
+  db.ref('usedCodes/'+code).once('value').then(function(s){
+    if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado — pide otro';return;}
+    // Código válido — guardar referredBy y marcar código como usado
+    db.ref('profiles/'+curUser.uid+'/referredBy').set(refOwner).then(function(){
+      db.ref('usedCodes/'+code).set({usedBy:curUser.uid,usedAt:Date.now(),ownerUid:refOwner});
+      closeModal();
+      toast('✅ Código aceptado — ya puedes entrar al torneo');
+      // recargar perfil y entrar al torneo
+      db.ref('profiles/'+curUser.uid).once('value').then(function(ps){
+        if(ps.val())profiles[curUser.uid]=ps.val();
+        setTimeout(function(){goTorneo();},400);
+      });
+    });
+  });
+}
 function goTorneo(){
   if(!torneoData||!torneoData.activo){toast('No hay torneo activo');return;}
   var canPlay=curUser&&profiles[curUser.uid]&&profiles[curUser.uid].referredBy;
   if(!canPlay){
     document.getElementById('modalBody').innerHTML=
-      '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:12px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
-      '<p style="font-size:13px;color:var(--tx);margin-bottom:10px;line-height:1.7">Para participar en torneos con premio necesitas haber sido invitado por alguien que ya juega RIVAL.</p>'+
-      '<p style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">Pídele a alguien su <strong style="color:var(--ac)">código de invitación</strong> y regístrate con él. Una vez que lo hagas, podrás entrar a este y todos los torneos futuros.</p>'+
-      '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--tm)">'+
-      '💡 Los códigos tienen 1 solo uso — cada usuario de RIVAL tiene el suyo para compartir.</div>'+
-      '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
+      '<p style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">Para participar necesitas un <strong style="color:var(--ac)">código de invitación</strong> de alguien que ya juega RIVAL. Ingrésalo aquí:</p>'+
+      '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">'+
+        '<input id="modalRefInput" placeholder="Ej. CARL4X" maxlength="8" style="height:46px;background:var(--sf2);border:2px solid var(--ac);border-radius:10px;color:var(--tx);font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:6px;text-align:center;outline:none;text-transform:uppercase">'+
+        '<div id="modalRefMsg" style="font-size:11px;text-align:center;min-height:14px;color:var(--tm)">Pídele su código a alguien que ya juega</div>'+
+      '</div>'+
+      '<button onclick="aplicarCodigoTorneo()" style="width:100%;height:44px;background:var(--ac);color:#000;border:none;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;margin-bottom:8px">✅ INGRESAR CÓDIGO</button>'+
+      '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:38px;border-radius:9px;font-size:12px">Cancelar</button>';
     document.getElementById('overlay').classList.add('show');
+    setTimeout(function(){var inp=document.getElementById('modalRefInput');if(inp)inp.focus();},100);
     return;
   }
   renderTorneoScreen();
