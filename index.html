@@ -1507,6 +1507,41 @@ function showPerfilModal(){
       '</div>'+
     '</div>'+
     '<div style="font-size:11px;color:var(--td);text-align:center;margin-bottom:12px;line-height:1.6">Comparte tu código — quien lo use puede entrar a torneos con premio 🏆</div>'+
+    // ── MIS PUNTOS HOY ──
+    (function(){
+      var gameList=[
+        {g:5,  icon:'🟢',label:'Reto 1'},
+        {g:10, icon:'🔵',label:'Reto 2'},
+        {g:15, icon:'🟣',label:'Reto 3'},
+        {g:4,  icon:'🟡',label:'Reto 4'},
+        {g:'s',icon:'🩵',label:'Secuencia'},
+        {g:'r',icon:'⚡',label:'Reacción'}
+      ];
+      var todayPts=weekPoints[uid]&&weekPoints[uid].days&&weekPoints[uid].days[todayKey]?weekPoints[uid].days[todayKey]:{};
+      var totalSemana=weekPoints[uid]?weekPoints[uid].total||0:0;
+      var rows=gameList.map(function(item){
+        var gkey=item.g===4?'g4b':item.g==='r'?'gr':item.g==='s'?'gs':'g'+item.g;
+        var pts=todayPts[gkey]||0;
+        var rank=wScores[item.g]&&wScores[item.g][uid]&&wScores[item.g][uid].bestTime?'#'+getRank(uid,item.g):'—';
+        var ptsColor=pts>=10?'var(--ac)':pts>=5?'var(--wn)':pts>0?'var(--bl)':'var(--td)';
+        return '<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)">'+
+          '<span style="font-size:13px;width:20px">'+item.icon+'</span>'+
+          '<span style="flex:1;font-size:12px;color:var(--tm);margin-left:6px">'+item.label+'</span>'+
+          '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--bl);width:36px;text-align:center">'+rank+'</span>'+
+          '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:'+ptsColor+';width:52px;text-align:right">'+
+            (pts>0?'+'+pts+' pts':'0 pts')+
+          '</span>'+
+        '</div>';
+      }).join('');
+      return '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px 14px;margin-bottom:12px">'+
+        '<div style="font-size:9px;letter-spacing:3px;color:var(--wn);text-transform:uppercase;margin-bottom:8px">🏅 Mis puntos hoy</div>'+
+        rows+
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;margin-top:2px">'+
+          '<span style="font-size:10px;color:var(--tm);letter-spacing:1px">Total esta semana</span>'+
+          '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--wn)">'+totalSemana+' pts</span>'+
+        '</div>'+
+      '</div>';
+    })()+
     '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-bottom:8px">Cerrar</button>'+
     '<button onclick="closeModal();doLogout()" style="width:100%;height:38px;background:transparent;border:1px solid var(--dg);border-radius:9px;color:var(--dg);font-size:12px;cursor:pointer">Cerrar sesión</button>';
   document.getElementById('overlay').classList.add('show');
