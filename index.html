@@ -1085,13 +1085,13 @@ function renderTorneoHistorial(){
       var motivo=t.cierreMotivo==='automatico_tiempo'?'⏱ Auto':'✋ Manual';
       var partsHtml='';
       if(t.participantes&&Object.keys(t.participantes).length>0){
-        var sorted=Object.entries(t.participantes)
+        var pSorted=Object.entries(t.participantes)
           .filter(function(e){return e[1].bestDiff!=null;})
           .sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
-        if(sorted.length>0){
+        if(pSorted.length>0){
           partsHtml='<div style="margin-top:8px">'+
             '<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:4px">Participantes</div>'+
-            sorted.map(function(e,i){
+            pSorted.map(function(e,i){
               var w=e[1],medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.';
               return '<div style="display:flex;align-items:center;gap:8px;padding:4px 6px;background:var(--sf);border-radius:6px;margin-bottom:3px;font-size:11px">'+
                 '<span style="width:20px">'+medal+'</span>'+
@@ -1315,7 +1315,7 @@ function confirmCerrarTorneo(){
   var ganadorUid=window._cerrarGanadorUid||null;
   var bestTime=window._cerrarGanadorTime||null;
   var ahora=Date.now();
-  var parts=torneoData?torneoData.participantes||{}:{};
+  // Guardar en historial antes de sobrescribir torneo activo
   var torneoArchivado={
     reto:torneoData?torneoData.reto:null,
     premio:torneoData?torneoData.premio:null,
@@ -1327,7 +1327,7 @@ function confirmCerrarTorneo(){
     ganadorNombre:ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].name:'—',
     ganadorEmail:ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].email:'—',
     participantesTotal:window._cerrarParticipantesTotal||0,
-    participantes:parts
+    participantes:torneoData?torneoData.participantes||{}:{}
   };
   var torneoId='torneo_'+ahora;
   db.ref('torneoHistorial/'+torneoId).set(torneoArchivado).then(function(){
