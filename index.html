@@ -644,7 +644,7 @@ body.playing{overflow:hidden}
       <button class="adm-lbtn" onclick="admLogin()">ENTRAR</button>
       <div style="margin-top:10px;text-align:center"><button onclick="admLogout()" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer">← Volver</button></div>
     </div>
-    <div id="admP" class="ap">
+    <div id="admP" class="ap" style="display:none">
       <!-- Header -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>
@@ -671,9 +671,9 @@ body.playing{overflow:hidden}
       <div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:10px">
         <button onclick="toggleAdmSection('secTargets')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">
           <span style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎲 Tiempos objetivo de hoy</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="btn btn-g" onclick="event.stopPropagation();genTargets()" style="font-size:10px;padding:4px 10px">🎲 Generar</button>
-            <span id="secTargetsArrow" style="color:var(--tm);font-size:12px">▼</span>
+          <div style="display:flex;align-items:center;gap:8px" onclick="event.stopPropagation()">
+            <button class="btn btn-g" onclick="genTargets()" style="font-size:10px;padding:4px 10px">🎲 Generar</button>
+            <span id="secTargetsArrow" style="color:var(--tm);font-size:12px;pointer-events:none">▼</span>
           </div>
         </button>
         <div id="secTargets" style="padding:0 14px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
@@ -696,7 +696,7 @@ body.playing{overflow:hidden}
             <button onclick="toggleAdmSection('secHistorial')" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:6px">
               <span id="secHistorialArrow">▶</span> 📋 Ver historial de torneos
             </button>
-            <div id="secHistorial" style="display:none;margin-top:10px" id="torneoHistorialPanel"></div>
+            <div id="secHistorial" style="display:none;margin-top:10px"></div>
           </div>
         </div>
       </div>
@@ -1122,7 +1122,7 @@ function toggleHistorial(){
   }
 }
 function renderTorneoHistorial(){
-  var el=document.getElementById('torneoHistorialPanel');if(!el)return;
+  var el=document.getElementById('secHistorial');if(!el)return;
   el.innerHTML='<div style="font-size:12px;color:var(--tm);padding:10px;text-align:center">Cargando...</div>';
   db.ref('torneoHistorial').orderByChild('cerradoAt').once('value').then(function(s){
     var data=s.val();
@@ -1135,25 +1135,21 @@ function renderTorneoHistorial(){
       var fechaStr=DAYS[cdmx.getDay()]+' '+cdmx.getDate()+' '+MONTHS[cdmx.getMonth()]+' '+String(cdmx.getHours()).padStart(2,'0')+':'+String(cdmx.getMinutes()).padStart(2,'0');
       var isR=t.reto==='r';
       var gameLabel=GAME_LABELS[t.reto]||'—';
-      var motivo=t.cierreMotivo==='automatico_tiempo'?'⏱ Cerrado automáticamente':'✋ Cerrado manualmente';
-      return '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:11px;padding:12px;margin-bottom:8px">'+
-        '<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:6px">'+
-          '<div style="flex:1">'+
-            '<div style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:3px">'+fechaStr+' · <span style="color:var(--td)">'+motivo+'</span></div>'+
-            '<div style="font-size:13px;font-weight:700">'+gameLabel+' · '+t.premio+'</div>'+
-            '<div style="font-size:11px;color:var(--tm);margin-top:2px">'+t.participantesTotal+' participantes · Límite: '+(t.limite||'—')+'</div>'+
-          '</div>'+
-          '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'+
+      var motivo=t.cierreMotivo==='automatico_tiempo'?'⏱ Auto':'✋ Manual';
+      return '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:10px 12px;margin-bottom:8px">'+
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">'+
+          '<div style="flex:1;min-width:0">'+
+            '<div style="font-size:10px;color:var(--td);margin-bottom:2px">'+fechaStr+' · '+motivo+'</div>'+
+            '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+gameLabel+' · '+t.premio+'</div>'+
+            '<div style="font-size:11px;color:var(--tm);margin-top:2px">'+t.participantesTotal+' participantes</div>'+
             (t.ganadorNombre&&t.ganadorNombre!=='—'?
-              '<div style="background:var(--adim);border:1px solid var(--wn);border-radius:8px;padding:8px 12px;text-align:right">'+
-                '<div style="font-size:9px;color:var(--wn);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">🥇 Ganador</div>'+
-                '<div style="font-weight:700;font-size:13px">'+t.ganadorNombre+'</div>'+
-                '<div style="font-family:DM Mono,monospace;font-size:12px;color:var(--wn)">'+t.ganadorTiempo+(isR?'ms':'s')+'</div>'+
-                '<div style="font-size:10px;color:var(--tm);margin-top:2px">'+t.ganadorEmail+'</div>'+
+              '<div style="margin-top:6px;padding:6px 8px;background:var(--sf);border:1px solid var(--wn);border-radius:7px">'+
+                '<div style="font-size:9px;color:var(--wn);text-transform:uppercase;letter-spacing:2px">🥇 '+t.ganadorNombre+'</div>'+
+                '<div style="font-family:DM Mono,monospace;font-size:12px;color:var(--wn)">'+t.ganadorTiempo+(isR?'ms':'s')+' · '+t.ganadorEmail+'</div>'+
               '</div>':
-              '<div style="font-size:11px;color:var(--td);padding:8px">Sin ganador</div>')+
-            '<button onclick="eliminarTorneo(\''+torneoId+'\')" style="background:transparent;border:1px solid var(--dg);border-radius:7px;color:var(--dg);font-size:10px;padding:4px 10px;cursor:pointer;white-space:nowrap">🗑 Eliminar</button>'+
+              '<div style="font-size:11px;color:var(--td);margin-top:4px">Sin ganador</div>')+
           '</div>'+
+          '<button onclick="eliminarTorneo(\''+torneoId+'\')" title="Eliminar" style="background:transparent;border:1px solid var(--dg);border-radius:7px;color:var(--dg);font-size:14px;width:32px;height:32px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">🗑</button>'+
         '</div>'+
       '</div>';
     }).join('');
@@ -1230,26 +1226,35 @@ function renderTorneoAdminPanel(){
       '</div>';
       ganadorHtml=el.innerHTML;
     }
-    el.innerHTML=ganadorHtml+'<div class="torneo-admin-box">'+
-      '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:var(--ct);margin-bottom:10px">Crear nuevo torneo</div>'+
-      '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">'+
-        '<div class="fld"><label>Premio</label><input id="tornPremio" value="$100 pesos" style="height:36px;font-size:13px"></div>'+
-        '<div class="fld"><label>Límite de jugadores</label><input id="tornLimite" type="number" value="20" min="2" max="200" style="height:36px;font-size:13px"><div style="font-size:10px;color:var(--td);margin-top:2px">El torneo se cierra cuando se llena</div></div>'+
-        '<div class="fld"><label>Duración máxima</label>'+
-          '<select id="tornDuracion" style="height:36px;background:var(--sf2);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 10px;outline:none">'+
-            '<option value="1">1 hora</option>'+
-            '<option value="2">2 horas</option>'+
-            '<option value="3">3 horas</option>'+
-            '<option value="4" selected>4 horas</option>'+
-          '</select>'+
-        '</div>'+
+    el.innerHTML=ganadorHtml+
+      '<div style="display:flex;justify-content:center;padding:8px 0 4px">'+
+        '<button class="btn btn-t" onclick="showNuevoTorneoForm()" style="height:44px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:#fff;padding:0 28px">🏆 NUEVO TORNEO RELÁMPAGO</button>'+
       '</div>'+
-      '<button class="btn btn-t" onclick="admActivarTorneo()" style="width:100%;height:42px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px">🏆 ACTIVAR TORNEO RELÁMPAGO</button>'+
-      '<div style="font-size:10px;color:var(--td);margin-top:8px;text-align:center">El sistema elige el reto aleatoriamente · Duración máxima 4 horas</div>'+
-    '</div>';
+      '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">El sistema elige el reto aleatoriamente · Duración configurable</div>';
   }
 }
 
+function showNuevoTorneoForm(){
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">🏆 NUEVO TORNEO</div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">'+
+      '<div class="fld"><label>Premio</label><input id="tornPremio" value="$100 pesos" style="height:40px;font-size:13px"></div>'+
+      '<div class="fld"><label>Límite de jugadores</label><input id="tornLimite" type="number" value="20" min="2" max="200" style="height:40px;font-size:13px"><div style="font-size:10px;color:var(--td);margin-top:3px">Se cierra automáticamente cuando se llena</div></div>'+
+      '<div class="fld"><label>Duración máxima</label>'+
+        '<select id="tornDuracion" style="height:40px;background:var(--sf2);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 10px;outline:none;width:100%">'+
+          '<option value="1">1 hora</option>'+
+          '<option value="2">2 horas</option>'+
+          '<option value="3">3 horas</option>'+
+          '<option value="4" selected>4 horas</option>'+
+        '</select>'+
+      '</div>'+
+    '</div>'+
+    '<div class="mbtns">'+
+      '<button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button>'+
+      '<button class="btn btn-t" onclick="admActivarTorneo()" style="height:42px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;color:#fff">CONTINUAR →</button>'+
+    '</div>';
+  document.getElementById('overlay').classList.add('show');
+}
 function admActivarTorneo(){
   var premio=document.getElementById('tornPremio')?document.getElementById('tornPremio').value.trim():'$100 pesos';
   var limite=document.getElementById('tornLimite')?parseInt(document.getElementById('tornLimite').value)||20:20;
