@@ -1003,9 +1003,6 @@ function torneoRegistrarIntento(fmt,diff,g){
   var isBetter=existing.bestDiff==null||diff<existing.bestDiff;
   var upd={intentos:intentosUsados,lastPlayed:Date.now(),name:pname,photoURL:pphoto||null};
   if(isBetter){upd.bestTime=fmt;upd.bestDiff=diff;}
-  // Actualizar local inmediatamente para que el contador sea correcto en el siguiente intento
-  if(!torneoData.participantes)torneoData.participantes={};
-  torneoData.participantes[uid]=Object.assign({},existing,upd);
   db.ref('torneo/participantes/'+uid).update(upd).then(function(){
     // verificar si se llenó el torneo
     if(torneoData&&torneoData.limite){
@@ -1020,6 +1017,9 @@ function torneoRegistrarIntento(fmt,diff,g){
   curTorneoMode=false;
   lastWasTorneo=true;
   var intentosLeft=5-intentosUsados;
+  // Actualizar el contador en la pantalla del juego inmediatamente
+  var barLeft=document.getElementById('torIntentosLeft');
+  if(barLeft)barLeft.textContent=intentosLeft;
   var box=document.getElementById('torneoResultBox');
   if(box){
     box.style.display='block';
@@ -1742,7 +1742,7 @@ function showResult(fmt,diff,isRec,g){
     };
   }
   if(curTorneoMode)lastWasTorneo=true;
-  lastWasTorneo=false;
+  else if(!lastWasTorneo)lastWasTorneo=false;
 }
 function playAgain(){
   if(curTorneoMode||document.getElementById('torneoResultBox').style.display==='block'){var intentosUsados=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;if(intentosUsados<5){torneoJugar();return;}else{renderTorneoScreen();showScreen('sTorneo');return;}}
