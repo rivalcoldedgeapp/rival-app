@@ -775,7 +775,7 @@ db.ref('appVersion').on('value',function(s){
 
 setInterval(function(){
   if(torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
-    db.ref('torneo/activo').set(false);
+    autoCerrarTorneo();
   }
 },60000);
 db.ref('torneo').on('value',function(s){
@@ -783,11 +783,46 @@ db.ref('torneo').on('value',function(s){
   updateTorneoHomeCard();
   if(admLoggedIn)renderTorneoAdminPanel();
   if(torneoData&&torneoData.activo&&document.getElementById('sTorneo').classList.contains('on'))renderTorneoScreen();
-  // auto-cerrar si pasaron 4 horas
+  // auto-cerrar si pasaron las horas definidas
   if(torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
-    db.ref('torneo/activo').set(false);
+    autoCerrarTorneo();
   }
 });
+
+function autoCerrarTorneo(){
+  if(!torneoData||!torneoData.activo)return;
+  var parts=torneoData.participantes||{};
+  var sorted=Object.entries(parts).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+  var ganador=sorted.length>0?sorted[0][1]:null;
+  var ganadorUid=sorted.length>0?sorted[0][0]:null;
+  var ganadorEmail=ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].email:'—';
+  var ahora=Date.now();
+  var torneoArchivado={
+    reto:torneoData.reto||null,
+    premio:torneoData.premio||null,
+    limite:torneoData.limite||null,
+    inicioAt:torneoData.inicioAt||null,
+    cerradoAt:ahora,
+    cierreMotivo:'automatico_tiempo',
+    ganadorUid:ganadorUid||null,
+    ganadorTiempo:ganador?ganador.bestTime:null,
+    ganadorNombre:ganador?ganador.name:(ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].name:'—'),
+    ganadorEmail:ganadorEmail,
+    participantesTotal:Object.keys(parts).length
+  };
+  var torneoId='torneo_'+ahora;
+  // Marcar como inactivo primero para evitar que múltiples clientes lo cierren
+  db.ref('torneo/activo').set(false).then(function(){
+    db.ref('torneoHistorial/'+torneoId).set(torneoArchivado);
+    db.ref('torneo').update({
+      ganadorUid:ganadorUid||null,
+      ganadorTiempo:ganador?ganador.bestTime:null,
+      ganadorReto:torneoData.reto||null,
+      ganadorPremio:torneoData.premio||null,
+      cerradoAt:ahora
+    });
+  });
+}
 
 function updateTorneoHomeCard(){
   var el=document.getElementById('torneoHomeCard');if(!el)return;
@@ -1233,6 +1268,7 @@ function admCerrarTorneo(){
   var ganadorEmail=ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].email:'Sin participantes';
   window._cerrarGanadorUid=ganadorUid||null;
   window._cerrarGanadorTime=ganador?ganador.bestTime:null;
+  window._cerrarParticipantesTotal=Object.keys(parts).length;
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--dg)">🔴 CERRAR TORNEO</div>'+
     (ganador?
@@ -1266,7 +1302,7 @@ function confirmCerrarTorneo(){
     ganadorTiempo:bestTime,
     ganadorNombre:ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].name:'—',
     ganadorEmail:ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].email:'—',
-    participantesTotal:torneoData&&torneoData.participantes?Object.keys(torneoData.participantes).length:0
+    participantesTotal: window._cerrarParticipantesTotal||0
   };
   var torneoId='torneo_'+ahora;
   db.ref('torneoHistorial/'+torneoId).set(torneoArchivado).then(function(){
