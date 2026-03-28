@@ -692,7 +692,7 @@ firebase.initializeApp({
 var auth=firebase.auth(),db=firebase.database();
 var DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 var MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-var GCFG={5:5.0,10:10.0,15:15.0,4:20.0};
+var GCFG={5:null,10:null,15:null,4:null};
 var GMAXTIME={5:20,10:30,15:40,4:60};
 var GCOLORS={
   5:{color:'var(--c5)',stroke:'#00e87a',glow:'#00e87a40'},
@@ -1411,7 +1411,20 @@ function showApp(fu,profile){
   document.getElementById('navTabs').classList.add('show');
   updateConfigUI();updateHomecards();updateNavPoints();goTab('home');
 }
-function updateConfigUI(){var tEl=document.getElementById('homeTitle'),dEl=document.getElementById('homeDate');if(tEl)tEl.textContent=getTodayLabel();if(dEl)dEl.textContent=getTodayDate();var t5=document.getElementById('tgt5'),t10=document.getElementById('tgt10'),t15=document.getElementById('tgt15');if(t5)t5.textContent=GCFG[5].toFixed(3);if(t10)t10.textContent=GCFG[10].toFixed(3);if(t15)t15.textContent=GCFG[15].toFixed(3);var a5=document.getElementById('admT5'),a10=document.getElementById('admT10'),a15=document.getElementById('admT15'),a4=document.getElementById('admT4');if(a5)a5.textContent=GCFG[5].toFixed(3)+'s';if(a10)a10.textContent=GCFG[10].toFixed(3)+'s';if(a15)a15.textContent=GCFG[15].toFixed(3)+'s';if(a4)a4.textContent=GCFG[4].toFixed(3)+'s';}
+function updateConfigUI(){
+  var tEl=document.getElementById('homeTitle'),dEl=document.getElementById('homeDate');
+  if(tEl)tEl.textContent=getTodayLabel();
+  if(dEl)dEl.textContent=getTodayDate();
+  var t5=document.getElementById('tgt5'),t10=document.getElementById('tgt10'),t15=document.getElementById('tgt15');
+  if(t5)t5.textContent=GCFG[5]!=null?GCFG[5].toFixed(3):'...';
+  if(t10)t10.textContent=GCFG[10]!=null?GCFG[10].toFixed(3):'...';
+  if(t15)t15.textContent=GCFG[15]!=null?GCFG[15].toFixed(3):'...';
+  var a5=document.getElementById('admT5'),a10=document.getElementById('admT10'),a15=document.getElementById('admT15'),a4=document.getElementById('admT4');
+  if(a5)a5.textContent=GCFG[5]!=null?GCFG[5].toFixed(3)+'s':'...';
+  if(a10)a10.textContent=GCFG[10]!=null?GCFG[10].toFixed(3)+'s':'...';
+  if(a15)a15.textContent=GCFG[15]!=null?GCFG[15].toFixed(3)+'s':'...';
+  if(a4)a4.textContent=GCFG[4]!=null?GCFG[4].toFixed(3)+'s':'...';
+}
 function updateHomecards(){
   if(!curUser)return;
   var uid=curUser.uid;
@@ -1478,6 +1491,7 @@ function showPerfilModal(){
 // ══ GAME ══
 function gameBack(){if(curTorneoMode){curTorneoMode=false;renderTorneoScreen();showScreen('sTorneo');}else goTab('home');}
 function startGame(g){
+  if(GCFG[g]==null&&g!==4){toast('Cargando objetivo del día...');return;}
   curGame=g;var cfg=GCOLORS[g];
   var labels={5:'RETO 1',10:'RETO 2',15:'RETO 3',4:'RETO 4 · CIEGO'};
   document.getElementById('ghTitle').textContent=labels[g]||'RETO';document.getElementById('ghTitle').style.color=cfg.color;
