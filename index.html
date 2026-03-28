@@ -303,7 +303,7 @@ tr:hover td{background:var(--sf2)}
 /* SHARED */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
 .overlay.show{display:flex}
-.modal{background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:22px;width:100%;max-width:380px;margin:16px;animation:mi .2s ease-out}
+.modal{background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:22px;width:100%;max-width:380px;margin:16px;animation:mi .2s ease-out;max-height:90vh;overflow-y:auto}
 @keyframes mi{from{transform:scale(.95) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
 .mbtns{display:flex;gap:8px;margin-top:12px}
 .mbtns button{flex:1;height:42px;border-radius:9px;font-size:12px}
