@@ -1398,13 +1398,10 @@ function emailReg(){
   if(pass.length<6){setMsg('rMsg','Contraseña mínimo 6 caracteres','err');return;}
   document.getElementById('rMsg').innerHTML='<div class="spin"></div>';
   if(ref){
-    // Validar código: existe en perfiles Y no ha sido usado
+    // Validar que el código existe en perfiles (uso ilimitado)
     var refOwner=findRef(ref);
     if(!refOwner){setMsg('rMsg','Código de invitación inválido','err');return;}
-    db.ref('usedCodes/'+ref).once('value').then(function(s){
-      if(s.val()){setMsg('rMsg','Ese código ya fue usado — pide otro','err');return;}
-      doCreateAccount(name,email,pass,ref,refOwner);
-    });
+    doCreateAccount(name,email,pass,ref,refOwner);
   } else {
     doCreateAccount(name,email,pass,null,null);
   }
@@ -1415,8 +1412,7 @@ function doCreateAccount(name,email,pass,refCode,refOwnerUid){
       var uid=r.user.uid,rc=genRef(name);
       var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,referredBy:refOwnerUid||null,createdAt:Date.now()};
       if(refOwnerUid&&refCode){
-        // marcar código como usado — 1 solo uso, solo en registro nuevo
-        db.ref('usedCodes/'+refCode).set({usedBy:uid,usedAt:Date.now(),ownerUid:refOwnerUid});
+        // referral ilimitado — solo guardamos referredBy en el perfil
       }
       return db.ref('profiles/'+uid).set(np);
     });
