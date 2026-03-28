@@ -1089,8 +1089,11 @@ function renderTorneoHistorial(){
       var partsHtml='';
       if(t.participantes&&Object.keys(t.participantes).length>0){
         var pSorted=Object.entries(t.participantes)
-          .filter(function(e){return e[1].bestDiff!=null;})
-          .sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+          .sort(function(a,b){
+            var da=a[1].bestDiff!=null?a[1].bestDiff:Infinity;
+            var db2=b[1].bestDiff!=null?b[1].bestDiff:Infinity;
+            return da-db2;
+          });
         if(pSorted.length>0){
           partsHtml='<div style="margin-top:8px"><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:4px">Participantes</div>'+
             pSorted.map(function(e,i){
@@ -1098,7 +1101,7 @@ function renderTorneoHistorial(){
               return '<div style="display:flex;align-items:center;gap:8px;padding:4px 6px;background:var(--sf);border-radius:6px;margin-bottom:3px;font-size:11px">'+
                 '<span style="width:20px">'+medal+'</span>'+
                 '<span style="flex:1;color:var(--tx)">'+w.name+'</span>'+
-                '<span style="font-family:DM Mono,monospace;color:'+(i===0?'var(--wn)':'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</span>'+
+                '<span style="font-family:DM Mono,monospace;color:'+(i===0?'var(--wn)':'var(--tm)')+'">'+(w.bestTime?w.bestTime+(isR?'ms':'s'):'—')+'</span>'+
                 '<span style="color:var(--td);font-size:10px;width:28px;text-align:right">'+(w.intentos||0)+'/5</span>'+
               '</div>';
             }).join('')+'</div>';
@@ -1135,7 +1138,11 @@ function renderTorneoAdminPanel(){
     var gameLabel=GAME_LABELS[torneoData.reto]||'—';
     var remaining=torneoData.cierreAt-Date.now();
     var parts=torneoData.participantes||{};
-    var sortedP=Object.entries(parts).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+    var sortedP=Object.entries(parts).sort(function(a,b){
+      var da=a[1].bestDiff!=null?a[1].bestDiff:Infinity;
+      var db2=b[1].bestDiff!=null?b[1].bestDiff:Infinity;
+      return da-db2;
+    });
     var ganador=sortedP.length>0?sortedP[0][1]:null;
     var ganadorUid=sortedP.length>0?sortedP[0][0]:null;
     var ganadorEmail=ganadorUid&&profiles[ganadorUid]?profiles[ganadorUid].email:'—';
@@ -1203,8 +1210,11 @@ function renderTorneoAdminPanel(){
     var partsHtml='';
     var lastParts=torneoData&&torneoData.participantes?torneoData.participantes:{};
     var lastSorted=Object.entries(lastParts)
-      .filter(function(e){return e[1].bestDiff!=null;})
-      .sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      .sort(function(a,b){
+        var da=a[1].bestDiff!=null?a[1].bestDiff:Infinity;
+        var db2=b[1].bestDiff!=null?b[1].bestDiff:Infinity;
+        return da-db2;
+      });
     if(lastSorted.length>0){
       partsHtml='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:12px">'+
         '<div style="padding:10px 14px;border-bottom:1px solid var(--bo);display:flex;justify-content:space-between;align-items:center">'+
