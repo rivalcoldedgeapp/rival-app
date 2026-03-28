@@ -1336,7 +1336,19 @@ db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.t5)GCFG[5
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
-function listenWeekScore(g){db.ref(getScorePath(g)).on('value',function(s){wScores[g]=s.val()||{};updateHomecards();if(document.getElementById('sRanking').classList.contains('on')&&rankGame===g)renderTop10(g);if(admLoggedIn){updateAdmStats();buildWinners();if(admGame===g)renderAdmTable();}});}
+function startListeners(){
+  // Cancelar listeners anteriores y re-registrar con auth activo
+  db.ref('gameConfig').off();
+  db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.t5)GCFG[5]=parseFloat(cfg.t5);if(cfg.t10)GCFG[10]=parseFloat(cfg.t10);if(cfg.t15)GCFG[15]=parseFloat(cfg.t15);if(cfg.t4)GCFG[4]=parseFloat(cfg.t4);updateConfigUI();if(admLoggedIn)updateAdmStats();});
+  db.ref('profiles').off();
+  db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
+  db.ref('weekPoints/'+weekKey).off();
+  db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();if(admLoggedIn)buildWinners();});
+  [5,10,15,4,'s','r'].forEach(function(g){
+    db.ref(getScorePath(g)).off();
+    listenWeekScore(g);
+  });
+}
 [5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});
 
 // ══ INVITE ══
@@ -1409,6 +1421,7 @@ function showApp(fu,profile){
   else av.textContent=(profile.name||'R')[0].toUpperCase();
   document.getElementById('navRight').classList.add('show');
   document.getElementById('navTabs').classList.add('show');
+  startListeners();
   updateConfigUI();updateHomecards();updateNavPoints();goTab('home');
 }
 function updateConfigUI(){
@@ -1976,6 +1989,7 @@ function admLogin(){
   var u=document.getElementById('au').value,p=document.getElementById('ap').value;
   if((u==='admin'||u==='socio')&&p==='rival2024'){
     admLoggedIn=true;
+    startListeners();
     document.getElementById('admLC').style.display='none';
     var panel=document.getElementById('admP');
     panel.innerHTML=
