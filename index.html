@@ -25,6 +25,24 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bo);position:sticky;top:0;background:rgba(8,8,8,.97);backdrop-filter:blur(10px);z-index:100;gap:10px}
+.nav-tabs{display:none;gap:3px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:3px;position:absolute;left:50%;transform:translateX(-50%)}
+.nav-tabs.show{display:flex}
+/* compact game grid */
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.gc2{border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;gap:6px;min-height:140px}
+.gc2::before{content:'';position:absolute;inset:0;opacity:.06;pointer-events:none}
+.gc2.g5{border-color:var(--c5)}.gc2.g5::before{background:var(--c5)}
+.gc2.g10{border-color:var(--c10)}.gc2.g10::before{background:var(--c10)}
+.gc2.g15{border-color:var(--c15)}.gc2.g15::before{background:var(--c15)}
+.gc2.g4b{border-color:var(--c4b)}.gc2.g4b::before{background:var(--c4b)}
+.gc2.gs{border-color:var(--cs)}.gc2.gs::before{background:var(--cs)}
+.gc2.gr{border-color:var(--cr)}.gc2.gr::before{background:var(--cr)}
+.gc2:hover{transform:translateY(-2px)}
+.gc2-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;line-height:1}
+.gc2-tgt{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;text-shadow:0 0 20px currentColor}
+.gc2-tgtlbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:-2px}
+.gc2-leader{font-size:11px;margin-top:auto;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
+.gc2-pos{font-size:10px;color:var(--tm)}
 .nav-brand{display:flex;align-items:baseline;gap:8px}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--ac)}
 .demo-tag{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.6);text-transform:uppercase;padding:2px 7px;border:1px solid rgba(255,255,255,.2);border-radius:4px}
@@ -323,13 +341,12 @@ body.playing{overflow:hidden}
     <button class="ntab" id="nt-rank" onclick="goTab('rank')">🏆 Ranking</button>
   </div>
   <div class="nav-right" id="navRight">
-    <div class="nav-av" id="navAv">R</div>
-    <div class="nav-name" id="navName">—</div>
     <div id="navPts" style="display:none;align-items:center;gap:4px;background:var(--sf);border:1px solid var(--wn);border-radius:20px;padding:3px 10px">
       <span style="font-size:12px">🏅</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--wn);line-height:1" id="navPtsNum">0</span>
       <span style="font-size:10px;color:var(--tm)">pts</span>
     </div>
+    <button onclick="showPerfilModal()" id="navAv" class="nav-av" title="Mi perfil">R</button>
     <button class="out-btn" onclick="doLogout()">Salir</button>
   </div>
 </nav>
@@ -385,100 +402,83 @@ body.playing{overflow:hidden}
 
 <!-- HOME -->
 <div class="screen" id="sHome">
-  <div class="home-inner" style="padding-top:18px">
-    <!-- TORNEO ACTIVO (se muestra/oculta dinámicamente) -->
-    <div id="torneoHomeCard" style="display:none"></div>
+  <div class="home-inner" style="padding-top:14px">
+    <!-- TORNEO ACTIVO — full width arriba -->
+    <div id="torneoHomeCard" style="display:none;margin-bottom:10px"></div>
 
-    <div class="home-hdr"><div class="home-title" id="homeTitle">RETOS</div><div class="home-date" id="homeDate"></div></div>
-    <div class="home-sub">Para el reloj en el tiempo objetivo</div>
-    <div class="game-cards">
-      <!-- RETO 1 -->
-      <div class="gc g5" onclick="startGame(5)">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-          <div><div class="gc-title">RETO 1</div><div class="gc-sub">Detén el reloj en el momento exacto</div></div>
-          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c5);text-shadow:0 0 20px var(--c5m);line-height:1" id="tgt5">5.000</div><div style="font-size:9px;color:var(--c5);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div></div>
-            <button onclick="event.stopPropagation();showHowPlay(5)" style="background:transparent;border:1px solid var(--c5);border-radius:50%;width:22px;height:22px;color:var(--c5);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
-          </div>
-        </div>
-        <div class="gc-stats"><div class="gc-stat">Tu mejor hoy: <span id="hb5">—</span></div><div class="gc-stat">Posición: <span class="gc-rank" id="hr5">—</span></div></div>
-        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld5">—</div>
-      </div>
-      <!-- RETO 2 -->
-      <div class="gc g10" onclick="startGame(10)">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-          <div><div class="gc-title">RETO 2</div><div class="gc-sub">Detén el reloj en el momento exacto</div></div>
-          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c10);text-shadow:0 0 20px var(--c10m);line-height:1" id="tgt10">10.000</div><div style="font-size:9px;color:var(--c10);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div></div>
-            <button onclick="event.stopPropagation();showHowPlay(10)" style="background:transparent;border:1px solid var(--c10);border-radius:50%;width:22px;height:22px;color:var(--c10);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
-          </div>
-        </div>
-        <div class="gc-stats"><div class="gc-stat">Tu mejor hoy: <span id="hb10">—</span></div><div class="gc-stat">Posición: <span class="gc-rank" id="hr10" style="color:var(--c10)">—</span></div></div>
-        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld10">—</div>
-      </div>
-      <!-- RETO 3 -->
-      <div class="gc g15" onclick="startGame(15)">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-          <div><div class="gc-title">RETO 3</div><div class="gc-sub">Detén el reloj en el momento exacto</div></div>
-          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c15);text-shadow:0 0 20px var(--c15m);line-height:1" id="tgt15">15.000</div><div style="font-size:9px;color:var(--c15);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div></div>
-            <button onclick="event.stopPropagation();showHowPlay(15)" style="background:transparent;border:1px solid var(--c15);border-radius:50%;width:22px;height:22px;color:var(--c15);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
-          </div>
-        </div>
-        <div class="gc-stats"><div class="gc-stat">Tu mejor hoy: <span id="hb15">—</span></div><div class="gc-stat">Posición: <span class="gc-rank" id="hr15" style="color:var(--c15)">—</span></div></div>
-        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld15">—</div>
-      </div>
-      <!-- RETO 4 CIEGO -->
-      <div class="gc g4b" onclick="startGame(4)">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-          <div><div class="gc-title">RETO 4 <span style="font-size:13px;letter-spacing:2px;color:var(--c4b)">CIEGO</span></div><div class="gc-sub">El reloj se oculta — solo tu instinto</div><div class="gc-objective">Objetivo del día oculto hasta que pares</div></div>
-          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--c4b);text-shadow:0 0 20px var(--c4bm);line-height:1">???</div><div style="font-size:9px;color:var(--c4b);letter-spacing:3px;text-transform:uppercase;margin-top:1px">SEGUNDOS</div></div>
-            <button onclick="event.stopPropagation();showHowPlay(4)" style="background:transparent;border:1px solid var(--c4b);border-radius:50%;width:22px;height:22px;color:var(--c4b);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
-          </div>
-        </div>
-        <div class="gc-stats"><div class="gc-stat">Tu mejor hoy: <span id="hb4">—</span></div><div class="gc-stat">Posición: <span class="gc-rank" id="hr4" style="color:var(--c4b)">—</span></div></div>
-        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hld4">—</div>
-      </div>
-      <!-- SECUENCIA -->
-      <div class="gc gs" onclick="startSeq()">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-          <div><div class="gc-title">SECUENCIA</div><div class="gc-sub">Toca los números en orden del 1 al 9</div><div class="gc-objective" style="color:var(--cs)">Gana quien lo haga más rápido</div></div>
-          <div style="text-align:right;display:flex;align-items:flex-start;gap:8px">
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--cs);text-shadow:0 0 20px var(--csm);line-height:1">1→9</div><div style="font-size:9px;color:var(--cs);letter-spacing:3px;text-transform:uppercase;margin-top:1px">EN ORDEN</div></div>
-            <button onclick="event.stopPropagation();showHowPlay('s')" style="background:transparent;border:1px solid var(--cs);border-radius:50%;width:22px;height:22px;color:var(--cs);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
-          </div>
-        </div>
-        <div class="gc-stats"><div class="gc-stat">Tu mejor: <span id="hbs">—</span></div><div class="gc-stat">Posición: <span class="gc-rank" id="hrs" style="color:var(--cs)">—</span></div></div>
-        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)" id="hlds">—</div>
-      </div>
-      <!-- REACCIÓN -->
-      <div class="gc gr" onclick="startReaction()">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-          <div><div class="gc-title">REACCIÓN</div><div class="gc-sub">Toca en cuanto veas el flash</div><div class="gc-objective" style="color:var(--cr)">Promedio mundial: ~250ms</div></div>
-          <div style="display:flex;align-items:flex-start;gap:8px">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--cr);text-shadow:0 0 20px var(--crm);padding-top:4px">⚡</div>
-            <button onclick="event.stopPropagation();showHowPlay('r')" style="background:transparent;border:1px solid var(--cr);border-radius:50%;width:22px;height:22px;color:var(--cr);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-top:4px;padding:0">?</button>
-          </div>
-        </div>
-        <div class="gc-stats"><div class="gc-stat">Tu mejor: <span id="hbr">—</span></div><div class="gc-stat">Posición: <span class="gc-rank" id="hrr" style="color:var(--cr)">—</span></div></div>
-        <div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bo)" id="hldr">—</div>
-      </div>
+    <!-- Header compacto -->
+    <div class="home-hdr" style="margin-bottom:10px">
+      <div class="home-title" id="homeTitle">RETOS</div>
+      <div class="home-date" id="homeDate"></div>
     </div>
 
-    <!-- MI CÓDIGO DE INVITACIÓN -->
-    <div style="margin-top:16px">
-      <div class="invite-card" id="inviteCard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🔗 Tu código de invitación</div>
-          <div style="font-size:11px;color:var(--tm)">Invitados: <span style="color:var(--ac);font-weight:700" id="inviteCount">0</span></div>
+    <!-- GRID 2x3 COMPACTO -->
+    <div class="game-grid">
+      <!-- RETO 1 -->
+      <div class="gc2 g5" onclick="startGame(5)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="gc2-name" style="color:var(--c5)">RETO 1</div>
+          <button onclick="event.stopPropagation();showHowPlay(5)" style="background:transparent;border:1px solid var(--c5);border-radius:50%;width:20px;height:20px;color:var(--c5);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
         </div>
-        <div class="invite-code" id="inviteCodeDisplay">—</div>
-        <div style="font-size:11px;color:var(--td);text-align:center;margin-bottom:8px">Comparte este código — quien lo use puede entrar a torneos con premio 🏆</div>
-        <div class="invite-btns">
-          <button onclick="copyInviteCode()" style="background:var(--sf2);border:1px solid var(--bo);color:var(--tm)">📋 Copiar</button>
-          <button onclick="shareInviteCode()" style="background:var(--ac);color:#000">📤 Compartir</button>
+        <div class="gc2-tgt" style="color:var(--c5)" id="tgt5">5.000</div>
+        <div class="gc2-tgtlbl" style="color:var(--c5)">SEGUNDOS</div>
+        <div class="gc2-leader" id="hld5">—</div>
+        <div class="gc2-pos" id="hr5">—</div>
+      </div>
+      <!-- RETO 2 -->
+      <div class="gc2 g10" onclick="startGame(10)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="gc2-name" style="color:var(--c10)">RETO 2</div>
+          <button onclick="event.stopPropagation();showHowPlay(10)" style="background:transparent;border:1px solid var(--c10);border-radius:50%;width:20px;height:20px;color:var(--c10);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
         </div>
+        <div class="gc2-tgt" style="color:var(--c10)" id="tgt10">10.000</div>
+        <div class="gc2-tgtlbl" style="color:var(--c10)">SEGUNDOS</div>
+        <div class="gc2-leader" id="hld10">—</div>
+        <div class="gc2-pos" id="hr10">—</div>
+      </div>
+      <!-- RETO 3 -->
+      <div class="gc2 g15" onclick="startGame(15)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="gc2-name" style="color:var(--c15)">RETO 3</div>
+          <button onclick="event.stopPropagation();showHowPlay(15)" style="background:transparent;border:1px solid var(--c15);border-radius:50%;width:20px;height:20px;color:var(--c15);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+        </div>
+        <div class="gc2-tgt" style="color:var(--c15)" id="tgt15">15.000</div>
+        <div class="gc2-tgtlbl" style="color:var(--c15)">SEGUNDOS</div>
+        <div class="gc2-leader" id="hld15">—</div>
+        <div class="gc2-pos" id="hr15">—</div>
+      </div>
+      <!-- RETO 4 CIEGO -->
+      <div class="gc2 g4b" onclick="startGame(4)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="gc2-name" style="color:var(--c4b)">RETO 4 <span style="font-size:11px">CIEGO</span></div>
+          <button onclick="event.stopPropagation();showHowPlay(4)" style="background:transparent;border:1px solid var(--c4b);border-radius:50%;width:20px;height:20px;color:var(--c4b);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+        </div>
+        <div class="gc2-tgt" style="color:var(--c4b)">???</div>
+        <div class="gc2-tgtlbl" style="color:var(--c4b)">OCULTO</div>
+        <div class="gc2-leader" id="hld4">—</div>
+        <div class="gc2-pos" id="hr4">—</div>
+      </div>
+      <!-- SECUENCIA -->
+      <div class="gc2 gs" onclick="startSeq()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="gc2-name" style="color:var(--cs)">SECUENCIA</div>
+          <button onclick="event.stopPropagation();showHowPlay('s')" style="background:transparent;border:1px solid var(--cs);border-radius:50%;width:20px;height:20px;color:var(--cs);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+        </div>
+        <div class="gc2-tgt" style="color:var(--cs);font-size:26px">1→9</div>
+        <div class="gc2-tgtlbl" style="color:var(--cs)">EN ORDEN</div>
+        <div class="gc2-leader" id="hlds">—</div>
+        <div class="gc2-pos" id="hrs">—</div>
+      </div>
+      <!-- REACCIÓN -->
+      <div class="gc2 gr" onclick="startReaction()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="gc2-name" style="color:var(--cr)">REACCIÓN</div>
+          <button onclick="event.stopPropagation();showHowPlay('r')" style="background:transparent;border:1px solid var(--cr);border-radius:50%;width:20px;height:20px;color:var(--cr);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+        </div>
+        <div class="gc2-tgt" style="color:var(--cr);font-size:30px">⚡</div>
+        <div class="gc2-tgtlbl" style="color:var(--cr)">~250ms</div>
+        <div class="gc2-leader" id="hldr">—</div>
+        <div class="gc2-pos" id="hrr">—</div>
       </div>
     </div>
   </div>
@@ -1379,9 +1379,76 @@ function chkVerified(){document.getElementById('vMsg').textContent='Verificando.
 function resendV(){curUser.sendEmailVerification().then(function(){document.getElementById('vMsg').textContent='✅ Reenviado';}).catch(function(){document.getElementById('vMsg').textContent='❌ Espera antes de reenviar';});}
 function doLogout(){gState='idle';cancelAnimationFrame(raf);cancelAnimationFrame(seqRaf);clearTimeout(reactTO);setMsg('lMsg','','');setMsg('rMsg','','');auth.signOut();}
 function loadAndEnter(fu){checkDailyReset();backfillLegacyPoints();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
-function showApp(fu,profile){var av=document.getElementById('navAv');if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'">';else av.textContent=(profile.name||'R')[0].toUpperCase();document.getElementById('navName').textContent=profile.name;document.getElementById('navRight').classList.add('show');document.getElementById('navTabs').classList.add('show');updateConfigUI();updateHomecards();updateNavPoints();updateInviteCard();goTab('home');}
+function showApp(fu,profile){
+  var av=document.getElementById('navAv');
+  if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+  else av.textContent=(profile.name||'R')[0].toUpperCase();
+  document.getElementById('navRight').classList.add('show');
+  document.getElementById('navTabs').classList.add('show');
+  updateConfigUI();updateHomecards();updateNavPoints();goTab('home');
+}
 function updateConfigUI(){var tEl=document.getElementById('homeTitle'),dEl=document.getElementById('homeDate');if(tEl)tEl.textContent=getTodayLabel();if(dEl)dEl.textContent=getTodayDate();var t5=document.getElementById('tgt5'),t10=document.getElementById('tgt10'),t15=document.getElementById('tgt15');if(t5)t5.textContent=GCFG[5].toFixed(3);if(t10)t10.textContent=GCFG[10].toFixed(3);if(t15)t15.textContent=GCFG[15].toFixed(3);var a5=document.getElementById('admT5'),a10=document.getElementById('admT10'),a15=document.getElementById('admT15'),a4=document.getElementById('admT4');if(a5)a5.textContent=GCFG[5].toFixed(3)+'s';if(a10)a10.textContent=GCFG[10].toFixed(3)+'s';if(a15)a15.textContent=GCFG[15].toFixed(3)+'s';if(a4)a4.textContent=GCFG[4].toFixed(3)+'s';}
-function updateHomecards(){if(!curUser)return;var uid=curUser.uid;[5,10,15,4,'s','r'].forEach(function(g){var ws=wScores[g][uid],isR=g==='r',isS=g==='s',sfx=isR?'ms':'s';var bEl=document.getElementById('hb'+g),rEl=document.getElementById('hr'+g);if(bEl)bEl.textContent=ws&&ws.bestTime?ws.bestTime+sfx:'—';if(rEl)rEl.textContent=ws&&ws.bestTime?'#'+getRank(uid,g):'—';var ldEl=document.getElementById('hld'+g);if(ldEl){var sorted=getSorted(g,1);if(sorted.length>0){var leader=sorted[0][1],isMe=sorted[0][0]===uid;ldEl.innerHTML='🥇 <strong>'+leader.name+'</strong> · '+leader.bestTime+sfx+(isMe?' 👈':'');}else ldEl.textContent='Sin jugadores aún — ¡sé el primero!';}});updateTorneoHomeCard();}
+function updateHomecards(){
+  if(!curUser)return;
+  var uid=curUser.uid;
+  var GCFG_MAP={5:GCFG[5],10:GCFG[10],15:GCFG[15]};
+  // Actualizar targets
+  var t5=document.getElementById('tgt5'),t10=document.getElementById('tgt10'),t15=document.getElementById('tgt15');
+  if(t5)t5.textContent=GCFG[5].toFixed(3);
+  if(t10)t10.textContent=GCFG[10].toFixed(3);
+  if(t15)t15.textContent=GCFG[15].toFixed(3);
+  [5,10,15,4,'s','r'].forEach(function(g){
+    var ws=wScores[g][uid],isR=g==='r',isS=g==='s',sfx=isR?'ms':'s';
+    var cfg=GCOLORS[g];
+    // Líder
+    var sorted=getSorted(g,1);
+    var ldEl=document.getElementById('hld'+g);
+    if(ldEl){
+      if(sorted.length>0){
+        var leader=sorted[0][1],isMe=sorted[0][0]===uid;
+        ldEl.innerHTML='🥇 <strong style="color:'+cfg.stroke+'">'+(isMe?'Tú 👈':leader.name)+'</strong> <span style="font-family:DM Mono,monospace;color:'+cfg.stroke+'">'+leader.bestTime+sfx+'</span>';
+      } else {
+        ldEl.innerHTML='<span style="color:var(--td)">Sin jugadores aún</span>';
+      }
+    }
+    // Posición del usuario
+    var posEl=document.getElementById('hr'+g);
+    if(posEl){
+      if(ws&&ws.bestTime){
+        var rank=getRank(uid,g);
+        posEl.innerHTML='Tu mejor: <strong style="color:'+cfg.stroke+'">'+ws.bestTime+sfx+'</strong> · Pos <strong style="color:var(--wn)">#'+rank+'</strong>';
+      } else {
+        posEl.textContent='Aún no has jugado hoy';
+      }
+    }
+  });
+  updateTorneoHomeCard();
+}
+
+function showPerfilModal(){
+  if(!curUser)return;
+  var p=profiles[curUser.uid]||{};
+  var code=p.referralCode||'—';
+  var count=Object.values(profiles).filter(function(pr){return pr.referredBy===curUser.uid;}).length;
+  document.getElementById('modalBody').innerHTML=
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">'+
+      (p.photoURL?'<img src="'+p.photoURL+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover">':
+        '<div style="width:48px;height:48px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--ac)">'+(p.name||'R')[0].toUpperCase()+'</div>')+
+      '<div><div style="font-weight:700;font-size:16px">'+(p.name||'—')+'</div><div style="font-size:11px;color:var(--tm)">'+(p.email||'—')+'</div></div>'+
+    '</div>'+
+    '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:14px;margin-bottom:12px;text-align:center">'+
+      '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">🔗 Tu código de invitación</div>'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:34px;letter-spacing:8px;color:var(--ac);margin-bottom:4px">'+code+'</div>'+
+      '<div style="font-size:11px;color:var(--td);margin-bottom:10px">Invitados: <strong style="color:var(--ac)">'+count+'</strong></div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button onclick="copyInviteCode()" style="flex:1;height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tm);font-size:12px;cursor:pointer">📋 Copiar</button>'+
+        '<button onclick="shareInviteCode()" style="flex:1;height:38px;background:var(--ac);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:700;cursor:pointer">📤 Compartir</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="font-size:11px;color:var(--td);text-align:center;margin-bottom:12px;line-height:1.6">Comparte tu código — quien lo use puede entrar a torneos con premio 🏆</div>'+
+    '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';
+  document.getElementById('overlay').classList.add('show');
+}
 
 // ══ GAME ══
 function gameBack(){if(curTorneoMode){curTorneoMode=false;renderTorneoScreen();showScreen('sTorneo');}else goTab('home');}
