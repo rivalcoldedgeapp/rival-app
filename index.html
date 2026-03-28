@@ -802,7 +802,7 @@ function updateTorneoHomeCard(){
   if(remaining<=0){el.style.display='none';return;}
   el.style.display='block';
   var gameLabel=GAME_LABELS[torneoData.reto]||'—';
-  var canPlay=curUser&&((profiles[curUser.uid]&&profiles[curUser.uid].torneoAdmitido===true)||(torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true));
+  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   var intentosUsados=torneoData.participantes&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
   var intentosLeft=5-intentosUsados;
   var limite=torneoData.limite||null;
@@ -883,9 +883,9 @@ function aplicarCodigoTorneo(){
   // Verificar que el código no haya sido usado antes (global, permanente)
   db.ref('torneoInvites/'+code).once('value').then(function(s){
     if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;}
-    // Admitir al usuario permanentemente y quemar el código
+    // Admitir al usuario en este torneo y quemar el código permanentemente
     var updates={};
-    updates['profiles/'+curUser.uid+'/torneoAdmitido']=true;
+    updates['torneo/admitidos/'+curUser.uid]=true;
     updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
     // Limpiar torneoCode del dueño para que no se pueda volver a usar
     updates['profiles/'+codeOwner+'/torneoCode']=null;
@@ -898,7 +898,7 @@ function aplicarCodigoTorneo(){
 }
 function goTorneo(){
   if(!torneoData||!torneoData.activo){toast('No hay torneo activo');return;}
-  var canPlay=curUser&&((profiles[curUser.uid]&&profiles[curUser.uid].torneoAdmitido===true)||(torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true));
+  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   if(!canPlay){
     document.getElementById('modalBody').innerHTML=
       '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
