@@ -883,16 +883,21 @@ function aplicarCodigoTorneo(){
   // Verificar que el código no haya sido usado antes (global, permanente)
   db.ref('torneoInvites/'+code).once('value').then(function(s){
     if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;}
-    // Admitir al usuario permanentemente y quemar el código
+    // Admitir al usuario en este torneo y quemar el código permanentemente
     var updates={};
-    updates['profiles/'+curUser.uid+'/torneoAdmitido']=true;
+    updates['torneo/admitidos/'+curUser.uid]=true;
     updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
     // Limpiar torneoCode del dueño y marcarlo como usado permanentemente
     updates['profiles/'+codeOwner+'/torneoCode']=null;
     updates['profiles/'+codeOwner+'/torneoCodeUsed']=true;
     db.ref().update(updates).then(function(){
+      // Actualizar torneoData local inmediatamente para que canPlay sea true al instante
+      if(torneoData){
+        if(!torneoData.admitidos)torneoData.admitidos={};
+        torneoData.admitidos[curUser.uid]=true;
+      }
       closeModal();
-      toast('✅ Código aceptado — ya puedes entrar a todos los torneos');
+      toast('✅ Código aceptado — ya puedes entrar al torneo');
       setTimeout(function(){goTorneo();},400);
     });
   });
