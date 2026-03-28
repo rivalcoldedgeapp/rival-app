@@ -955,12 +955,15 @@ function admActivarTorneo(){
   var retos=[5,10,15,4,'s','r'];
   var reto=retos[Math.floor(Math.random()*retos.length)];
   var gameLabel=GAME_LABELS[reto];
+  // guardar en window para usarlos en confirmActivarTorneo
+  window._tornPremio=premio;
+  window._tornReto=reto;
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">🏆 ACTIVAR TORNEO</div>'+
     '<div style="background:var(--ctd);border:1px solid var(--ctm);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center">'+
       '<div style="font-size:11px;color:var(--ct);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Reto elegido aleatoriamente</div>'+
       '<div style="font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:3px">'+gameLabel+'</div>'+
-      '<div style="font-size:13px;color:var(--wn);font-family:Bebas Neue,sans-serif;font-size:24px;margin-top:4px">'+premio+'</div>'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:var(--wn);margin-top:4px">'+premio+'</div>'+
     '</div>'+
     '<div style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">'+
       '• 5 intentos por usuario<br>'+
@@ -970,14 +973,13 @@ function admActivarTorneo(){
     '</div>'+
     '<div class="mbtns">'+
       '<button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button>'+
-      '<button class="btn btn-t" onclick="confirmActivarTorneo('+JSON.stringify(reto)+')" style="height:42px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:#fff">✅ ACTIVAR</button>'+
+      '<button class="btn btn-t" onclick="confirmActivarTorneo()" style="height:42px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:#fff">✅ ACTIVAR</button>'+
     '</div>';
   document.getElementById('overlay').classList.add('show');
-  // guardar premio en window para usarlo en confirm
-  window._tornPremio=premio;
 }
  
-function confirmActivarTorneo(reto){
+function confirmActivarTorneo(){
+  var reto=window._tornReto;
   var ahora=Date.now();
   db.ref('torneo').set({
     activo:true,
@@ -1088,16 +1090,27 @@ function emailReg(){
   var name=document.getElementById('rN').value.trim(),email=document.getElementById('rE').value.trim(),pass=document.getElementById('rP').value,ref=document.getElementById('rRef').value.trim().toUpperCase();
   if(!name||!email||!pass){setMsg('rMsg','Llena todos los campos','err');return;}
   if(pass.length<6){setMsg('rMsg','Contraseña mínimo 6 caracteres','err');return;}
-  var refOwnerUid=null;
-  if(ref){refOwnerUid=findRef(ref);if(!refOwnerUid){setMsg('rMsg','Código de invitación inválido','err');return;}}
   document.getElementById('rMsg').innerHTML='<div class="spin"></div>';
+  if(ref){
+    // Validar código: existe en perfiles Y no ha sido usado
+    var refOwner=findRef(ref);
+    if(!refOwner){setMsg('rMsg','Código de invitación inválido','err');return;}
+    db.ref('usedCodes/'+ref).once('value').then(function(s){
+      if(s.val()){setMsg('rMsg','Ese código ya fue usado — pide otro','err');return;}
+      doCreateAccount(name,email,pass,ref,refOwner);
+    });
+  } else {
+    doCreateAccount(name,email,pass,null,null);
+  }
+}
+function doCreateAccount(name,email,pass,refCode,refOwnerUid){
   auth.createUserWithEmailAndPassword(email,pass).then(function(r){
     return r.user.updateProfile({displayName:name}).then(function(){return r.user.sendEmailVerification();}).then(function(){
       var uid=r.user.uid,rc=genRef(name);
       var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,referredBy:refOwnerUid||null,createdAt:Date.now()};
-      if(refOwnerUid){
-        // marcar código como usado — 1 solo uso
-        db.ref('usedCodes/'+ref).set({usedBy:uid,usedAt:Date.now(),ownerUid:refOwnerUid});
+      if(refOwnerUid&&refCode){
+        // marcar código como usado — 1 solo uso, solo en registro nuevo
+        db.ref('usedCodes/'+refCode).set({usedBy:uid,usedAt:Date.now(),ownerUid:refOwnerUid});
       }
       return db.ref('profiles/'+uid).set(np);
     });
