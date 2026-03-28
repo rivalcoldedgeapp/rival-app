@@ -1598,7 +1598,15 @@ function showResult(fmt,diff,isRec,g){
       if(recS)recS.style.display=isRec?'block':'none';
     }
     var btn=document.getElementById('seqBtn');
-    if(btn){btn.className='gbtn gbs';btn.style.background='var(--cs)';btn.style.color='#000';btn.style.border='none';btn.textContent='▶️ INTENTAR DE NUEVO';btn.disabled=false;btn.style.opacity='1';}
+    if(btn){
+      btn.className='gbtn gbs';btn.style.background='var(--cs)';btn.style.color='#000';btn.style.border='none';
+      btn.textContent='▶️ INTENTAR DE NUEVO';btn.disabled=false;btn.style.opacity='1';
+      btn.onclick=function(){
+        seqState='idle';
+        document.getElementById('inlineResultS').style.display='none';
+        handleSeqBtn();
+      };
+    }
     document.getElementById('srBestS').textContent=wScores['s'][uid]&&wScores['s'][uid].bestTime?wScores['s'][uid].bestTime+'s':'—';
     document.getElementById('srPosS').textContent='#'+rank+' de '+total;
     if(curTorneoMode){torneoRegistrarIntento(fmt,diff,g);curTorneoMode=false;}
