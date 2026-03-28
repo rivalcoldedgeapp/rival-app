@@ -645,6 +645,7 @@ body.playing{overflow:hidden}
       <div style="margin-top:10px;text-align:center"><button onclick="admLogout()" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer">← Volver</button></div>
     </div>
     <div id="admP" class="ap">
+      <!-- Header -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -652,61 +653,79 @@ body.playing{overflow:hidden}
           <button class="btn btn-gh" onclick="admLogout()">← Salir</button>
         </div>
       </div>
-      <div class="ap-stats">
-        <div class="ast"><div class="asl">Jugadores</div><div class="asv g" id="stU">0</div></div>
-        <div class="ast"><div class="asl">🟢 En línea ahora</div><div class="asv g" id="stOnline">0</div></div>
-        <div class="ast"><div class="asl">Partidas hoy</div><div class="asv y" id="stP">0</div></div>
-        <div class="ast"><div class="asl">Mejor 5s</div><div class="asv g" id="stB5">—</div></div>
-        <div class="ast"><div class="asl">Mejor ⚡</div><div class="asv r" id="stBr">—</div></div>
+
+      <!-- ══ STATS CARDS ══ -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+        <div class="ast"><div class="asl">👥 Jugadores totales</div><div class="asv g" id="stU">0</div></div>
+        <div class="ast"><div class="asl">🟢 En línea ahora</div><div class="asv" id="stOnline" style="color:var(--tm)">0</div></div>
+        <div class="ast"><div class="asl">🎮 Partidas hoy</div><div class="asv y" id="stP">0</div></div>
+      </div>
+
+      <!-- ══ LÍDERES ══ -->
+      <div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">🏆 Líderes actuales</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px" id="winnersWrap"></div>
+      </div>
+
+      <!-- ══ TIEMPOS OBJETIVO ══ -->
+      <div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:10px">
+        <button onclick="toggleAdmSection('secTargets')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">
+          <span style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎲 Tiempos objetivo de hoy</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn btn-g" onclick="event.stopPropagation();genTargets()" style="font-size:10px;padding:4px 10px">🎲 Generar</button>
+            <span id="secTargetsArrow" style="color:var(--tm);font-size:12px">▼</span>
+          </div>
+        </button>
+        <div id="secTargets" style="padding:0 14px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="background:var(--sf2);border:1px solid var(--c5);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c5);margin-bottom:4px">🟢 Reto 1</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c5)" id="admT5">—</div></div>
+          <div style="background:var(--sf2);border:1px solid var(--c10);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c10);margin-bottom:4px">🔵 Reto 2</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c10)" id="admT10">—</div></div>
+          <div style="background:var(--sf2);border:1px solid var(--c15);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c15);margin-bottom:4px">🟣 Reto 3</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c15)" id="admT15">—</div></div>
+          <div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--c4b);margin-bottom:4px">🟡 Reto 4</div><div style="font-family:DM Mono,monospace;font-size:15px;color:var(--c4b)" id="admT4">—</div></div>
+        </div>
       </div>
 
       <!-- ══ TORNEO RELÁMPAGO ══ -->
-      <div class="sec-hdr"><div class="sec-lbl" style="color:var(--ct)">🏆 TORNEO RELÁMPAGO</div></div>
-      <div id="torneoAdminPanel"></div>
-      <!-- historial -->
-      <div class="sec-hdr" style="margin-top:8px">
-        <div class="sec-lbl" style="color:var(--tm)">📋 Historial de torneos</div>
-        <button class="btn btn-gh" onclick="toggleHistorial()">Ver historial</button>
-      </div>
-      <div id="torneoHistorialPanel" style="display:none;margin-bottom:20px"></div>
-
-      <!-- targets -->
-      <div class="sec-hdr">
-        <div class="sec-lbl">🎲 Tiempos objetivo de hoy</div>
-        <button class="btn btn-g" onclick="genTargets()">🎲 Generar aleatorios</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px">
-        <div style="background:var(--sf);border:1px solid var(--c5);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;letter-spacing:2px;color:var(--c5);text-transform:uppercase;margin-bottom:4px">🟢 Reto 1</div><div style="font-family:DM Mono,monospace;font-size:16px;color:var(--c5)" id="admT5">—</div></div>
-        <div style="background:var(--sf);border:1px solid var(--c10);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;letter-spacing:2px;color:var(--c10);text-transform:uppercase;margin-bottom:4px">🔵 Reto 2</div><div style="font-family:DM Mono,monospace;font-size:16px;color:var(--c10)" id="admT10">—</div></div>
-        <div style="background:var(--sf);border:1px solid var(--c15);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;letter-spacing:2px;color:var(--c15);text-transform:uppercase;margin-bottom:4px">🟣 Reto 3</div><div style="font-family:DM Mono,monospace;font-size:16px;color:var(--c15)" id="admT15">—</div></div>
-        <div style="background:var(--sf);border:1px solid var(--c4b);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;letter-spacing:2px;color:var(--c4b);text-transform:uppercase;margin-bottom:4px">🟡 Reto 4</div><div style="font-family:DM Mono,monospace;font-size:16px;color:var(--c4b)" id="admT4">—</div></div>
-      </div>
-      <div class="sec-hdr">
-        <div class="sec-lbl">📅 Vista semanal</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="apt" id="awgt5" onclick="setAdmWeekGame(5)">🟢 Reto 1</button>
-          <button class="apt" id="awgt10" onclick="setAdmWeekGame(10)">🔵 Reto 2</button>
-          <button class="apt" id="awgt15" onclick="setAdmWeekGame(15)">🟣 Reto 3</button>
-          <button class="apt" id="awgt4" onclick="setAdmWeekGame(4)">🟡 Reto 4</button>
-          <button class="apt" id="awgts" onclick="setAdmWeekGame('s')">🔵 Secuencia</button>
-          <button class="apt" id="awgtr" onclick="setAdmWeekGame('r')">⚡ Reacción</button>
+      <div style="background:var(--sf);border:2px solid var(--ct);border-radius:12px;overflow:hidden;margin-bottom:10px">
+        <button onclick="toggleAdmSection('secTorneo')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">
+          <span style="font-size:9px;letter-spacing:3px;color:var(--ct);text-transform:uppercase">🏆 Torneo Relámpago</span>
+          <span id="secTorneoArrow" style="color:var(--tm);font-size:12px">▼</span>
+        </button>
+        <div id="secTorneo" style="padding:0 14px 14px">
+          <div id="torneoAdminPanel"></div>
+          <div style="margin-top:10px;border-top:1px solid var(--bo);padding-top:10px">
+            <button onclick="toggleAdmSection('secHistorial')" style="background:transparent;border:none;color:var(--tm);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:6px">
+              <span id="secHistorialArrow">▶</span> 📋 Ver historial de torneos
+            </button>
+            <div id="secHistorial" style="display:none;margin-top:10px" id="torneoHistorialPanel"></div>
+          </div>
         </div>
       </div>
-      <div id="admWeekWrap" style="margin-bottom:20px"><div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Selecciona un reto</div></div>
-      <div class="sec-hdr"><div class="sec-lbl">🏆 Líderes actuales</div></div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px" id="winnersWrap"></div>
-      <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
-        <button class="apt" id="aptG" onclick="setAdmTab('global')" style="background:var(--wn);color:#000;border-color:var(--wn)">🏅 Global</button>
-        <button class="apt" id="apt5" onclick="setAdmTab(5)">🟢 Reto 1</button>
-        <button class="apt" id="apt10" onclick="setAdmTab(10)">🔵 Reto 2</button>
-        <button class="apt" id="apt15" onclick="setAdmTab(15)">🟣 Reto 3</button>
-        <button class="apt" id="apt4" onclick="setAdmTab(4)">🟡 Reto 4</button>
-        <button class="apt" id="apts" onclick="setAdmTab('s')">🔵 Secuencia</button>
-        <button class="apt" id="aptrr" onclick="setAdmTab('r')">⚡ Reacción</button>
+
+      <!-- ══ RANKING GLOBAL ══ -->
+      <div style="background:var(--sf);border:1px solid var(--wn);border-radius:12px;overflow:hidden;margin-bottom:10px">
+        <button onclick="toggleAdmSection('secGlobal')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">
+          <span style="font-size:9px;letter-spacing:3px;color:var(--wn);text-transform:uppercase">🏅 Ranking global</span>
+          <span id="secGlobalArrow" style="color:var(--tm);font-size:12px">▶</span>
+        </button>
+        <div id="secGlobal" style="display:none;padding:0 14px 14px;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;min-width:600px">
+            <thead><tr>
+              <th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">#</th>
+              <th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Jugador</th>
+              <th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Email</th>
+              <th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Puntos</th>
+              <th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Partidas</th>
+              <th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Invitados</th>
+              <th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Último acceso</th>
+            </tr></thead>
+            <tbody id="admTblGlobal"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="tbl-wrap">
-        <table><thead><tr><th>#</th><th>Jugador</th><th>Email</th><th id="admTblCol3">Mejor hoy</th><th id="admTblCol4">Diff</th><th>Partidas</th><th>Pts semana</th><th>Invitados</th><th></th></tr></thead><tbody id="admTbl"></tbody></table>
-      </div>
+
+      <!-- ══ LISTAS POR RETO ══ -->
+      <div id="secRetosWrap"></div>
+
     </div>
   </div>
 </div>
@@ -1584,26 +1603,134 @@ function renderAdmGlobalTable(){
     '</tr>';
   }).join('');
 }
-function admLogin(){var u=document.getElementById('au').value,p=document.getElementById('ap').value;if((u==='admin'||u==='socio')&&p==='rival2024'){admLoggedIn=true;document.getElementById('admLC').style.display='none';document.getElementById('admP').classList.add('show');updateConfigUI();updateAdmStats();buildWinners();setAdmTab('global');renderTorneoAdminPanel();toast('✅ Bienvenido '+u);}else toast('❌ Credenciales incorrectas');}
+function toggleAdmSection(id){
+  var el=document.getElementById(id);if(!el)return;
+  var arrow=document.getElementById(id+'Arrow');
+  var hidden=el.style.display==='none'||el.style.display==='';
+  el.style.display=hidden?'block':'none';
+  if(arrow)arrow.textContent=hidden?'▼':'▶';
+  // lazy load contenido
+  if(hidden){
+    if(id==='secGlobal')renderAdmGlobalTable();
+    if(id==='secHistorial')renderTorneoHistorial();
+    if(id.startsWith('secReto_'))renderAdmRetoSection(id.replace('secReto_',''));
+  }
+}
+
+function buildRetosAccordion(){
+  var wrap=document.getElementById('secRetosWrap');if(!wrap)return;
+  var retos=[
+    {g:5,label:'🟢 Reto 1',color:'var(--c5)',stroke:'#00e87a'},
+    {g:10,label:'🔵 Reto 2',color:'var(--c10)',stroke:'#3d9bff'},
+    {g:15,label:'🟣 Reto 3',color:'var(--c15)',stroke:'#b319ff'},
+    {g:4,label:'🟡 Reto 4 Ciego',color:'var(--c4b)',stroke:'#ff9f00'},
+    {g:'s',label:'🔵 Secuencia',color:'var(--cs)',stroke:'#00c2e0'},
+    {g:'r',label:'⚡ Reacción',color:'var(--cr)',stroke:'#ff6b00'}
+  ];
+  wrap.innerHTML=retos.map(function(r){
+    var sid='secReto_'+r.g;
+    return '<div style="background:var(--sf);border:1px solid '+r.stroke+'30;border-radius:12px;overflow:hidden;margin-bottom:10px">'+
+      '<button onclick="toggleAdmSection(\''+sid+'\')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">'+
+        '<span style="font-size:9px;letter-spacing:3px;color:'+r.stroke+';text-transform:uppercase">'+r.label+'</span>'+
+        '<span id="'+sid+'Arrow" style="color:var(--tm);font-size:12px">▶</span>'+
+      '</button>'+
+      '<div id="'+sid+'" style="display:none;padding:0 14px 14px"><div style="font-size:12px;color:var(--tm);text-align:center;padding:10px">Cargando...</div></div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderAdmRetoSection(g){
+  var sid='secReto_'+g;
+  var el=document.getElementById(sid);if(!el)return;
+  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g===4,gkey=getGameKey(g);
+  var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);
+  monday.setDate(d.getDate()+diff);
+  var days=[];
+  for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}
+  var today=getTodayKey();
+  Promise.all(days.map(function(dayObj){
+    return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};});
+  })).then(function(results){
+    // Filtrar solo días con jugadas y tomar los 3 más recientes
+    var conJugadas=results.filter(function(r){
+      return Object.values(r.scores).some(function(w){return w.bestDiff!=null;})&&r.day.key<=today;
+    }).reverse().slice(0,3);
+    if(conJugadas.length===0){el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';return;}
+    var html=conJugadas.map(function(r){
+      var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      var isToday=r.day.key===today;
+      return '<div style="margin-bottom:14px">'+
+        '<div style="font-size:11px;font-weight:700;color:'+(isToday?cfg.stroke:'var(--tm)')+';margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bo)">'+
+          r.day.label+(isToday?' · Hoy':'')+' <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span>'+
+        '</div>'+
+        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:500px">'+
+          '<thead><tr>'+
+            '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">#</th>'+
+            '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Jugador</th>'+
+            '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Email</th>'+
+            '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Tiempo</th>'+
+            '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Diff</th>'+
+            '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Partidas</th>'+
+          '</tr></thead><tbody>'+
+          sorted.map(function(e,i){
+            var uid2=e[0],w=e[1],p=profiles[uid2]||{};
+            var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+            return '<tr style="border-top:1px solid var(--bo)">'+
+              '<td style="padding:6px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
+              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+w.name+'</td>'+
+              '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
+              '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
+              '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;color:var(--tm);text-align:center">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td>'+
+              '<td style="padding:6px 8px;font-size:12px;color:var(--tm);text-align:center">'+(w.attempts||0)+'</td>'+
+            '</tr>';
+          }).join('')+
+          '</tbody></table></div>'+
+      '</div>';
+    }).join('');
+    el.innerHTML=html;
+  });
+}
+
+function renderAdmGlobalTable(){
+  var tbody=document.getElementById('admTblGlobal');if(!tbody)return;
+  var ahora=Date.now(),cincoMin=5*60*1000;
+  var allUids=new Set(Object.keys(weekPoints));
+  [5,10,15,4,'s','r'].forEach(function(g){Object.keys(wScores[g]).forEach(function(u){allUids.add(u);});});
+  var rows=Array.from(allUids).map(function(uid2){
+    var wp=weekPoints[uid2]||{},p=profiles[uid2]||{};
+    var totalPartidas=0;[5,10,15,4,'s','r'].forEach(function(g){if(wScores[g][uid2])totalPartidas+=(wScores[g][uid2].attempts||0);});
+    var lastPlayed=0;[5,10,15,4,'s','r'].forEach(function(g){if(wScores[g][uid2]&&wScores[g][uid2].lastPlayed&&wScores[g][uid2].lastPlayed>lastPlayed)lastPlayed=wScores[g][uid2].lastPlayed;});
+    var isOnline=lastPlayed&&(ahora-lastPlayed)<cincoMin;
+    var invCount=Object.values(profiles).filter(function(pr){return pr.referredBy===uid2;}).length;
+    var ultimoStr='—';
+    if(lastPlayed){var d=new Date(lastPlayed),cdmx=new Date(d.getTime()+d.getTimezoneOffset()*60000+(-6*3600000));var diffMin=Math.floor((ahora-lastPlayed)/60000);ultimoStr=diffMin<1?'ahora':diffMin<60?diffMin+'min':diffMin<1440?Math.floor(diffMin/60)+'h':DAYS[cdmx.getDay()]+' '+cdmx.getDate();}
+    return{uid:uid2,name:wp.name||p.name||'?',email:p.email||'—',total:wp.total||0,partidas:totalPartidas,invCount:invCount,isOnline:isOnline,ultimoStr:ultimoStr,lastPlayed:lastPlayed};
+  }).sort(function(a,b){return b.total-a.total||b.lastPlayed-a.lastPlayed;});
+  if(rows.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:20px">Sin datos</td></tr>';return;}
+  tbody.innerHTML=rows.map(function(r,i){
+    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+    return '<tr style="border-top:1px solid var(--bo)">'+
+      '<td style="padding:7px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
+      '<td style="padding:7px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+r.name+(r.isOnline?'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ac);margin-left:6px;vertical-align:middle"></span>':'')+'</td>'+
+      '<td style="padding:7px 8px;font-size:10px;color:var(--tm)">'+r.email+'</td>'+
+      '<td style="padding:7px 8px;font-family:DM Mono,monospace;font-size:13px;color:var(--wn);font-weight:700;text-align:center">'+r.total+'</td>'+
+      '<td style="padding:7px 8px;font-size:12px;color:var(--tm);text-align:center">'+r.partidas+'</td>'+
+      '<td style="padding:7px 8px;font-size:12px;color:var(--ac);text-align:center">'+r.invCount+'</td>'+
+      '<td style="padding:7px 8px;font-size:11px;color:'+(r.isOnline?'var(--ac)':'var(--td)')+';text-align:center">'+r.ultimoStr+'</td>'+
+    '</tr>';
+  }).join('');
+}
+function admLogin(){var u=document.getElementById('au').value,p=document.getElementById('ap').value;if((u==='admin'||u==='socio')&&p==='rival2024'){admLoggedIn=true;document.getElementById('admLC').style.display='none';document.getElementById('admP').classList.add('show');updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();renderTorneoAdminPanel();toast('✅ Bienvenido '+u);}else toast('❌ Credenciales incorrectas');}
 function genTargets(){var t5=Math.round((3+Math.random()*4)*1000)/1000,t10=Math.round((7+Math.random()*6)*1000)/1000,t15=Math.round((12+Math.random()*6)*1000)/1000,t4=Math.round((15+Math.random()*10)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c5);border-radius:9px"><span style="color:var(--c5)">🟢 Reto 1</span><span style="font-family:DM Mono,monospace;color:var(--c5)">'+t5.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c10);border-radius:9px"><span style="color:var(--c10)">🔵 Reto 2</span><span style="font-family:DM Mono,monospace;color:var(--c10)">'+t10.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c15);border-radius:9px"><span style="color:var(--c15)">🟣 Reto 3</span><span style="font-family:DM Mono,monospace;color:var(--c15)">'+t15.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto 4</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+t4.toFixed(3)+'s</span></div></div><p style="font-size:11px;color:var(--tm);margin-bottom:12px">⚠️ Cambia el objetivo para todos al instante.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-g" onclick="saveTargets('+t5+','+t10+','+t15+','+t4+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
 function saveTargets(t5,t10,t15,t4){db.ref('gameConfig').set({t5:t5,t10:t10,t15:t15,t4:t4,lastDay:getTodayKey(),updatedAt:Date.now()}).then(function(){closeModal();toast('✅ Tiempos actualizados');});}
 function updateAdmStats(){
   document.getElementById('stU').textContent=Object.keys(profiles).length;
-  // En línea = jugaron en los últimos 5 minutos en cualquier reto
   var ahora=Date.now(),cincoMin=5*60*1000,onlineUids=new Set();
-  [5,10,15,4,'s','r'].forEach(function(g){
-    Object.entries(wScores[g]).forEach(function(e){
-      if(e[1].lastPlayed&&(ahora-e[1].lastPlayed)<cincoMin)onlineUids.add(e[0]);
-    });
-  });
+  [5,10,15,4,'s','r'].forEach(function(g){Object.entries(wScores[g]).forEach(function(e){if(e[1].lastPlayed&&(ahora-e[1].lastPlayed)<cincoMin)onlineUids.add(e[0]);});});
   var onlineEl=document.getElementById('stOnline');
   if(onlineEl){onlineEl.textContent=onlineUids.size;onlineEl.style.color=onlineUids.size>0?'var(--ac)':'var(--tm)';}
-  var total=0;
-  [5,10,15,4,'s','r'].forEach(function(g){total+=Object.values(wScores[g]).reduce(function(a,w){return a+(w.attempts||0);},0);});
+  var total=0;[5,10,15,4,'s','r'].forEach(function(g){total+=Object.values(wScores[g]).reduce(function(a,w){return a+(w.attempts||0);},0);});
   document.getElementById('stP').textContent=total;
-  var b5=getSorted(5,1);document.getElementById('stB5').textContent=b5.length>0?b5[0][1].bestTime+'s':'—';
-  var br=getSorted('r',1);document.getElementById('stBr').textContent=br.length>0?br[0][1].bestTime+'ms':'—';
-  // Actualizar cada 30 segundos automáticamente
   clearTimeout(window._onlineTO);
   window._onlineTO=setTimeout(updateAdmStats,30000);
 }
