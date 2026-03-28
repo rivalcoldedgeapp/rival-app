@@ -203,7 +203,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .react-ms-big{font-family:'Bebas Neue',sans-serif;font-size:90px;color:var(--cr);line-height:1;text-shadow:0 0 30px var(--crm)}
 .react-ms-lbl{font-size:12px;color:var(--tm);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
 /* RESULT */
-#sResult{padding:18px}
 .res-inner{width:100%;max-width:400px}
 .rh{text-align:center;margin-bottom:14px}
 .rh-time{font-family:'Bebas Neue',sans-serif;font-size:82px;line-height:1}
@@ -634,23 +633,6 @@ body.playing{overflow:hidden}
   </div>
 </div>
 
-<!-- RESULT -->
-<div class="screen" id="sResult">
-  <div class="res-inner">
-    <div class="rh">
-      <div class="rh-time" id="rhTime">5.000s</div>
-      <div class="rh-diff" id="rhDiff">±0ms del objetivo</div>
-      <div class="rh-rank" id="rhRank">Posición <span id="rhRankSpan" style="color:var(--ac)">#1</span></div>
-    </div>
-    <div class="nr" id="nrBox">🎉 ¡Nuevo récord personal!</div>
-    <div id="torneoResultBox" style="display:none;text-align:center;padding:10px 14px;background:var(--ctd);border:1px solid var(--ctm);border-radius:9px;font-size:12px;color:var(--ct);margin-bottom:10px"></div>
-    <div id="resPts" style="display:none;text-align:center;padding:8px;background:var(--sf);border:1px solid var(--wn);border-radius:9px;font-size:12px;margin-bottom:10px"></div>
-    <div class="lb-hdr" id="lbHdr">🏆 TOP 10</div>
-    <div id="lbList"></div>
-    <button class="pa-btn" id="paBtn" onclick="playAgain()">▶️ JUGAR DE NUEVO</button>
-  </div>
-</div>
-
 <!-- RANKING -->
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner">
@@ -677,27 +659,6 @@ body.playing{overflow:hidden}
       <div id="rankList"></div>
       <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
     </div>
-  </div>
-</div>
-
-<!-- WEEKLY -->
-<div class="screen" id="sWeek" style="align-items:flex-start;justify-content:flex-start">
-  <div style="width:100%;max-width:560px;margin:0 auto;padding:18px">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px">SEMANA</div>
-      <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="weekRangeLbl"></div>
-    </div>
-    <div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Días anteriores · Top 3 · Tu posición</div>
-    <div style="font-size:11px;color:var(--td);margin-bottom:14px">🥇+10pts &nbsp; 🥈+7pts &nbsp; 🥉+5pts &nbsp; 4to+3pts &nbsp; 5to-10mo+1pt</div>
-    <div style="display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap">
-      <button class="rgt" id="wgt5" onclick="setWeekGame(5)">🟢 Reto 1</button>
-      <button class="rgt" id="wgt10" onclick="setWeekGame(10)">🔵 Reto 2</button>
-      <button class="rgt" id="wgt15" onclick="setWeekGame(15)">🟣 Reto 3</button>
-      <button class="rgt" id="wgt4" onclick="setWeekGame(4)">🟡 Reto 4</button>
-      <button class="rgt" id="wgts" onclick="setWeekGame('s')">🔵 Secuencia</button>
-      <button class="rgt" id="wgtr" onclick="setWeekGame('r')">⚡ Reacción</button>
-    </div>
-    <div id="weekDaysWrap"><div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Cargando...</div></div>
   </div>
 </div>
 
@@ -1075,9 +1036,7 @@ function torneoRegistrarIntento(fmt,diff,g){
       box.innerHTML='🏆 Torneo · Intento '+intentosUsados+'/5 registrado'+(intentosLeft>0?' · Te quedan <strong>'+intentosLeft+' intentos</strong>':' · <strong>Sin más intentos</strong>');
     }
   }
-  var paBtn=document.getElementById('paBtn');
-  if(paBtn&&intentosLeft>0)paBtn.textContent='▶️ USAR OTRO INTENTO ('+intentosLeft+')';
-  else if(paBtn)paBtn.textContent='← VOLVER AL TORNEO';
+  // paBtn removido - resultado ahora es inline
 }
 
 // ══ TORNEO ADMIN ══
@@ -1661,7 +1620,7 @@ function showResult(fmt,diff,isRec,g){
       resetClock();
     };
   }
-  if(curTorneoMode)torneoRegistrarIntento(fmt,diff,g);
+  if(curTorneoMode)lastWasTorneo=true;
   lastWasTorneo=false;
 }
 function playAgain(){
@@ -1757,7 +1716,7 @@ function getRank(uid,g){var sorted=Object.entries(wScores[g]).filter(function(e)
 function goTab(t){
   document.getElementById('nt-home').classList.toggle('on',t==='home');
   document.getElementById('nt-rank').classList.toggle('on',t==='rank');
-  if(t==='home'){showScreen('sHome');updateHomecards();updateConfigUI();updateInviteCard();}
+  if(t==='home'){showScreen('sHome');updateHomecards();updateConfigUI();}
   else if(t==='rank'){
     [5,10,15,4,'s','r','global'].forEach(function(x){var id='rgt'+(x==='r'?'r':x==='global'?'G':x==='s'?'s':x);var el=document.getElementById(id);if(el){el.style.background='';el.style.color='';el.style.borderColor='';}});
     setRankGame('global');showScreen('sRanking');
