@@ -1114,6 +1114,32 @@ function renderTorneoAdminPanel(){
         '<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--wn);margin-top:2px">'+ganador.bestTime+(torneoData.reto==='r'?'ms':'s')+'</div>'+
         '<div style="font-size:11px;color:var(--tm);margin-top:4px">📧 '+ganadorEmail+'</div>'+
       '</div>':'')+
+      // Tabla completa de todos los participantes
+      (sortedP.length>0?
+        '<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Todos los participantes</div>'+
+        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+          '<thead><tr>'+
+            '<th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">#</th>'+
+            '<th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Jugador</th>'+
+            '<th style="text-align:left;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Email</th>'+
+            '<th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Mejor tiempo</th>'+
+            '<th style="text-align:center;font-size:9px;letter-spacing:1px;color:var(--tm);text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--bo)">Intentos</th>'+
+          '</tr></thead>'+
+          '<tbody>'+
+          sortedP.map(function(e,i){
+            var uid2=e[0],w=e[1],p=profiles[uid2]||{},isTop=i===0;
+            var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+            var isR=torneoData.reto==='r';
+            return '<tr style="border-top:1px solid var(--bo);background:'+(isTop?'rgba(255,184,0,.05)':'')+'">'+
+              '<td style="padding:7px 8px;font-size:12px;color:'+(isTop?'var(--wn)':'var(--td)')+'">'+medal+'</td>'+
+              '<td style="padding:7px 8px;font-weight:'+(isTop?'700':'400')+';font-size:12px">'+w.name+'</td>'+
+              '<td style="padding:7px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
+              '<td style="padding:7px 8px;font-family:DM Mono,monospace;font-size:13px;color:'+(isTop?'var(--wn)':'var(--ct)')+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
+              '<td style="padding:7px 8px;font-size:12px;color:var(--tm);text-align:center">'+(w.intentos||0)+'/5</td>'+
+            '</tr>';
+          }).join('')+
+          '</tbody></table></div>':
+        '<div style="font-size:11px;color:var(--td);margin-top:6px">Sin participantes aún</div>')+
       '<div style="font-size:10px;color:var(--td);margin-top:4px">Al cerrar el torneo se revelará el ganador y su correo para que lo contactes.</div>'+
     '</div>';
   } else {
