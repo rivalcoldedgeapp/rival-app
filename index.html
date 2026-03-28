@@ -1331,18 +1331,7 @@ function backfillLegacyPoints(){
   });
 }
 function checkDailyReset(){var currentDay=getTodayKey();db.ref('gameConfig').once('value').then(function(s){var cfg=s.val();if(!cfg||!cfg.t5||cfg.lastDay!==currentDay){db.ref('gameConfig').set({t5:Math.round((3+Math.random()*4)*1000)/1000,t10:Math.round((7+Math.random()*6)*1000)/1000,t15:Math.round((12+Math.random()*6)*1000)/1000,t4:Math.round((15+Math.random()*10)*1000)/1000,lastDay:currentDay,updatedAt:Date.now()});}});}
-setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();function listenWeekScore(g){
-  db.ref(getScorePath(g)).on('value',function(s){
-    wScores[g]=s.val()||{};
-    updateHomecards();
-    if(document.getElementById('sRanking').classList.contains('on')){
-      if(rankGame===g)renderTop10(g);
-      else if(rankGame==='global')renderGlobalRank();
-    }
-    if(admLoggedIn){updateAdmStats();buildWinners();}
-  });
-}
-[5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});wScores={5:{},10:{},15:{},4:{},s:{},r:{}};}},60000);
+setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();[5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});wScores={5:{},10:{},15:{},4:{},s:{},r:{}};}},60000);
 db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.t5)GCFG[5]=parseFloat(cfg.t5);if(cfg.t10)GCFG[10]=parseFloat(cfg.t10);if(cfg.t15)GCFG[15]=parseFloat(cfg.t15);if(cfg.t4)GCFG[4]=parseFloat(cfg.t4);updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
@@ -1358,6 +1347,17 @@ function startListeners(){
   [5,10,15,4,'s','r'].forEach(function(g){
     db.ref(getScorePath(g)).off();
     listenWeekScore(g);
+  });
+}
+function listenWeekScore(g){
+  db.ref(getScorePath(g)).on('value',function(s){
+    wScores[g]=s.val()||{};
+    updateHomecards();
+    if(document.getElementById('sRanking').classList.contains('on')){
+      if(rankGame===g)renderTop10(g);
+      else if(rankGame==='global')renderGlobalRank();
+    }
+    if(admLoggedIn){updateAdmStats();buildWinners();}
   });
 }
 [5,10,15,4,'s','r'].forEach(function(g){listenWeekScore(g);});
