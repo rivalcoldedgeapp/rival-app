@@ -1208,6 +1208,9 @@ function updateInviteCard(){
   // contar invitados
   var count=Object.values(profiles).filter(function(pr){return pr.referredBy===curUser.uid;}).length;
   var cel=document.getElementById('inviteCount');if(cel)cel.textContent=count;
+  // ocultar card si el código ya fue usado (1 solo uso)
+  var card=document.getElementById('inviteCard');
+  if(card)card.style.display=count>=1?'none':'block';
 }
 function copyInviteCode(){
   var p=profiles[curUser.uid];if(!p||!p.referralCode)return;
