@@ -950,7 +950,7 @@ function renderTorneoScreen(){
   var btn=document.getElementById('torneoJugarBtn');
   var btnDisabled=intentosLeft<=0||torneoLleno;
   btn.disabled=btnDisabled;
-  btn.innerHTML=torneoLleno?'TORNEO LLENO':intentosLeft>0?'JUGAR INTENTO<br><span style="font-size:12px;letter-spacing:1px">('+intentosLeft+' restantes)</span>':'SIN INTENTOS';
+  btn.innerHTML=torneoLleno?'TORNEO LLENO':intentosLeft>0?'JUGAR INTENTO':'SIN INTENTOS';
   // lugares restantes
   var lugaresEl=document.getElementById('torLugares');
   if(lugaresEl){
