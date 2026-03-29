@@ -875,30 +875,45 @@ function aplicarCodigoTorneo(){
   if(!inp||!msg)return;
   var code=inp.value.trim().toUpperCase();
   if(!code){msg.style.color='var(--dg)';msg.textContent='Escribe un código';return;}
-  // Buscar dueño por torneoCode
-  var codeOwner=findTorneoRef(code);
-  if(!codeOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
-  if(codeOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
   msg.style.color='var(--tm)';msg.textContent='Verificando...';
-  // Verificar que el código no haya sido usado antes (global, permanente)
-  db.ref('torneoInvites/'+code).once('value').then(function(s){
-    if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;}
-    // Admitir al usuario en este torneo y quemar el código permanentemente
-    var updates={};
-    updates['torneo/admitidos/'+curUser.uid]=true;
-    updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
-    // Limpiar torneoCode del dueño y marcarlo como usado permanentemente
-    updates['profiles/'+codeOwner+'/torneoCode']=null;
-    updates['profiles/'+codeOwner+'/torneoCodeUsed']=true;
-    db.ref().update(updates).then(function(){
-      // Actualizar torneoData local inmediatamente para que canPlay sea true al instante
-      if(torneoData){
-        if(!torneoData.admitidos)torneoData.admitidos={};
-        torneoData.admitidos[curUser.uid]=true;
-      }
-      closeModal();
-      toast('✅ Código aceptado — ya puedes entrar al torneo');
-      setTimeout(function(){goTorneo();},400);
+  // Primero buscar en banco de códigos admin
+  db.ref('codigosBanco/'+code).once('value').then(function(snap){
+    var banco=snap.val();
+    if(banco&&!banco.usado){
+      // Es un código del banco — admitir y quemar
+      var updates={};
+      updates['torneo/admitidos/'+curUser.uid]=true;
+      updates['codigosBanco/'+code+'/usado']=true;
+      updates['codigosBanco/'+code+'/usadoPor']=curUser.uid;
+      updates['codigosBanco/'+code+'/usadoAt']=Date.now();
+      db.ref().update(updates).then(function(){
+        if(torneoData){if(!torneoData.admitidos)torneoData.admitidos={};torneoData.admitidos[curUser.uid]=true;}
+        closeModal();
+        toast('✅ Código aceptado — ya puedes entrar al torneo');
+        setTimeout(function(){goTorneo();},400);
+      });
+      return;
+    }
+    if(banco&&banco.usado){
+      msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;
+    }
+    // No es del banco — buscar por torneoCode de usuario
+    var codeOwner=findTorneoRef(code);
+    if(!codeOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
+    if(codeOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
+    db.ref('torneoInvites/'+code).once('value').then(function(s){
+      if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;}
+      var updates={};
+      updates['torneo/admitidos/'+curUser.uid]=true;
+      updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
+      updates['profiles/'+codeOwner+'/torneoCode']=null;
+      updates['profiles/'+codeOwner+'/torneoCodeUsed']=true;
+      db.ref().update(updates).then(function(){
+        if(torneoData){if(!torneoData.admitidos)torneoData.admitidos={};torneoData.admitidos[curUser.uid]=true;}
+        closeModal();
+        toast('✅ Código aceptado — ya puedes entrar al torneo');
+        setTimeout(function(){goTorneo();},400);
+      });
     });
   });
 }
@@ -1252,10 +1267,46 @@ function renderTorneoAdminPanel(){
       '<div style="display:flex;justify-content:center;padding:8px 0 4px">'+
         '<button class="btn btn-t" onclick="showNuevoTorneoForm()" style="height:44px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:#fff;padding:0 28px">🏆 NUEVO TORNEO RELÁMPAGO</button>'+
       '</div>'+
+      '<div style="margin-top:12px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 14px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+          '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎟 Banco de códigos</div>'+
+          '<button onclick="admGenerarCodigos()" style="background:var(--sf2);border:1px solid var(--bo);border-radius:6px;color:var(--tm);font-size:11px;padding:4px 10px;cursor:pointer">+ Generar 100</button>'+
+        '</div>'+
+        '<div id="bancoCodigos" style="font-size:11px;color:var(--td)">Cargando...</div>'+
+      '</div>'+
       '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">El sistema elige el reto aleatoriamente · Duración configurable</div>';
+    setTimeout(admCargarBanco, 0);
   }
 }
 
+function admGenerarCodigos(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var updates={};
+  for(var i=0;i<100;i++){
+    var code='';
+    for(var j=0;j<8;j++)code+=chars[Math.floor(Math.random()*chars.length)];
+    updates['codigosBanco/'+code]={usado:false,creadoAt:Date.now()};
+  }
+  db.ref().update(updates).then(function(){
+    toast('✅ 100 códigos generados');
+    admCargarBanco();
+  }).catch(function(err){toast('❌ Error: '+err.message);});
+}
+function admCargarBanco(){
+  var el=document.getElementById('bancoCodigos');if(!el)return;
+  db.ref('codigosBanco').once('value').then(function(s){
+    var data=s.val()||{};
+    var todos=Object.keys(data);
+    var disponibles=todos.filter(function(k){return !data[k].usado;});
+    var usados=todos.length-disponibles.length;
+    if(todos.length===0){el.innerHTML='<span style="color:var(--td)">Sin códigos — genera 100 para empezar</span>';return;}
+    var codesHtml=disponibles.slice(0,20).map(function(c){
+      return '<span style="font-family:DM Mono,monospace;background:var(--sf2);padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;cursor:pointer" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+c+'\').then(function(){toast(\'📋 '+c+' copiado\');})">'+c+'</span>';
+    }).join('');
+    el.innerHTML='<div style="margin-bottom:6px"><strong style="color:var(--ac)">'+disponibles.length+'</strong> disponibles · <span style="color:var(--td)">'+usados+' usados</span></div>'+
+      '<div style="line-height:2">'+codesHtml+(disponibles.length>20?'<span style="color:var(--td)"> +más en Firebase</span>':'')+'</div>';
+  }).catch(function(){el.innerHTML='<span style="color:var(--dg)">Error al cargar</span>';});
+}
 function showNuevoTorneoForm(){
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">🏆 NUEVO TORNEO</div>'+
