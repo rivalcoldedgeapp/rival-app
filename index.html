@@ -1670,6 +1670,20 @@ function _showPerfilModalWith(p){
 }
 
 // ══ GAME ══
+
+// Helper: devuelve {best, pos} del torneo activo para mostrar en srBest/srPos
+function getTorneoScoreRow(uid,isMs){
+  if(!curTorneoMode||!torneoData||!torneoData.participantes||!uid)return null;
+  var myScore=torneoData.participantes[uid];
+  var best=myScore&&myScore.bestTime?myScore.bestTime+(isMs?'ms':'s'):'—';
+  if(!myScore||!myScore.bestTime)return{best:'—',pos:'—'};
+  var tornTarget=torneoData.target||0;
+  var sorted=Object.entries(torneoData.participantes).filter(function(e){return e[1].bestTime!=null;}).sort(function(a,b){
+    return Math.abs(parseFloat(a[1].bestTime)-tornTarget)-Math.abs(parseFloat(b[1].bestTime)-tornTarget);
+  });
+  var rank=sorted.findIndex(function(e){return e[0]===uid;})+1;
+  return{best:best,pos:rank>0?'#'+rank+' de '+sorted.length:'—'};
+}
 function gameBack(){if(curTorneoMode){curTorneoMode=false;renderTorneoScreen();showScreen('sTorneo');}else goTab('home');}
 function startGame(g){
   curGame=g;var cfg=GCOLORS[g];
@@ -1680,8 +1694,10 @@ function startGame(g){
   document.getElementById('ghSub').style.color=cfg.color;document.getElementById('tNum').style.color=cfg.color;document.getElementById('tNum').style.textShadow='0 0 30px '+cfg.glow;
   document.getElementById('rfg').style.stroke=cfg.stroke;document.getElementById('cRing').style.setProperty('--gc-glow',cfg.glow);
   var uid=curUser?curUser.uid:null,ws=uid?wScores[g][uid]:null;
-  document.getElementById('srBest').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';document.getElementById('srBest').style.color=cfg.color;
-  document.getElementById('srPos').textContent=ws&&ws.bestTime?'#'+getRank(uid,g):'—';
+  var tRow=getTorneoScoreRow(uid,false);
+  if(tRow){document.getElementById('srBest').textContent=tRow.best;document.getElementById('srPos').textContent=tRow.pos;}
+  else{document.getElementById('srBest').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';document.getElementById('srPos').textContent=ws&&ws.bestTime?'#'+getRank(uid,g):'—';}
+  document.getElementById('srBest').style.color=cfg.color;
   // torneo badge
   var bar=document.getElementById('torneoIntentosBar');
   if(curTorneoMode&&torneoData&&torneoData.activo){
@@ -1709,7 +1725,10 @@ function resetClock(){
 }
 
 // ══ SECUENCIA ══
-function startSeq(){seqState='idle';seqCurrent=1;var uid=curUser?curUser.uid:null,ws=uid?wScores['s'][uid]:null;document.getElementById('srBestS').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';document.getElementById('srPosS').textContent=ws&&ws.bestTime?'#'+getRank(uid,'s'):'—';document.getElementById('seqNextHint').style.display='none';document.getElementById('seqTimerLbl').textContent='—';document.getElementById('seqArea').innerHTML='';var btn=document.getElementById('seqBtn');btn.textContent='INICIAR';btn.disabled=false;btn.style.opacity='1';showScreen('sSeq');}
+function startSeq(){seqState='idle';seqCurrent=1;var uid=curUser?curUser.uid:null,ws=uid?wScores['s'][uid]:null;
+var tRowS=getTorneoScoreRow(uid,false);
+if(tRowS){document.getElementById('srBestS').textContent=tRowS.best;document.getElementById('srPosS').textContent=tRowS.pos;}
+else{document.getElementById('srBestS').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';document.getElementById('srPosS').textContent=ws&&ws.bestTime?'#'+getRank(uid,'s'):'—';}document.getElementById('seqNextHint').style.display='none';document.getElementById('seqTimerLbl').textContent='—';document.getElementById('seqArea').innerHTML='';var btn=document.getElementById('seqBtn');btn.textContent='INICIAR';btn.disabled=false;btn.style.opacity='1';showScreen('sSeq');}
 function handleSeqBtn(){if(seqState==='idle'){seqState='countdown';var btn=document.getElementById('seqBtn');btn.disabled=true;btn.style.opacity='.5';var num=document.getElementById('cdN');num.style.color='#00c2e0';document.getElementById('cdWrap').classList.add('show');var n=3;function tick(){n--;if(n>0){num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.textContent=n;setTimeout(tick,800);}else{num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');seqStartRun();},600);}}setTimeout(tick,800);}}
 function seqAbort(){cancelAnimationFrame(seqRaf);seqState='idle';seqCurrent=1;document.getElementById('cdWrap').classList.remove('show');if(curTorneoMode){curTorneoMode=false;renderTorneoScreen();showScreen('sTorneo');}else goTab('home');}
 function seqBuildBoard(){var area=document.getElementById('seqArea');area.innerHTML='';var W=area.offsetWidth||300,H=area.offsetHeight||340;var r=31,nums=[1,2,3,4,5,6,7,8,9];for(var i=nums.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=nums[i];nums[i]=nums[j];nums[j]=tmp;}// Grid 3x3 garantiza que los números NUNCA se encimen
@@ -1746,7 +1765,10 @@ function saveSeqScore(ms){
 }
 
 // ══ REACTION ══
-function startReaction(){curGame='r';var uid=curUser?curUser.uid:null,ws=uid?wScores['r'][uid]:null;document.getElementById('srBestR').textContent=ws&&ws.bestTime?ws.bestTime+'ms':'—';document.getElementById('srPosR').textContent=ws&&ws.bestTime?'#'+getRank(uid,'r'):'—';reactState='idle';showReactIdle();showScreen('sReaction');}
+function startReaction(){curGame='r';var uid=curUser?curUser.uid:null,ws=uid?wScores['r'][uid]:null;
+var tRowR=getTorneoScoreRow(uid,true);
+if(tRowR){document.getElementById('srBestR').textContent=tRowR.best;document.getElementById('srPosR').textContent=tRowR.pos;}
+else{document.getElementById('srBestR').textContent=ws&&ws.bestTime?ws.bestTime+'ms':'—';document.getElementById('srPosR').textContent=ws&&ws.bestTime?'#'+getRank(uid,'r'):'—';}reactState='idle';showReactIdle();showScreen('sReaction');}
 function showReactIdle(){var z=document.getElementById('rZone');if(!z)return;z.className='rzone waiting';z.innerHTML='<div class="rz-icon">👁️</div><div class="rz-t">LISTO</div><div class="rz-s">Toca aquí para comenzar</div>';}
 function reactTap(){if(reactState==='idle'){reactState='waiting';var z=document.getElementById('rZone');z.className='rzone waiting';z.innerHTML='<div class="rz-icon">⏳</div><div class="rz-t">ESPERA...</div><div class="rz-s">Toca cuando veas el verde</div>';var delay=1000+Math.random()*4000;reactTO=setTimeout(function(){reactState='ready';var rT0=performance.now();var z2=document.getElementById('rZone');if(!z2)return;z2.className='rzone ready';z2.innerHTML='<div class="rz-icon">🟢</div><div class="rz-t" style="color:#000;font-size:28px;letter-spacing:4px">¡TOCA!</div>';window._reactT0=rT0;},delay);}else if(reactState==='waiting'){clearTimeout(reactTO);reactState='early';var z=document.getElementById('rZone');z.className='rzone early';z.innerHTML='<div class="rz-icon">❌</div><div class="rz-t" style="color:#fff">MUY RÁPIDO</div><div class="rz-s" style="color:rgba(255,255,255,.7)">Toca para reintentar</div>';setTimeout(function(){reactState='idle';showReactIdle();},1500);}else if(reactState==='ready'){var ms=Math.round(performance.now()-window._reactT0);reactState='done';var z=document.getElementById('rZone');z.className='rzone done';z.innerHTML='<div class="react-ms-big">'+ms+'</div><div class="react-ms-lbl">MILISEGUNDOS</div>';setTimeout(function(){saveScore(String(ms),ms,'r');},800);}else if(reactState==='done'||reactState==='early'){reactState='idle';showReactIdle();}}
 
@@ -1873,10 +1895,15 @@ function showResult(fmt,diff,isRec,g){
       irTorneo.innerHTML='🏆 Torneo · Intento '+(intentosUsados)+'/5'+(intentosLeft>0?' · <strong>'+intentosLeft+' restantes</strong>':' · Sin más intentos');
     } else if(irTorneo){irTorneo.style.display='none';}
   }
-  // Actualizar score row
-  var ws=wScores[g][uid];
-  document.getElementById('srBest').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';
-  document.getElementById('srPos').textContent='#'+rank+' de '+total;
+  // Actualizar score row — torneo o diario
+  if(lastWasTorneo){
+    var tRowUpd=getTorneoScoreRow(uid,false);
+    if(tRowUpd){document.getElementById('srBest').textContent=tRowUpd.best;document.getElementById('srPos').textContent=tRowUpd.pos;}
+  } else {
+    var ws=wScores[g][uid];
+    document.getElementById('srBest').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';
+    document.getElementById('srPos').textContent='#'+rank+' de '+total;
+  }
   // Cambiar botón
   var btn=document.getElementById('gBtn');
   if(btn){
