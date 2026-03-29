@@ -654,15 +654,15 @@ function backfillLegacyPoints(){
 }
 function checkDailyReset(){
   var currentDay=getTodayKey();
-  // Transaction garantiza que solo UN cliente genera los targets (sin race condition)
+  // IMPORTANTE: los valores aleatorios se generan UNA sola vez FUERA del callback.
+  // Firebase puede ejecutar el callback varias veces (optimistic + server confirm).
+  // Si Math.random() estuviera dentro, cada reintento generaría un target distinto.
+  var newTt=Math.round((3+Math.random()*12)*1000)/1000;   // Tiempo: 3.000–15.000s
+  var newTb=Math.round((5+Math.random()*15)*1000)/1000;   // Ciego:  5.000–20.000s
+  var now=Date.now();
   db.ref('gameConfig').transaction(function(cfg){
-    if(cfg&&cfg.lastDay===currentDay)return; // ya actualizado hoy — abortar
-    return{
-      tt:Math.round((3+Math.random()*12)*1000)/1000,  // Tiempo: 3.000–15.000s
-      tb:Math.round((5+Math.random()*15)*1000)/1000,  // Ciego:  5.000–20.000s
-      lastDay:currentDay,
-      updatedAt:Date.now()
-    };
+    if(cfg&&cfg.lastDay===currentDay)return; // ya actualizado hoy — abortar sin cambios
+    return{tt:newTt,tb:newTb,lastDay:currentDay,updatedAt:now};
   });
 }
 setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();['t','b','s','r'].forEach(function(g){listenWeekScore(g);});wScores={t:{},b:{},s:{},r:{}};}},60000);
