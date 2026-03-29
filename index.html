@@ -872,7 +872,7 @@ function showApp(fu,profile){
   if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
   else av.textContent=(profile.name||'R')[0].toUpperCase();
   var adminBtn=document.getElementById('navAdminBtn');
-  if(adminBtn)adminBtn.style.display=fu.uid==='U4X0cDD33Ahh2MxDsKCLgaoZMtR2'?'block':'none';
+  if(adminBtn)adminBtn.style.display='block'; // dev: visible para todos, contraseña es el gate
   document.getElementById('navRight').classList.add('show');
   document.getElementById('navTabs').classList.add('show');
   startListeners();
@@ -1543,7 +1543,7 @@ function goTab(t){
     ['global','t','b','s','r','yo','torneo'].forEach(function(x){var map={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};var el=document.getElementById('rgc'+map[x]);if(el)el.classList.remove('active');});
     setRankGame('global');showScreen('sRanking');
   }
-  else if(t==='admin'&&curUser&&curUser.uid==='U4X0cDD33Ahh2MxDsKCLgaoZMtR2'){
+  else if(t==='admin'&&curUser){
     openAdminDirect();
   }
 }
@@ -1819,11 +1819,12 @@ function admLogin(){
       updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
       toast('✅ Bienvenido '+u);
     };
-    if(auth.currentUser && !auth.currentUser.isAnonymous){
+    if(auth.currentUser){
       initPanel();
     } else {
-      toast('❌ Debes iniciar sesión con tu cuenta de Google primero');
-      admLoggedIn=false;
+      auth.signInAnonymously().then(initPanel).catch(function(e){
+        toast('❌ Error de auth: '+e.message);admLoggedIn=false;
+      });
     }
   } else {
     toast('❌ Credenciales incorrectas');
