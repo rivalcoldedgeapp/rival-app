@@ -29,17 +29,26 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .nav-tabs.show{display:flex}
 /* compact game grid */
 .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
-.gc2{border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;gap:6px;min-height:140px}
+.gc2{border-radius:14px;padding:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;min-height:140px}
 .gc2::before{content:'';position:absolute;inset:0;opacity:.06;pointer-events:none}
 .gc2.gt{border-color:var(--ac)}.gc2.gt::before{background:var(--ac)}
 .gc2.gb{border-color:var(--c4b)}.gc2.gb::before{background:var(--c4b)}
 .gc2.gs{border-color:var(--cs)}.gc2.gs::before{background:var(--cs)}
 .gc2.gr{border-color:var(--cr)}.gc2.gr::before{background:var(--cr)}
 .gc2:hover{transform:translateY(-2px)}
-.gc2-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;line-height:1}
-.gc2-tgt{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;text-shadow:0 0 20px currentColor}
-.gc2-tgtlbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:-2px}
-.gc2-leader{font-size:11px;margin-top:auto;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
+.gc2-name{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;line-height:1}
+/* Target: protagonista de la tarjeta — grande, centrado, con glow */
+.gc2-tgt{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:58px;line-height:1;
+  text-shadow:0 0 30px currentColor;
+  text-align:center;
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  margin:4px 0;
+}
+.gc2-tgtlbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.6;text-align:center;margin-top:-4px}
+.gc2-leader{font-size:11px;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
 .gc2-pos{font-size:10px;color:var(--tm)}
 .nav-brand{display:flex;align-items:baseline;gap:8px}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--ac)}
@@ -80,9 +89,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .amsg.err{color:var(--dg)}.amsg.ok{color:var(--ac)}
 .fl{font-size:10px;color:var(--tm);text-align:right;cursor:pointer;display:block;margin-top:3px}
 .fl:hover{color:var(--ac)}
-.adm-link{margin-top:12px;padding-top:10px;border-top:1px solid var(--bo);text-align:center}
-.adm-link button{background:transparent;border:none;color:var(--td);font-size:10px;cursor:pointer}
-.adm-link button:hover{color:var(--tm)}
+
 /* VERIFY */
 #sVerify{padding:20px}
 .vc{width:100%;max-width:320px;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:28px;text-align:center}
@@ -200,36 +207,44 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .li-sep{text-align:center;font-size:11px;color:var(--td);padding:3px}
 .pa-btn{width:100%;height:50px;background:var(--ac);color:#000;border:none;border-radius:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;cursor:pointer;margin-top:12px}
 .pa-btn:active{transform:scale(.98)}
-/* ══ TORNEO ══ */
-.torneo-card{border-radius:14px;padding:16px;border:2px solid var(--ct);background:var(--sf);position:relative;overflow:hidden;margin-top:12px}
-.torneo-card::before{content:'';position:absolute;inset:0;background:var(--ct);opacity:.04;pointer-events:none}
-.torneo-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:8px;font-family:'DM Sans',sans-serif;font-weight:600}
-.torneo-badge.waiting{background:var(--ctd);color:var(--ct);border:1px solid var(--ctm)}
-.torneo-badge.active{background:var(--ctd);color:var(--ct);border:1px solid var(--ct);animation:tornBadgePulse 2s ease-in-out infinite}
-.torneo-badge.cancelled{background:rgba(255,61,90,.1);color:var(--dg);border:1px solid rgba(255,61,90,.3)}
-.torneo-badge.finished{background:rgba(255,184,0,.1);color:var(--wn);border:1px solid rgba(255,184,0,.3)}
-@keyframes tornBadgePulse{0%,100%{opacity:1}50%{opacity:.65}}
-.torneo-banner{background:var(--ctd);border:1px solid var(--ctm);border-radius:10px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;width:100%;gap:8px;position:relative;z-index:2}
-.torneo-attempts{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ct)}
-.torneo-lb-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px;margin-bottom:4px}
-.torneo-lb-row.me{border-color:var(--ct)}
-.torneo-lb-row.top1{background:var(--ctd);border-color:var(--ctm)}
 /* RANKING */
 #sRanking{align-items:flex-start;justify-content:flex-start;padding:0}
 .rank-inner{width:100%;max-width:500px;margin:0 auto;padding:16px}
-.rg-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.rg-chips::-webkit-scrollbar{display:none}
-.rgc{padding:7px 13px;border-radius:20px;border:1px solid var(--bo);background:var(--sf2);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.rgc:active{transform:scale(.95)}
+/* Grid de selección 2×3 — mismo idioma visual que las game cards */
+.rk-sel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.rk-sel-card{
+  border-radius:13px;padding:12px 11px;cursor:pointer;
+  border:1px solid var(--bo);background:var(--sf);
+  position:relative;overflow:hidden;
+  transition:transform .15s,border-color .15s;
+  display:flex;flex-direction:column;gap:3px;min-height:76px;
+}
+.rk-sel-card::before{content:'';position:absolute;inset:0;opacity:.05;pointer-events:none;transition:opacity .15s}
+.rk-sel-card:active{transform:scale(.97)}
+/* Colores por categoría */
+.rks-global{border-color:var(--bo)}.rks-global::before{background:var(--wn)}
+.rks-t{border-color:var(--bo)}.rks-t::before{background:var(--ac)}
+.rks-b{border-color:var(--bo)}.rks-b::before{background:var(--c4b)}
+.rks-s{border-color:var(--bo)}.rks-s::before{background:var(--cs)}
+.rks-r{border-color:var(--bo)}.rks-r::before{background:var(--cr)}
+.rks-yo{border-color:var(--bo)}.rks-yo::before{background:var(--bl)}
+/* Estado activo — igual que gc2 pero con glow */
+.rk-sel-card.active.rks-global{border-color:var(--wn);box-shadow:0 0 14px rgba(255,184,0,.15)}.rk-sel-card.active.rks-global::before{opacity:.1}
+.rk-sel-card.active.rks-t{border-color:var(--ac);box-shadow:0 0 14px rgba(0,232,122,.15)}.rk-sel-card.active.rks-t::before{opacity:.1}
+.rk-sel-card.active.rks-b{border-color:var(--c4b);box-shadow:0 0 14px rgba(255,159,0,.15)}.rk-sel-card.active.rks-b::before{opacity:.1}
+.rk-sel-card.active.rks-s{border-color:var(--cs);box-shadow:0 0 14px rgba(0,194,224,.15)}.rk-sel-card.active.rks-s::before{opacity:.1}
+.rk-sel-card.active.rks-r{border-color:var(--cr);box-shadow:0 0 14px rgba(255,107,0,.15)}.rk-sel-card.active.rks-r::before{opacity:.1}
+.rk-sel-card.active.rks-yo{border-color:var(--bl);box-shadow:0 0 14px rgba(61,155,255,.15)}.rk-sel-card.active.rks-yo::before{opacity:.1}
+.rk-sel-name{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;line-height:1;color:var(--tm);transition:color .15s}
+.rk-sel-card.active .rk-sel-name{color:var(--tx)}
+.rk-sel-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto}
+.rk-sel-sub{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--td)}
+.rank-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;margin-bottom:2px}
 @media(min-width:768px){
   #sRanking{padding:24px}
-  .rank-inner{max-width:860px;display:grid;grid-template-columns:180px 1fr;gap:24px;align-items:start;padding:0}
-  .rank-hdr-desktop{grid-column:1/-1;margin-bottom:4px}
-  .rg-chips{flex-direction:column;overflow-x:visible;padding-bottom:0;margin-bottom:0;position:sticky;top:76px;background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:8px!important}
-  .rgc{border-radius:9px;white-space:normal;text-align:left}
-  .rank-list-col{min-width:0}
+  .rank-inner{max-width:600px}
+  .rk-sel-grid{grid-template-columns:repeat(3,1fr)}
 }
-.rank-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;margin-bottom:2px}
 .rank-sub{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:14px}
 .rg-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
 .rgt{padding:7px 14px;border-radius:9px;border:1px solid var(--bo);background:var(--sf2);color:var(--tm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
@@ -312,7 +327,46 @@ tr:hover td{background:var(--sf2)}
   .ap-stats{grid-template-columns:1fr 1fr}.adm-inner{padding:12px}
   #sAuth{padding:12px}.auth-card{padding:20px}
   .seq-area{width:280px;height:320px}
-  
+
+  /* ── Home mobile: sin scroll, grid + teaser llenan pantalla ── */
+  #sHome{overflow:hidden;padding:0;align-items:stretch;justify-content:flex-start}
+  .home-inner{
+    width:100%;height:100%;
+    display:flex;flex-direction:column;
+    padding:14px 12px 10px;
+  }
+  .home-hdr{flex-shrink:0;margin-bottom:10px}
+  .game-grid{
+    flex:1;min-height:0;gap:8px;
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+    max-height:calc(2 * 200px + 8px);
+  }
+  .gc2{min-height:0;padding:10px 10px 8px}
+  .gc2-name{font-size:13px}
+  .gc2-tgt{font-size:42px;margin:2px 0}
+  .gc2-tgtlbl{font-size:7px}
+  .gc2-leader{font-size:10px;padding-top:4px}
+  .gc2-pos{font-size:9px}
+}
+/* ══ TORNEO RELÁMPAGO ══ */
+.torneo-card{border-radius:14px;padding:16px;border:2px solid var(--ct);background:var(--sf);position:relative;overflow:hidden;margin-top:12px}
+.torneo-card::before{content:'';position:absolute;inset:0;background:var(--ct);opacity:.04;pointer-events:none}
+.torneo-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:8px;font-family:'DM Sans',sans-serif;font-weight:600}
+.torneo-badge.waiting{background:var(--ctd);color:var(--ct);border:1px solid var(--ctm)}
+.torneo-badge.active{background:var(--ctd);color:var(--ct);border:1px solid var(--ct);animation:tornBadgePulse 2s ease-in-out infinite}
+.torneo-badge.cancelled{background:rgba(255,61,90,.1);color:var(--dg);border:1px solid rgba(255,61,90,.3)}
+@keyframes tornBadgePulse{0%,100%{opacity:1}50%{opacity:.65}}
+.torneo-banner{background:var(--ctd);border:1px solid var(--ctm);border-radius:10px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;width:100%;gap:8px;position:relative;z-index:2}
+.torneo-attempts{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ct)}
+.torneo-lb-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--sf2);border:1px solid var(--bo);border-radius:9px;margin-bottom:4px}
+.torneo-lb-row.me{border-color:var(--ct)}
+.torneo-lb-row.top1{background:var(--ctd);border-color:var(--ctm)}
+.rk-sel-card.active.rks-tn{border-color:var(--ct);box-shadow:0 0 14px var(--ctm)}.rk-sel-card.active.rks-tn::before{opacity:.1}
+  position:relative;width:100%;border-radius:16px;overflow:hidden;
+  border:1px solid var(--ct);
+  background:linear-gradient(135deg,rgba(255,45,120,.08) 0%,rgba(255,45,120,.03) 100%);
+  cursor:default;user-select:none;
+  margin-top:10px;
 }
 body.playing{overflow:hidden}
 </style>
@@ -334,6 +388,7 @@ body.playing{overflow:hidden}
       <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--wn);line-height:1" id="navPtsNum">0</span>
       <span style="font-size:10px;color:var(--tm)">pts</span>
     </div>
+    <button id="navAdminBtn" onclick="goTab('admin')" style="display:none;padding:4px 10px;border-radius:7px;border:1px solid var(--ac);background:transparent;color:var(--ac);font-size:11px;font-weight:600;cursor:pointer">⚙️ Admin</button>
     <button onclick="showPerfilModal()" id="navAv" class="nav-av" title="Mi perfil">R</button>
     <button class="out-btn" onclick="doLogout()">Salir</button>
   </div>
@@ -372,7 +427,7 @@ body.playing{overflow:hidden}
       <button class="sbtn" onclick="emailReg()">CREAR CUENTA</button>
       <div class="amsg" id="rMsg"></div>
     </div>
-    <div class="adm-link"><button onclick="showAdmin()">⚙️ Admin</button></div>
+
   </div>
 </div>
 
@@ -444,10 +499,14 @@ body.playing{overflow:hidden}
         <div class="gc2-pos" id="hrr">—</div>
       </div>
     </div>
-    <!-- TORNEO RELÁMPAGO CARD -->
+
+    <!-- TORNEOS RELÁMPAGO — card dinámica -->
     <div id="torneoCard"></div>
+
   </div>
 </div>
+
+<!-- GAME -->
 <div class="screen" id="sGame">
   <div class="gi">
     <div class="gh">
@@ -545,28 +604,52 @@ body.playing{overflow:hidden}
 <!-- RANKING -->
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner">
-    <!-- Header — span completo en desktop -->
-    <div class="rank-hdr-desktop">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;margin-top:2px">
-        <div class="rank-title" id="rankTitle">RANKING</div>
-        <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+    <!-- Header -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;margin-top:2px">
+      <div class="rank-title" id="rankTitle">RANKING</div>
+      <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+    </div>
+    <!-- Grid de selección — 2×3 igual que las game cards -->
+    <div class="rk-sel-grid" id="rgChips">
+      <div class="rk-sel-card rks-global" id="rgcG" onclick="setRankGame('global')">
+        <div class="rk-sel-name">🏅 GLOBAL</div>
+        <div class="rk-sel-val" id="rksv-global">—</div>
+        <div class="rk-sel-sub" id="rkss-global">puntos semana</div>
+      </div>
+      <div class="rk-sel-card rks-t" id="rgcT" onclick="setRankGame('t')">
+        <div class="rk-sel-name">🟢 TIEMPO</div>
+        <div class="rk-sel-val" id="rksv-t">—</div>
+        <div class="rk-sel-sub" id="rkss-t">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-b" id="rgcB" onclick="setRankGame('b')">
+        <div class="rk-sel-name">🟡 CIEGO</div>
+        <div class="rk-sel-val" id="rksv-b">—</div>
+        <div class="rk-sel-sub" id="rkss-b">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-s" id="rgcS" onclick="setRankGame('s')">
+        <div class="rk-sel-name">🩵 SECUENCIA</div>
+        <div class="rk-sel-val" id="rksv-s">—</div>
+        <div class="rk-sel-sub" id="rkss-s">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-r" id="rgcR" onclick="setRankGame('r')">
+        <div class="rk-sel-name">⚡ REACCIÓN</div>
+        <div class="rk-sel-val" id="rksv-r">—</div>
+        <div class="rk-sel-sub" id="rkss-r">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-yo" id="rgcYO" onclick="setRankGame('yo')">
+        <div class="rk-sel-name">👤 YO</div>
+        <div class="rk-sel-val" id="rksv-yo">—</div>
+        <div class="rk-sel-sub" id="rkss-yo">mis stats</div>
+      </div>
+      <div class="rk-sel-card rks-tn" id="rgcTN" onclick="setRankGame('torneo')">
+        <div class="rk-sel-name">⚡ TORNEOS</div>
+        <div class="rk-sel-val" id="rksv-tn">—</div>
+        <div class="rk-sel-sub" id="rkss-tn">historial</div>
       </div>
     </div>
-    <!-- Chips — sidebar en desktop, scroll horizontal en móvil -->
-    <div class="rg-chips" id="rgChips">
-      <button class="rgc" id="rgcG" onclick="setRankGame('global')">🏅 Global</button>
-      <button class="rgc" id="rgcT" onclick="setRankGame('t')">🟢 Tiempo</button>
-      <button class="rgc" id="rgcB" onclick="setRankGame('b')">🟡 Ciego</button>
-      <button class="rgc" id="rgcS" onclick="setRankGame('s')">🩵 Sec</button>
-      <button class="rgc" id="rgcR" onclick="setRankGame('r')">⚡ Reac</button>
-      <button class="rgc" id="rgcYO" onclick="setRankGame('yo')">👤 Yo</button>
-      <button class="rgc" id="rgcTN" onclick="setRankGame('torneo')">⚡ Torneos</button>
-    </div>
     <!-- Lista -->
-    <div class="rank-list-col">
-      <div id="rankList"></div>
-      <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
-    </div>
+    <div id="rankList" style="margin-top:6px"></div>
+    <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
   </div>
 </div>
 
@@ -609,11 +692,12 @@ var GAME_LABELS={t:'🟢 Reto Tiempo',b:'🟡 Reto Ciego',s:'🩵 Secuencia',r:'
 var profiles={},POINTS=[15,10,7,5,2,2,2,2,2,2],weekPoints={};
 var wScores={t:{},b:{},s:{},r:{}};
 var curUser=null,curGame='t',admLoggedIn=false,admGame='t',rankGame='global';
+var resetInProgress=false; // bloquea recalcPoints durante un reset para evitar re-escritura
 var gState='idle',t0=null,raf=null,elapsed=0;
 var reactState='idle',reactTO=null;
 var seqState='idle',seqCurrent=1,seqRaf=null,seqT0=null;
 var weekKey=getWeekKey(),todayKey=getTodayKey();
-// ══ TORNEO STATE ══
+// ══ TORNEO STATE ══ (completamente aislado de scores/ y weekPoints/)
 var torneoData=null,torneoPartic={},torneoMyData=null,inTorneoGame=false;
 var torneoCountdownTO=null,torneoCancelTO=null,torneoAutoCloseTO=null;
 var torneoCancelledDisplay=null;
@@ -630,7 +714,7 @@ function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g)
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
 // ══ VERSIÓN / FORCE RELOAD ══
-var APP_VERSION='v6.1';
+var APP_VERSION='v6.8';
 db.ref('appVersion').on('value',function(s){
   var serverVersion=s.val();
   if(!serverVersion)return;
@@ -671,23 +755,12 @@ function backfillLegacyPoints(){
     });
   });
 }
-function checkDailyReset(){
-  var currentDay=getTodayKey();
-  // Transaction garantiza que solo UN cliente genera los targets (sin race condition)
-  db.ref('gameConfig').transaction(function(cfg){
-    if(cfg&&cfg.lastDay===currentDay)return; // ya actualizado hoy — abortar
-    return{
-      tt:Math.round((3+Math.random()*12)*1000)/1000,  // Tiempo: 3.000–15.000s
-      tb:Math.round((5+Math.random()*15)*1000)/1000,  // Ciego:  5.000–20.000s
-      lastDay:currentDay,
-      updatedAt:Date.now()
-    };
-  });
-}
-setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();['t','b','s','r'].forEach(function(g){listenWeekScore(g);});wScores={t:{},b:{},s:{},r:{}};}},60000);
+// Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
+// No hay reset automático ni setInterval de día para eliminar race conditions.
+
 db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
-db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
+db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
 function startListeners(){
   // Cancelar listeners anteriores y re-registrar con auth activo
@@ -701,12 +774,11 @@ function startListeners(){
     db.ref(getScorePath(g)).off();
     listenWeekScore(g);
   });
-  // Torneo listeners
+  // ── Torneo listeners (paths completamente separados de scores/ y weekPoints/) ──
   db.ref('torneo/active').off();
   db.ref('torneo/active').on('value',function(s){
     var newData=s.val();
-    // Detectar cuando un torneo cancelado desaparece → mostrar card cancelada 5 min
-    if(!newData && torneoData && torneoData.status==='cancelled'){
+    if(!newData&&torneoData&&torneoData.status==='cancelled'){
       torneoCancelledDisplay={at:Date.now(),data:torneoData};
       clearTimeout(window._tornCancelDisplayTO);
       window._tornCancelDisplayTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
@@ -714,6 +786,7 @@ function startListeners(){
     torneoData=newData;
     torneoMyData=torneoData&&curUser?(torneoPartic[curUser.uid]||null):null;
     updateTorneoCard();
+    updateRankCards();
     scheduleAutoClose();
     if(admLoggedIn)renderAdmTorneos();
   });
@@ -731,6 +804,7 @@ function listenWeekScore(g){
   db.ref(getScorePath(g)).on('value',function(s){
     wScores[g]=s.val()||{};
     updateHomecards();
+    updateRankCards();
     if(document.getElementById('sRanking').classList.contains('on')){
       if(rankGame===g)renderTop10(g);
       else if(rankGame==='global')renderGlobalRank();
@@ -799,11 +873,13 @@ function forgotPw(){var e=document.getElementById('inE').value.trim();if(!e){set
 function chkVerified(){document.getElementById('vMsg').textContent='Verificando...';curUser.reload().then(function(){if(curUser.emailVerified){document.getElementById('vMsg').textContent='';loadAndEnter(curUser);}else document.getElementById('vMsg').textContent='❌ Aún no verificado';});}
 function resendV(){curUser.sendEmailVerification().then(function(){document.getElementById('vMsg').textContent='✅ Reenviado';}).catch(function(){document.getElementById('vMsg').textContent='❌ Espera antes de reenviar';});}
 function doLogout(){gState='idle';cancelAnimationFrame(raf);cancelAnimationFrame(seqRaf);clearTimeout(reactTO);setMsg('lMsg','','');setMsg('rMsg','','');auth.signOut();}
-function loadAndEnter(fu){checkDailyReset();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
+function loadAndEnter(fu){db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
 function showApp(fu,profile){
   var av=document.getElementById('navAv');
   if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
   else av.textContent=(profile.name||'R')[0].toUpperCase();
+  var adminBtn=document.getElementById('navAdminBtn');
+  if(adminBtn)adminBtn.style.display=fu.uid==='U4X0cDD33Ahh2MxDsKCLgaoZMtR2'?'block':'none';
   document.getElementById('navRight').classList.add('show');
   document.getElementById('navTabs').classList.add('show');
   startListeners();
@@ -890,7 +966,7 @@ function _showPerfilModalWith(p){
 // ══ GAME ══
 function gameBack(){
   if(inTorneoGame&&gState==='running'){toast('⚡ Para el reloj antes de salir');return;}
-  if(inTorneoGame){inTorneoGame=false;}
+  if(inTorneoGame){inTorneoGame=false;removeTorneoBanner();removeTorneoLBInject();}
   goTab('home');
 }
 function startGame(g){
@@ -929,7 +1005,7 @@ document.getElementById('srBestS').textContent=ws&&ws.bestTime?ws.bestTime+'s':'
 document.getElementById('srPosS').textContent=ws&&ws.bestTime?'#'+getRank(uid,'s'):'—';
 document.getElementById('seqNextHint').style.display='none';document.getElementById('seqTimerLbl').textContent='—';document.getElementById('seqArea').innerHTML='';var btn=document.getElementById('seqBtn');btn.textContent='INICIAR';btn.disabled=false;btn.style.opacity='1';showScreen('sSeq');}
 function handleSeqBtn(){if(seqState==='idle'){seqState='countdown';var btn=document.getElementById('seqBtn');btn.disabled=true;btn.style.opacity='.5';var num=document.getElementById('cdN');num.style.color='#00c2e0';document.getElementById('cdWrap').classList.add('show');var n=3;function tick(){n--;if(n>0){num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.textContent=n;setTimeout(tick,800);}else{num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');seqStartRun();},600);}}setTimeout(tick,800);}}
-function seqAbort(){cancelAnimationFrame(seqRaf);seqState='idle';seqCurrent=1;document.getElementById('cdWrap').classList.remove('show');if(inTorneoGame){inTorneoGame=false;}goTab('home');}
+function seqAbort(){cancelAnimationFrame(seqRaf);seqState='idle';seqCurrent=1;document.getElementById('cdWrap').classList.remove('show');if(inTorneoGame){inTorneoGame=false;removeTorneoBanner();removeTorneoLBInject();}goTab('home');}
 function seqBuildBoard(){var area=document.getElementById('seqArea');area.innerHTML='';var W=area.offsetWidth||300,H=area.offsetHeight||340;var r=31,nums=[1,2,3,4,5,6,7,8,9];for(var i=nums.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=nums[i];nums[i]=nums[j];nums[j]=tmp;}// Grid 3x3 garantiza que los números NUNCA se encimen
 var cols=3,rows=3,cellW=W/cols,cellH=H/rows,pad=r+4;nums.forEach(function(n,idx){var col=idx%cols,row=Math.floor(idx/cols);var x=col*cellW+pad+Math.random()*Math.max(0,cellW-2*pad);var y=row*cellH+pad+Math.random()*Math.max(0,cellH-2*pad);var el=document.createElement('div');el.className='seq-circle';el.textContent=n;el.style.left=x+'px';el.style.top=y+'px';el.onclick=(function(num){return function(){seqTap(num);};})(n);area.appendChild(el);});}
 function seqStartRun(){
@@ -980,7 +1056,31 @@ function saveScore(fmt,diff,g){
     recalcPoints(g);
   });
 }
-function recalcPoints(g){var key=getGameKey(g);db.ref('scores/'+weekKey+'/'+todayKey+'/'+key).once('value').then(function(s){var dayScores=s.val()||{};var sorted=Object.entries(dayScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var updates={};sorted.forEach(function(e,i){var uid2=e[0],w=e[1],pts=i<POINTS.length?POINTS[i]:0,p=profiles[uid2]||{};updates['weekPoints/'+weekKey+'/'+uid2+'/days/'+todayKey+'/'+key]=pts;updates['weekPoints/'+weekKey+'/'+uid2+'/name']=w.name||p.name||'?';updates['weekPoints/'+weekKey+'/'+uid2+'/photoURL']=w.photoURL||p.photoURL||null;});if(Object.keys(updates).length>0){db.ref().update(updates).then(function(){sorted.map(function(e){return e[0];}).forEach(function(uid2){db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds){var days=ds.val()||{},total=0;Object.values(days).forEach(function(dg){Object.values(dg).forEach(function(pts){total+=(pts||0);});});db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);});});});}});}
+function recalcPoints(g){
+  if(resetInProgress)return;
+  var key=getGameKey(g);
+  db.ref('scores/'+weekKey+'/'+todayKey+'/'+key).once('value').then(function(s){
+    if(resetInProgress)return;
+    var dayScores=s.val()||{};
+    var sorted=Object.entries(dayScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});
+    var updates={};
+    sorted.forEach(function(e,i){var uid2=e[0],w=e[1],pts=i<POINTS.length?POINTS[i]:0,p=profiles[uid2]||{};updates['weekPoints/'+weekKey+'/'+uid2+'/days/'+todayKey+'/'+key]=pts;updates['weekPoints/'+weekKey+'/'+uid2+'/name']=w.name||p.name||'?';updates['weekPoints/'+weekKey+'/'+uid2+'/photoURL']=w.photoURL||p.photoURL||null;});
+    if(Object.keys(updates).length>0){
+      db.ref().update(updates).then(function(){
+        if(resetInProgress)return;
+        sorted.map(function(e){return e[0];}).forEach(function(uid2){
+          db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds){
+            if(resetInProgress)return;
+            var days=ds.val()||{},total=0;
+            var validKeys={'gt':1,'gb':1,'gs':1,'gr':1};
+            Object.values(days).forEach(function(dg){Object.entries(dg).forEach(function(kv){if(validKeys[kv[0]])total+=(kv[1]||0);});});
+            db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);
+          });
+        });
+      });
+    }
+  });
+}
 
 function showResult(fmt,diff,isRec,g){
   var uid=curUser.uid,isR=g==='r',isBlind=g==='b',isSeq=g==='s',cfg=GCOLORS[g];
@@ -1056,21 +1156,69 @@ function playAgain(){
 
 function renderLB(hUid,g){var sorted=getSorted(g,10),cfg=GCOLORS[g],isR=g==='r',isS=g==='s',html='',myInTop=sorted.some(function(e){return e[0]===hUid;});sorted.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=uid2===hUid,isTop=i===0,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';var avHtml=w.photoURL?'<div class="li-av"><img src="'+w.photoURL+'"></div>':'<div class="li-av">'+(w.name||'?')[0].toUpperCase()+'</div>';html+='<div class="li'+(isTop?' top1':'')+(isMe?' me':'')+'"><div class="li-pos">'+medal+'</div>'+avHtml+'<div class="li-info"><div class="li-name">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+(isR||isS?'':'<div class="li-diff">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div class="li-time" style="color:'+(isTop?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});if(!myInTop&&hUid&&wScores[g][hUid]&&wScores[g][hUid].bestTime){var rank=getRank(hUid,g),me=wScores[g][hUid];html+='<div class="li-sep">···</div><div class="li me"><div class="li-pos">'+rank+'</div><div class="li-av">'+(me.name||'?')[0].toUpperCase()+'</div><div class="li-info"><div class="li-name">'+(me.name||'?')+' 👈</div>'+(isR||isS?'':'<div class="li-diff">±'+(me.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div class="li-time">'+me.bestTime+(isR?'ms':'s')+'</div></div>';}var el=document.getElementById('lbList');if(el)el.innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:20px;font-size:13px">Sé el primero esta semana</div>';}
 
+function updateRankCards(){
+  var uid=curUser?curUser.uid:null;
+  var games=[
+    {g:'t',id:'t',sfx:'s'},{g:'b',id:'b',sfx:'s'},
+    {g:'s',id:'s',sfx:'s'},{g:'r',id:'r',sfx:'ms'}
+  ];
+  games.forEach(function(item){
+    var sorted=getSorted(item.g,1);
+    var valEl=document.getElementById('rksv-'+item.id);
+    if(!valEl)return;
+    valEl.textContent=sorted.length>0?(sorted[0][1].name||'?'):'Sin partidas';
+  });
+  var gValEl=document.getElementById('rksv-global');
+  if(gValEl){
+    var allWp=Object.entries(weekPoints).filter(function(e){return e[1].total>0;}).sort(function(a,b){return (b[1].total||0)-(a[1].total||0);});
+    gValEl.textContent=allWp.length>0?(allWp[0][1].name||'?'):' Sin puntos';
+  }
+  var yValEl=document.getElementById('rksv-yo'),ySubEl=document.getElementById('rkss-yo');
+  if(yValEl){
+    if(uid&&weekPoints[uid]&&weekPoints[uid].total>0){
+      yValEl.textContent=(weekPoints[uid].total||0)+' pts';
+      if(ySubEl)ySubEl.textContent='esta semana';
+    } else {
+      yValEl.textContent='Juega hoy';
+    }
+  }
+  // Card de torneos — muestra estado del torneo activo o último ganador
+  var tnValEl=document.getElementById('rksv-tn'),tnSubEl=document.getElementById('rkss-tn');
+  if(tnValEl){
+    if(torneoData&&torneoData.status==='active'){
+      var partCount=Object.keys(torneoPartic).length;
+      tnValEl.textContent=partCount+' jugando';
+      if(tnSubEl)tnSubEl.textContent='en curso';
+    } else if(torneoData&&torneoData.status==='waiting'){
+      tnValEl.textContent='Esperando';
+      if(tnSubEl)tnSubEl.textContent='únete ahora';
+    } else {
+      tnValEl.textContent='Ver historial';
+      if(tnSubEl)tnSubEl.textContent='torneos';
+    }
+  }
+}
 function setRankGame(g){
   rankGame=g;
-  var chipMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};
-  Object.keys(chipMap).forEach(function(k){var el=document.getElementById('rgc'+chipMap[k]);if(!el)return;el.style.background='';el.style.color='';el.style.borderColor='';});
-  var activeEl=document.getElementById('rgc'+chipMap[g]);
-  if(activeEl){
-    if(g==='global'){activeEl.style.background='var(--wn)';activeEl.style.color='#000';activeEl.style.borderColor='var(--wn)';}
-    else if(g==='yo'){activeEl.style.background='var(--tx)';activeEl.style.color='#000';activeEl.style.borderColor='var(--tx)';}
-    else if(g==='torneo'){activeEl.style.background='var(--ct)';activeEl.style.color='#fff';activeEl.style.borderColor='var(--ct)';}
-    else{var cfg=GCOLORS[g];activeEl.style.background=cfg.stroke;activeEl.style.color='#000';activeEl.style.borderColor=cfg.stroke;}
-  }
+  var idMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};
+  Object.keys(idMap).forEach(function(k){
+    var el=document.getElementById('rgc'+idMap[k]);
+    if(el)el.classList.remove('active');
+  });
+  var activeEl=document.getElementById('rgc'+idMap[g]);
+  if(activeEl)activeEl.classList.add('active');
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
   if(g==='yo'){renderYoRanking();return;}
-  if(g==='torneo'){document.getElementById('rankTitle').textContent='TORNEOS';document.getElementById('rankSub').textContent='Historial · esta semana';renderTorneoRanking();return;}
-  if(g==='global'){document.getElementById('rankTitle').textContent='RANKING';document.getElementById('rankSub').textContent='Puntos · '+getWeekLabel();renderGlobalRank();return;}
+  if(g==='torneo'){
+    document.getElementById('rankTitle').textContent='TORNEOS';
+    document.getElementById('rankSub').textContent='Historial · relámpago';
+    renderTorneoRanking();return;
+  }
+  if(g==='global'){
+    document.getElementById('rankTitle').textContent='RANKING';
+    document.getElementById('rankSub').textContent='Puntos · '+getWeekLabel();
+    renderGlobalRank();return;
+  }
   var labels={'t':'Reto Tiempo','b':'Reto Ciego','s':'Secuencia','r':'Reacción'};
   document.getElementById('rankTitle').textContent=labels[g]||'—';
   document.getElementById('rankSub').textContent='Hoy · '+getTodayDate();
@@ -1179,27 +1327,21 @@ function renderGlobalRank(){var allUids=new Set(Object.keys(weekPoints));['t','b
   document.getElementById('rankList').innerHTML=html;}
 function renderFullRank(g){var sorted=getSorted(g,50),cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g==='b';var gameLabel=GAME_LABELS[g]||g;document.getElementById('rankSub').textContent='TOP 50 · '+gameLabel+' · '+getWeekLabel();var html='';if(sorted.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}else{sorted.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=curUser&&uid2===curUser.uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',pos=i+1;var avHtml=w.photoURL?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+w.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div>';html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?cfg.stroke:'var(--bo)')+';border-radius:11px;margin-bottom:5px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+avHtml+'<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+(isR||isS?'':'<div style="font-size:10px;color:var(--tm);margin-top:1px">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div style="font-family:\'DM Mono\',monospace;font-size:'+(isTop3?'14':'12')+'px;color:'+(isTop3?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});}document.getElementById('rankList').innerHTML=html;if(curUser){var rank=getRank(curUser.uid,g),myW=wScores[g][curUser.uid],myDiv=document.getElementById('rankMy');myDiv.classList.toggle('show',!!(myW&&myW.bestTime));myDiv.style.borderColor=cfg.stroke;document.getElementById('rmyPos').textContent=myW&&myW.bestTime?'#'+rank+' de '+sorted.length:'—';document.getElementById('rmyPos').style.color=cfg.color;document.getElementById('rmyTime').textContent=myW&&myW.bestTime?myW.bestTime+'s'+(isR||isS?'':'  ±'+(myW.bestDiff*1000).toFixed(0)+'ms'):'Juega para aparecer aquí';}}
 // ══════════════════════════════════════════════
-// ══ TORNEO RELÁMPAGO ══════════════════════════
+// ══ TORNEOS RELÁMPAGO ═════════════════════════
+// ══ COMPLETAMENTE AISLADOS de scores/, weekPoints/, recalcPoints()
+// ══ Única ruta de escritura: torneo/participants/{uid}
+// ══ Única ruta de lectura final: torneoHistorial/{id}
 // ══════════════════════════════════════════════
 
-// ── Helpers ──────────────────────────────────
+// ── Helpers ──
 function getTorneoRankSorted(){
-  var g=torneoData?torneoData.gameMode:'t';
-  var isR=g==='r';
   return Object.entries(torneoPartic)
     .filter(function(e){return e[1].bestDiff!=null;})
-    .sort(function(a,b){
-      return a[1].bestDiff!==b[1].bestDiff
-        ?a[1].bestDiff-b[1].bestDiff
-        :(a[1].lastPlayed||0)-(b[1].lastPlayed||0);
-    })
+    .sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);})
     .map(function(e){return Object.assign({uid:e[0]},e[1]);});
 }
-
-function getTorneoGameLabel(gameMode){
-  return {t:'🟢 Reto Tiempo',b:'🟡 Reto Ciego',s:'🩵 Secuencia',r:'⚡ Reacción'}[gameMode]||'?';
-}
-function getTorneoTimeSuffix(gameMode){return gameMode==='r'?'ms':'s';}
+function getTorneoGameLabel(m){return {t:'🟢 Reto Tiempo',b:'🟡 Reto Ciego',s:'🩵 Secuencia',r:'⚡ Reacción'}[m]||'?';}
+function getTorneoTimeSuffix(m){return m==='r'?'ms':'s';}
 function getTorneoTargetLabel(td){
   if(!td)return '';
   if(td.gameMode==='r')return 'Reacción más rápida';
@@ -1208,8 +1350,14 @@ function getTorneoTargetLabel(td){
   return '';
 }
 function fmtMs(ms){if(ms<=0)return '00:00';var m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000);return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+function getTorneoMyRank(){
+  if(!curUser)return '—';
+  var sorted=getTorneoRankSorted();
+  var idx=sorted.findIndex(function(p){return p.uid===curUser.uid;});
+  return idx>=0?(idx+1):'—';
+}
 
-// ── Lifecycle timers ─────────────────────────
+// ── Timers de ciclo de vida ──
 function scheduleAutoClose(){
   clearTimeout(torneoCountdownTO);clearTimeout(torneoCancelTO);clearTimeout(torneoAutoCloseTO);
   if(!torneoData)return;
@@ -1229,8 +1377,7 @@ function scheduleAutoClose(){
     if(rem3<=0){closeTorneo('time');return;}
     torneoAutoCloseTO=setTimeout(function(){closeTorneo('time');},rem3);
   }
-  // Refresh waiting countdown display every second
-  if(torneoData.status==='waiting'||torneoData.status==='countdown'){
+  if(torneoData.status==='waiting'||torneoData.status==='countdown'||torneoData.status==='active'){
     clearTimeout(window._tornCardTO);
     window._tornCardTO=setTimeout(updateTorneoCard,1000);
   }
@@ -1243,7 +1390,6 @@ function cancelTorneo(){
     c.status='cancelled';c.finishedAt=Date.now();return c;
   }).then(function(res){
     if(!res.committed)return;
-    // Borrar nodo después de 5 min para que los clientes muestren la tarjeta
     setTimeout(function(){
       db.ref('torneo/active').once('value').then(function(s){
         var d=s.val();if(d&&d.status==='cancelled')db.ref('torneo/active').remove();
@@ -1266,8 +1412,8 @@ function closeTorneo(reason){
   db.ref('torneo/active').transaction(function(c){
     if(!c||c.status==='finished'||c.status==='cancelled')return;
     c.status='finished';c.finishedAt=Date.now();c.closeReason=reason||'manual';return c;
-  }).then(function(res){
-    if(!res.committed)return; // otro cliente ya cerró
+  },{applyLocally:false}).then(function(res){
+    if(!res.committed)return;
     var finalData=res.snapshot.val();
     var sorted=getTorneoRankSorted();
     var winner=sorted.length>0?sorted[0]:null;
@@ -1298,36 +1444,34 @@ function checkAllExhausted(){
   if(!torneoData||torneoData.status!=='active')return;
   var partic=Object.values(torneoPartic);
   if(partic.length===0)return;
-  var allDone=partic.every(function(p){return p.attemptsExhausted;});
-  if(allDone)closeTorneo('exhausted');
+  if(partic.every(function(p){return p.attemptsExhausted;}))closeTorneo('exhausted');
 }
 
-// ── Join ─────────────────────────────────────
+// ── Join ──
 function joinTorneo(){
   if(!curUser){toast('Inicia sesión para unirte');return;}
   if(!torneoData||torneoData.status!=='waiting'){toast('El torneo ya no acepta jugadores');return;}
   var uid=curUser.uid;
   if(torneoPartic[uid]){toast('Ya estás en el torneo');closeModal();return;}
   var p=profiles[uid]||{};
-  var participantData={name:p.name||'?',email:p.email||'',joinedAt:Date.now(),attempts:0,attemptsExhausted:false};
-  db.ref('torneo/participants/'+uid).set(participantData).then(function(){
-    // Verificar si se alcanzó el mínimo y avanzar estado
+  db.ref('torneo/participants/'+uid).set({
+    name:p.name||'?',email:p.email||'',joinedAt:Date.now(),
+    attempts:0,attemptsExhausted:false
+  }).then(function(){
     db.ref('torneo/participants').once('value').then(function(s){
-      var all=s.val()||{};
-      var count=Object.keys(all).length;
+      var count=Object.keys(s.val()||{}).length;
       db.ref('torneo/active').transaction(function(c){
         if(!c||c.status!=='waiting')return;
         if(!c.waitingStartedAt)c.waitingStartedAt=Date.now();
         if(count>=c.minPlayers){c.status='countdown';c.countdownEndsAt=Date.now()+5000;}
         return c;
-      });
+      },{applyLocally:false});
     });
-    toast('✅ ¡Te uniste al torneo!');
-    closeModal();
+    toast('✅ ¡Te uniste al torneo!');closeModal();
   }).catch(function(err){toast('❌ Error: '+err.message);});
 }
 
-// ── Start torneo game attempt ────────────────
+// ── Iniciar intento de torneo ──
 function startTorneoGame(){
   if(!curUser||!torneoData){toast('No hay torneo activo');return;}
   if(torneoData.status!=='active'){toast('El torneo aún no ha iniciado');return;}
@@ -1338,19 +1482,19 @@ function startTorneoGame(){
   inTorneoGame=true;
   var g=torneoData.gameMode;
   curGame=g;
-  // Sobrescribir el target si es un modo de tiempo
-  if((g==='t'||g==='b')&&torneoData.targetTime){
-    GCFG[g]=parseFloat(torneoData.targetTime);
-  }
+  // Sobrescribir target SOLO en memoria local — nunca toca gameConfig en Firebase
+  if((g==='t'||g==='b')&&torneoData.targetTime)GCFG[g]=parseFloat(torneoData.targetTime);
   if(g==='s'){startSeq();}
   else if(g==='r'){startReaction();}
   else{startGame(g);}
+  // Inyectar banner después de que la pantalla cargue
+  setTimeout(ensureTorneoBanner,100);
 }
 
-// ── Save torneo score ────────────────────────
+// ── Guardar score de torneo ── (NUNCA escribe a scores/ ni weekPoints/)
 function saveTorneoScore(fmt,diff,g){
   inTorneoGame=false;
-  if(!curUser||!torneoData){return;}
+  if(!curUser||!torneoData)return;
   var uid=curUser.uid;
   var myData=torneoPartic[uid]||{};
   var attempts=(myData.attempts||0)+1;
@@ -1359,23 +1503,21 @@ function saveTorneoScore(fmt,diff,g){
   var upd={attempts:attempts,lastPlayed:Date.now(),name:pname};
   if(isRec){upd.bestTime=fmt;upd.bestDiff=diff;}
   if(attempts>=5)upd.attemptsExhausted=true;
+  // Escribe ÚNICAMENTE a torneo/participants/{uid}
   db.ref('torneo/participants/'+uid).update(upd).then(function(){
     showTorneoResult(fmt,diff,isRec,attempts,g);
     checkAllExhausted();
   });
 }
 
-// ── Show torneo result (reuses inline result area) ──
+// ── Resultado de intento ──
 function showTorneoResult(fmt,diff,isRec,attempts,g){
   var isR=g==='r',isS=g==='s',sfx=isR?'ms':'s';
   var cfg=GCOLORS[g];
   var remaining=5-attempts;
-  // Inyectar banner de torneo si no existe
   ensureTorneoBanner();
-  // Actualizar banner con intentos
   var bannerAttempts=document.getElementById('tornBannerAttempts');
   if(bannerAttempts)bannerAttempts.textContent='INTENTO '+attempts+'/5';
-  // Mostrar resultado inline igual que el modo normal
   var ir=document.getElementById('inlineResult');
   var irS=document.getElementById('inlineResultS');
   var irR=document.getElementById('inlineResultR');
@@ -1384,22 +1526,23 @@ function showTorneoResult(fmt,diff,isRec,attempts,g){
     document.getElementById('irTimeS').textContent=fmt+sfx;
     document.getElementById('irPosS').textContent='#'+getTorneoMyRank();
     var recS=document.getElementById('irRecS');
-    if(recS){recS.style.display=isRec?'block':'none';if(isRec)recS.textContent='🎉 ¡Nuevo mejor tiempo en el torneo!';}
-    // Agregar mini-LB debajo
+    if(recS){recS.style.display=isRec?'block':'none';if(isRec)recS.textContent='🎉 ¡Nuevo mejor en el torneo!';}
     injectTorneoLBAfter('inlineResultS',remaining);
     var btn=document.getElementById('seqBtn');
-    if(btn){btn.className='gbtn gbs';btn.style.background='var(--ct)';btn.style.color='#fff';btn.style.border='none';
-      btn.textContent=remaining>0?'▶️ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';
+    if(btn){
+      btn.className='gbtn gbs';btn.style.background='var(--ct)';btn.style.color='#fff';btn.style.border='none';
+      btn.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';
       btn.disabled=remaining<=0;btn.style.opacity='1';
-      btn.onclick=remaining>0?function(){irS.style.display='none';removeTorneoLBInject();handleSeqBtn();}:null;}
-  }else if(isR&&irR){
+      btn.onclick=remaining>0?function(){irS.style.display='none';removeTorneoLBInject();handleSeqBtn();}:null;
+    }
+  } else if(isR&&irR){
     irR.style.display='block';
     document.getElementById('irTimeR').textContent=fmt+sfx;
     document.getElementById('irPosR').textContent='#'+getTorneoMyRank();
     var recR=document.getElementById('irRecR');
-    if(recR){recR.style.display=isRec?'block':'none';if(isRec)recR.textContent='🎉 ¡Nuevo mejor tiempo en el torneo!';}
+    if(recR){recR.style.display=isRec?'block':'none';if(isRec)recR.textContent='🎉 ¡Nuevo mejor en el torneo!';}
     injectTorneoLBAfter('inlineResultR',remaining);
-  }else if(ir){
+  } else if(ir){
     ir.style.display='block';
     var irTime=document.getElementById('irTime');
     var irDiff=document.getElementById('irDiff');
@@ -1408,57 +1551,22 @@ function showTorneoResult(fmt,diff,isRec,attempts,g){
     if(irTime){irTime.textContent=fmt+sfx;irTime.style.color=cfg.stroke;}
     if(irDiff){irDiff.textContent='±'+(diff*1000).toFixed(0)+'ms';irDiff.style.color=diff<0.05?'var(--ac)':diff<0.15?'var(--wn)':'var(--dg)';}
     if(irPos)irPos.textContent='#'+getTorneoMyRank();
-    if(irRec){irRec.style.display=isRec?'block':'none';if(isRec)irRec.textContent='🎉 ¡Nuevo mejor tiempo en el torneo!';}
+    if(irRec){irRec.style.display=isRec?'block':'none';if(isRec)irRec.textContent='🎉 ¡Nuevo mejor en el torneo!';}
     injectTorneoLBAfter('inlineResult',remaining);
     var btn2=document.getElementById('gBtn');
-    if(btn2){btn2.className='gbtn gbs';btn2.style.background='var(--ct)';btn2.style.color='#fff';btn2.style.border='none';
-      btn2.textContent=remaining>0?'▶️ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';
+    if(btn2){
+      btn2.className='gbtn gbs';btn2.style.background='var(--ct)';btn2.style.color='#fff';btn2.style.border='none';
+      btn2.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';
       btn2.disabled=remaining<=0;btn2.style.opacity='1';
-      btn2.onclick=remaining>0?function(){ir.style.display='none';removeTorneoLBInject();resetClock();}:null;}
+      btn2.onclick=remaining>0?function(){ir.style.display='none';removeTorneoLBInject();resetClock();}:null;
+    }
   }
 }
 
-function getTorneoMyRank(){
-  if(!curUser)return '—';
-  var sorted=getTorneoRankSorted();
-  var idx=sorted.findIndex(function(p){return p.uid===curUser.uid;});
-  return idx>=0?(idx+1):'—';
-}
-
+// ── Mini leaderboard inline ──
 function injectTorneoLBAfter(afterId,remaining){
   removeTorneoLBInject();
   var after=document.getElementById(afterId);if(!after)return;
-  var sorted=getTorneoRankSorted();
-  var g=torneoData?torneoData.gameMode:'t';
-  var isR=g==='r',isS=g==='s',sfx=isR?'ms':'s';
-  var uid=curUser?curUser.uid:null;
-  var medals=['🥇','🥈','🥉'];
-  var rows=sorted.slice(0,5).map(function(p,i){
-    var isMe=uid&&p.uid===uid;
-    return '<div class="torneo-lb-row'+(i===0?' top1':'')+(isMe?' me':'')+'">'+
-      '<span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--wn);width:22px;text-align:center">'+(medals[i]||(i+1))+'</span>'+
-      '<span style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</span>'+
-      '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+p.bestTime+sfx+'</span>'+
-    '</div>';
-  }).join('');
-  var div=document.createElement('div');
-  div.id='torneoLBInject';
-  div.style.cssText='margin-top:10px;width:100%';
-  div.innerHTML=
-    '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Ranking del torneo</div>'+
-    rows+
-    (remaining>0
-      ?'<div style="font-size:11px;color:var(--tm);text-align:center;margin-top:6px">Te quedan <strong style="color:var(--ct)">'+remaining+'</strong> intento'+(remaining===1?'':'s')+'</div>'
-      :'<div style="font-size:11px;color:var(--tm);text-align:center;margin-top:6px">Agotaste tus intentos · Posición final: <strong style="color:var(--ct)">#'+getTorneoMyRank()+'</strong></div>');
-  after.parentNode.insertBefore(div,after.nextSibling);
-}
-
-function removeTorneoLBInject(){
-  var el=document.getElementById('torneoLBInject');if(el)el.remove();
-}
-
-function renderTorneoInlineLB(){
-  var el=document.getElementById('torneoLBInject');if(!el)return;
   var g=torneoData?torneoData.gameMode:'t';
   var isR=g==='r',sfx=isR?'ms':'s';
   var uid=curUser?curUser.uid:null;
@@ -1472,31 +1580,49 @@ function renderTorneoInlineLB(){
       '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+p.bestTime+sfx+'</span>'+
     '</div>';
   }).join('');
-  el.querySelector('div:first-child').nextSibling&&(function(){
-    var existing=el.querySelectorAll('.torneo-lb-row');
-    existing.forEach(function(r){r.remove();});
-  })();
-  el.innerHTML=
-    '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Ranking del torneo</div>'+rows;
+  var div=document.createElement('div');
+  div.id='torneoLBInject';div.style.cssText='margin-top:10px;width:100%';
+  div.innerHTML=
+    '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Ranking del torneo</div>'+
+    rows+
+    (remaining>0
+      ?'<div style="font-size:11px;color:var(--tm);text-align:center;margin-top:6px">Te quedan <strong style="color:var(--ct)">'+remaining+'</strong> intento'+(remaining===1?'':'s')+'</div>'
+      :'<div style="font-size:11px;color:var(--tm);text-align:center;margin-top:6px">Posición final: <strong style="color:var(--ct)">#'+getTorneoMyRank()+'</strong></div>');
+  after.parentNode.insertBefore(div,after.nextSibling);
+}
+function removeTorneoLBInject(){var el=document.getElementById('torneoLBInject');if(el)el.remove();}
+function renderTorneoInlineLB(){
+  var el=document.getElementById('torneoLBInject');if(!el)return;
+  var g=torneoData?torneoData.gameMode:'t';
+  var sfx=getTorneoTimeSuffix(g);
+  var uid=curUser?curUser.uid:null;
+  var sorted=getTorneoRankSorted();
+  var medals=['🥇','🥈','🥉'];
+  var rows=sorted.slice(0,5).map(function(p,i){
+    var isMe=uid&&p.uid===uid;
+    return '<div class="torneo-lb-row'+(i===0?' top1':'')+(isMe?' me':'')+'">'+
+      '<span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--wn);width:22px;text-align:center">'+(medals[i]||(i+1))+'</span>'+
+      '<span style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</span>'+
+      '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+p.bestTime+sfx+'</span>'+
+    '</div>';
+  }).join('');
+  el.innerHTML='<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Ranking del torneo</div>'+rows;
 }
 
-// ── Ensure torneo banner injected in game screen ──
+// ── Banner de torneo en pantalla de juego ──
 function ensureTorneoBanner(){
   if(document.getElementById('torneoBanner'))return;
   var myData=curUser?torneoPartic[curUser.uid]:null;
   var attempts=myData?(myData.attempts||0):0;
   var g=torneoData?torneoData.gameMode:'t';
-  var cfg=GCOLORS[g];
   var banner=document.createElement('div');
-  banner.id='torneoBanner';
-  banner.className='torneo-banner';
+  banner.id='torneoBanner';banner.className='torneo-banner';
   banner.innerHTML=
     '<div style="display:flex;align-items:center;gap:8px">'+
       '<span style="font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;color:var(--ct)">⚡ TORNEO</span>'+
       '<span style="font-size:11px;color:var(--tm)">'+getTorneoGameLabel(g)+'</span>'+
     '</div>'+
     '<span class="torneo-attempts" id="tornBannerAttempts">INTENTO '+(attempts+1)+'/5</span>';
-  // Insertar justo antes del .gi en sGame, .si en sSeq, .ri en sReaction
   var screens=['sGame','sSeq','sReaction'];
   var wrappers=['.gi','.si','.ri'];
   for(var i=0;i<screens.length;i++){
@@ -1508,33 +1634,22 @@ function ensureTorneoBanner(){
     }
   }
 }
+function removeTorneoBanner(){var el=document.getElementById('torneoBanner');if(el)el.remove();}
 
-function removeTorneoBanner(){
-  var el=document.getElementById('torneoBanner');if(el)el.remove();
-}
-
-// ── Home card ────────────────────────────────
+// ── Tarjeta en Home ──
 function updateTorneoCard(){
   var el=document.getElementById('torneoCard');if(!el)return;
   var uid=curUser?curUser.uid:null;
-
-  // Mostrar card de cancelación durante 5 minutos
+  // Tarjeta de cancelación durante 5 min
   if(!torneoData&&torneoCancelledDisplay){
     var elapsedSec=Math.floor((Date.now()-torneoCancelledDisplay.at)/1000);
-    var remSec=300-elapsedSec;
-    if(remSec>0){
-      el.innerHTML=
-        '<div class="torneo-card">'+
-          '<span class="torneo-badge cancelled">⚡ CANCELADO</span>'+
-          '<div style="font-size:13px;color:var(--dg);margin-bottom:4px">Torneo cancelado</div>'+
-          '<div style="font-size:11px;color:var(--tm)">No se alcanzó el mínimo de jugadores a tiempo.</div>'+
-        '</div>';
-      clearTimeout(window._tornCardTO);
-      window._tornCardTO=setTimeout(updateTorneoCard,1000);
-      return;
-    }else{torneoCancelledDisplay=null;}
+    if(300-elapsedSec>0){
+      el.innerHTML='<div class="torneo-card"><span class="torneo-badge cancelled">⚡ CANCELADO</span>'+
+        '<div style="font-size:13px;color:var(--dg);margin-bottom:4px">Torneo cancelado</div>'+
+        '<div style="font-size:11px;color:var(--tm)">No se alcanzó el mínimo de jugadores a tiempo.</div></div>';
+      clearTimeout(window._tornCardTO);window._tornCardTO=setTimeout(updateTorneoCard,1000);return;
+    } else {torneoCancelledDisplay=null;}
   }
-
   if(!torneoData){el.innerHTML='';return;}
   var td=torneoData;
   var myData=uid?torneoPartic[uid]:null;
@@ -1546,99 +1661,62 @@ function updateTorneoCard(){
   var gameLabel=getTorneoGameLabel(td.gameMode);
   var targetLabel=getTorneoTargetLabel(td);
   var now=Date.now();
-
   if(td.status==='cancelled'){
-    el.innerHTML=
-      '<div class="torneo-card">'+
-        '<span class="torneo-badge cancelled">⚡ CANCELADO</span>'+
-        '<div style="font-size:13px;color:var(--dg);margin-bottom:4px">Torneo cancelado</div>'+
-        '<div style="font-size:11px;color:var(--tm)">No se alcanzó el mínimo de jugadores.</div>'+
-      '</div>';
-    return;
+    el.innerHTML='<div class="torneo-card"><span class="torneo-badge cancelled">⚡ CANCELADO</span>'+
+      '<div style="font-size:13px;color:var(--dg)">Torneo cancelado — no se alcanzó el mínimo.</div></div>';return;
   }
-
   if(td.status==='finished'){el.innerHTML='';return;}
-
   if(td.status==='waiting'){
     var waitRem=td.waitingStartedAt?(20*60*1000-(now-td.waitingStartedAt)):null;
     var timerStr=waitRem&&waitRem>0?'<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--ct)">'+fmtMs(waitRem)+'</span>':'';
-    var playerLine='<div style="font-size:12px;color:var(--tm);margin-bottom:12px">'+
-      '<strong style="color:var(--tx)">'+partCount+'</strong> / '+td.minPlayers+' jugadores'+
-      (timerStr?' · '+timerStr:'')+
-    '</div>';
-    var actionBtn='';
-    if(!uid)actionBtn='<button class="btn btn-gh" style="width:100%;height:38px;border-radius:9px;font-size:12px" onclick="toast(\'Inicia sesión para unirte\')">Iniciar sesión para unirte</button>';
-    else if(isJoined)actionBtn='<div style="font-size:12px;color:var(--ct);text-align:center;padding:8px 0">✅ Ya te uniste — esperando jugadores...</div>';
-    else actionBtn='<button class="btn" style="background:var(--ct);color:#fff;width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px" onclick="window._tornShowJoin()">UNIRSE AL TORNEO</button>';
-    el.innerHTML=
-      '<div class="torneo-card">'+
-        '<span class="torneo-badge waiting">⚡ TORNEO RELÁMPAGO</span>'+
-        '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px">'+
-          '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px">'+gameLabel+'</div>'+
-          '<button onclick="showTorneoHowPlay()" style="background:transparent;border:1px solid var(--ct);border-radius:50%;width:20px;height:20px;color:var(--ct);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>'+
-        '</div>'+
-        (targetLabel?'<div style="font-size:11px;color:var(--tm);margin-bottom:8px">'+targetLabel+'</div>':'')+
-        '<div style="font-size:12px;color:var(--wn);margin-bottom:6px">🏆 Premio: <strong>'+td.prize+'</strong></div>'+
-        playerLine+actionBtn+
-      '</div>';
-    clearTimeout(window._tornCardTO);
-    window._tornCardTO=setTimeout(updateTorneoCard,1000);
-    return;
+    var playerLine='<div style="font-size:12px;color:var(--tm);margin-bottom:12px"><strong style="color:var(--tx)">'+partCount+'</strong> / '+td.minPlayers+' jugadores'+(timerStr?' · '+timerStr:'')+'</div>';
+    var actionBtn=!uid?'<button class="btn btn-gh" style="width:100%;height:38px;border-radius:9px" onclick="toast(\'Inicia sesión para unirte\')">Iniciar sesión para unirte</button>':
+      isJoined?'<div style="font-size:12px;color:var(--ct);text-align:center;padding:8px 0">✅ Ya te uniste — esperando jugadores...</div>':
+      '<button class="btn" style="background:var(--ct);color:#fff;width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px" onclick="window._tornShowJoin()">UNIRSE AL TORNEO</button>';
+    el.innerHTML='<div class="torneo-card"><span class="torneo-badge waiting">⚡ TORNEO RELÁMPAGO</span>'+
+      '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px">'+
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px">'+gameLabel+'</div>'+
+        '<button onclick="showTorneoHowPlay()" style="background:transparent;border:1px solid var(--ct);border-radius:50%;width:20px;height:20px;color:var(--ct);font-size:10px;font-weight:700;cursor:pointer;padding:0">?</button>'+
+      '</div>'+
+      (targetLabel?'<div style="font-size:11px;color:var(--tm);margin-bottom:8px">'+targetLabel+'</div>':'')+
+      '<div style="font-size:12px;color:var(--wn);margin-bottom:6px">🏆 Premio: <strong>'+td.prize+'</strong></div>'+
+      playerLine+actionBtn+'</div>';
+    clearTimeout(window._tornCardTO);window._tornCardTO=setTimeout(updateTorneoCard,1000);return;
   }
-
   if(td.status==='countdown'){
-    var cdRem=td.countdownEndsAt-now;
-    var cdSec=Math.max(0,Math.ceil(cdRem/1000));
-    el.innerHTML=
-      '<div class="torneo-card" style="text-align:center">'+
-        '<span class="torneo-badge active">⚡ INICIANDO</span>'+
-        '<div style="font-family:Bebas Neue,sans-serif;font-size:72px;color:var(--ct);line-height:1;text-shadow:0 0 20px var(--ctm)">'+cdSec+'</div>'+
-        '<div style="font-size:11px;color:var(--tm);margin-top:4px">El torneo inicia en un momento...</div>'+
-      '</div>';
-    clearTimeout(window._tornCardTO);
-    window._tornCardTO=setTimeout(updateTorneoCard,250);
-    return;
+    var cdSec=Math.max(0,Math.ceil((td.countdownEndsAt-now)/1000));
+    el.innerHTML='<div class="torneo-card" style="text-align:center"><span class="torneo-badge active">⚡ INICIANDO</span>'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:72px;color:var(--ct);line-height:1;text-shadow:0 0 20px var(--ctm)">'+cdSec+'</div>'+
+      '<div style="font-size:11px;color:var(--tm);margin-top:4px">El torneo inicia en un momento...</div></div>';
+    clearTimeout(window._tornCardTO);window._tornCardTO=setTimeout(updateTorneoCard,250);return;
   }
-
   if(td.status==='active'){
     var timeRem=td.startedAt&&td.durationMs?(td.startedAt+td.durationMs-now):null;
     var timeStr=timeRem&&timeRem>0?fmtMs(timeRem):'00:00';
     var sorted=getTorneoRankSorted();
     var myRank=uid?sorted.findIndex(function(p){return p.uid===uid;}):-1;
     var leaderHtml='';
-    if(sorted.length>0){
-      var l=sorted[0];
-      leaderHtml='<div style="font-size:11px;color:var(--tm);margin-bottom:8px">🥇 <strong style="color:var(--tx)">'+(l.name||'?')+'</strong>'+
-        ' <span style="font-family:DM Mono,monospace;color:var(--ct)">'+l.bestTime+sfx+'</span></div>';
-    }
-    var actionArea='';
-    if(!uid)actionArea='<div style="font-size:11px;color:var(--tm);text-align:center">Inicia sesión para participar</div>';
-    else if(!isJoined)actionArea='<div style="font-size:11px;color:var(--tm);text-align:center;padding:6px">El torneo ya inició — no es posible unirse</div>';
-    else if(exhausted)actionArea='<div style="font-size:12px;color:var(--tm);text-align:center;padding:8px 0">Agotaste tus intentos · Posición: <strong style="color:var(--ct)">#'+(myRank>=0?(myRank+1):'—')+'</strong></div>';
-    else{
-      var remAttempts=5-attemptsUsed;
-      actionArea='<button class="btn" style="background:var(--ct);color:#fff;width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px" onclick="startTorneoGame()">▶ JUGAR · '+remAttempts+' intento'+(remAttempts===1?'':'s')+'</button>'+
-        (myRank>=0?'<div style="font-size:11px;color:var(--tm);text-align:center;margin-top:6px">Tu posición: <strong style="color:var(--ct)">#'+(myRank+1)+'</strong></div>':'');
-    }
-    el.innerHTML=
-      '<div class="torneo-card">'+
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
-          '<span class="torneo-badge active">⚡ EN CURSO</span>'+
-          '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+timeStr+'</span>'+
-        '</div>'+
-        '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:2px">'+gameLabel+'</div>'+
-        (targetLabel?'<div style="font-size:11px;color:var(--tm);margin-bottom:6px">'+targetLabel+'</div>':'')+
-        '<div style="font-size:12px;color:var(--wn);margin-bottom:8px">🏆 Premio: <strong>'+td.prize+'</strong></div>'+
-        leaderHtml+actionArea+
-      '</div>';
-    clearTimeout(window._tornCardTO);
-    window._tornCardTO=setTimeout(updateTorneoCard,1000);
-    return;
+    if(sorted.length>0){var l=sorted[0];leaderHtml='<div style="font-size:11px;color:var(--tm);margin-bottom:8px">🥇 <strong style="color:var(--tx)">'+(l.name||'?')+'</strong> <span style="font-family:DM Mono,monospace;color:var(--ct)">'+l.bestTime+sfx+'</span></div>';}
+    var actionArea=!uid?'<div style="font-size:11px;color:var(--tm);text-align:center">Inicia sesión para participar</div>':
+      !isJoined?'<div style="font-size:11px;color:var(--tm);text-align:center;padding:6px">El torneo ya inició — no es posible unirse</div>':
+      exhausted?'<div style="font-size:12px;color:var(--tm);text-align:center;padding:8px 0">Agotaste tus intentos · Pos: <strong style="color:var(--ct)">#'+(myRank>=0?(myRank+1):'—')+'</strong></div>':
+      '<button class="btn" style="background:var(--ct);color:#fff;width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px" onclick="startTorneoGame()">▶ JUGAR · '+(5-attemptsUsed)+' intento'+(5-attemptsUsed===1?'':'s')+'</button>'+
+      (myRank>=0?'<div style="font-size:11px;color:var(--tm);text-align:center;margin-top:6px">Tu posición: <strong style="color:var(--ct)">#'+(myRank+1)+'</strong></div>':'');
+    el.innerHTML='<div class="torneo-card">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+        '<span class="torneo-badge active">⚡ EN CURSO</span>'+
+        '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+timeStr+'</span>'+
+      '</div>'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:2px">'+gameLabel+'</div>'+
+      (targetLabel?'<div style="font-size:11px;color:var(--tm);margin-bottom:6px">'+targetLabel+'</div>':'')+
+      '<div style="font-size:12px;color:var(--wn);margin-bottom:8px">🏆 Premio: <strong>'+td.prize+'</strong></div>'+
+      leaderHtml+actionArea+'</div>';
+    clearTimeout(window._tornCardTO);window._tornCardTO=setTimeout(updateTorneoCard,1000);return;
   }
   el.innerHTML='';
 }
 
-// Función global para onclick del botón de join (evita problemas con inline handlers)
+// Modal de join
 window._tornShowJoin=function(){
   if(!torneoData)return;
   var td=torneoData;
@@ -1649,13 +1727,10 @@ window._tornShowJoin=function(){
     '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:5px">'+
       '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Premio</span><strong>'+td.prize+'</strong></div>'+
       '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Jugadores</span><span>'+partCount+' / '+td.minPlayers+'</span></div>'+
-      '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Duración</span><span>'+Math.round(td.durationMs/60000)+' minutos</span></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Duración (al iniciar)</span><span>'+Math.round(td.durationMs/60000)+' minutos</span></div>'+
       '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Intentos</span><span>5 exclusivos del torneo</span></div>'+
     '</div>'+
-    '<div style="font-size:11px;color:var(--tm);line-height:1.7;margin-bottom:14px">'+
-      'Al unirte aceptas competir con '+(td.minPlayers-partCount)+' jugador'+(td.minPlayers-partCount===1?'':'es')+' más. '+
-      'El torneo inicia cuando se alcance el mínimo. El ganador es contactado por email.'+
-    '</div>'+
+    '<div style="font-size:11px;color:var(--tm);line-height:1.7;margin-bottom:14px">Tus intentos en el torneo no afectan los retos diarios ni el ranking semanal.</div>'+
     '<div class="mbtns">'+
       '<button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button>'+
       '<button class="btn" onclick="joinTorneo()" style="height:42px;background:var(--ct);color:#fff;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">⚡ CONFIRMAR</button>'+
@@ -1667,280 +1742,236 @@ function showTorneoHowPlay(){
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">⚡ CÓMO FUNCIONA</div>'+
     '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:18px">👥</span><div><strong>Mínimo de jugadores requerido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Los 20 minutos de espera arrancan cuando el primer jugador se une</div></div></div>'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:18px">⏳</span><div><strong>Si no se alcanza el mínimo en 20 min, se cancela</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Nadie puede unirse una vez que el torneo inicia</div></div></div>'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:18px">🎯</span><div><strong>5 intentos exclusivos del torneo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Independientes de los intentos de los retos diarios</div></div></div>'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:18px">🏆</span><div><strong>Gana quien tenga el tiempo más cercano al objetivo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">En empate, gana quien registró ese tiempo primero</div></div></div>'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:18px">📧</span><div><strong>El ganador es contactado por correo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El premio se entrega de forma manual</div></div></div>'+
+      '<div style="display:flex;gap:12px"><span style="font-size:18px">👥</span><div><strong>Mínimo de jugadores requerido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">20 minutos de espera desde el primer join. Si no se alcanza el mínimo, se cancela.</div></div></div>'+
+      '<div style="display:flex;gap:12px"><span style="font-size:18px">🎯</span><div><strong>5 intentos exclusivos del torneo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Completamente independientes de los retos diarios y el ranking semanal.</div></div></div>'+
+      '<div style="display:flex;gap:12px"><span style="font-size:18px">🏆</span><div><strong>Gana quien esté más cerca del objetivo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">En empate, gana quien registró ese tiempo primero.</div></div></div>'+
+      '<div style="display:flex;gap:12px"><span style="font-size:18px">📧</span><div><strong>El ganador es contactado por correo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El premio se entrega de forma manual.</div></div></div>'+
     '</div>'+
     '<button class="btn" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;background:var(--ct);color:#fff;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';
   document.getElementById('overlay').classList.add('show');
 }
 
-// ── Ranking tab (historial) ───────────────────
+// ── Ranking tab ──
 function renderTorneoRanking(){
   var uid=curUser?curUser.uid:null;
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
   var listEl=document.getElementById('rankList');
   listEl.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando torneos...</div>';
-
-  // Mostrar torneo activo si existe (en tiempo real ya está en memoria)
+  // Torneo activo desde memoria (sin query extra)
   var activeSection='';
   if(torneoData&&(torneoData.status==='waiting'||torneoData.status==='active'||torneoData.status==='countdown')){
     var partCount=Object.keys(torneoPartic).length;
-    var statusLabels={waiting:'Esperando jugadores',countdown:'Iniciando...',active:'En curso'};
-    var statusColors={waiting:'var(--wn)',countdown:'var(--ct)',active:'var(--ac)'};
-    activeSection=
-      '<div style="background:var(--sf);border:2px solid var(--ct);border-radius:12px;padding:12px;margin-bottom:12px">'+
-        '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Torneo activo ahora</div>'+
-        '<div style="font-size:14px;font-weight:700;margin-bottom:2px">'+getTorneoGameLabel(torneoData.gameMode)+'</div>'+
-        (torneoData.prize?'<div style="font-size:12px;color:var(--wn);margin-bottom:6px">🏆 '+torneoData.prize+'</div>':'')+
-        '<div style="display:flex;align-items:center;justify-content:space-between">'+
-          '<span style="font-size:11px;color:'+(statusColors[torneoData.status]||'var(--tm)')+'">'+( statusLabels[torneoData.status]||'')+'</span>'+
-          '<span style="font-size:11px;color:var(--tm)">'+partCount+' jugador'+(partCount===1?'':'es')+'</span>'+
-        '</div>'+
-      '</div>';
+    var statusLabel={waiting:'Esperando jugadores',countdown:'Iniciando...',active:'En curso'}[torneoData.status]||'';
+    var statusColor={waiting:'var(--wn)',countdown:'var(--ct)',active:'var(--ac)'}[torneoData.status]||'var(--tm)';
+    activeSection='<div style="background:var(--sf);border:2px solid var(--ct);border-radius:12px;padding:12px;margin-bottom:12px">'+
+      '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Torneo activo</div>'+
+      '<div style="font-size:14px;font-weight:700;margin-bottom:2px">'+getTorneoGameLabel(torneoData.gameMode)+'</div>'+
+      (torneoData.prize?'<div style="font-size:12px;color:var(--wn);margin-bottom:6px">🏆 '+torneoData.prize+'</div>':'')+
+      '<div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:'+statusColor+'">'+statusLabel+'</span>'+
+      '<span style="font-size:11px;color:var(--tm)">'+partCount+' jugador'+(partCount===1?'':'es')+'</span></div></div>';
   }
-
   db.ref('torneoHistorial').orderByKey().limitToLast(20).once('value').then(function(s){
     var all=s.val()||{};
-    var entries=Object.values(all)
-      .filter(function(e){return e&&e.status==='finished';})
+    var entries=Object.values(all).filter(function(e){return e&&e.gameMode&&e.prize&&e.status==='finished';})
       .sort(function(a,b){return (b.finishedAt||0)-(a.finishedAt||0);});
-
     if(entries.length===0){
-      listEl.innerHTML=activeSection+
-        '<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">'+
-          'Aún no hay torneos finalizados.<br>'+
-          '<span style="font-size:11px;color:var(--td)">El historial aparecerá aquí cuando termine el primer torneo.</span>'+
-        '</div>';
+      listEl.innerHTML=activeSection+'<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Aún no hay torneos finalizados.<br><span style="font-size:11px;color:var(--td)">El historial aparecerá aquí cuando termine el primer torneo.</span></div>';
       return;
     }
-
-    var html=activeSection;
     var medals=['🥇','🥈','🥉'];
+    var html=activeSection;
     entries.forEach(function(e){
       var sfx=getTorneoTimeSuffix(e.gameMode);
-      var gameLabel=getTorneoGameLabel(e.gameMode);
-      var when=e.finishedAt
-        ?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'})
-        :'—';
+      var when=e.finishedAt?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'}):'—';
       var top3=e.top3||[];
-      var topRows=top3.length>0
-        ?top3.map(function(p,i){
-          var isMe=uid&&p.uid===uid;
-          return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--sf2);border-radius:7px;margin-bottom:3px;'+(isMe?'border:1px solid var(--ct);':'')+'">'+
-            '<span style="font-size:14px;width:20px">'+medals[i]+'</span>'+
-            '<span style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</span>'+
-            '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+(p.time||'—')+sfx+'</span>'+
-          '</div>';
-        }).join('')
-        :'<div style="font-size:11px;color:var(--td);padding:6px">Sin resultados registrados</div>';
-
-      var durationStr=e.durationMs?Math.round(e.durationMs/60000)+' min':'—';
-      html+=
-        '<div style="background:var(--sf);border:1px solid var(--ctm);border-radius:12px;padding:12px;margin-bottom:8px">'+
-          '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">'+
-            '<div>'+
-              '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:2px">'+gameLabel+'</div>'+
-              (e.prize?'<div style="font-size:12px;color:var(--wn)">🏆 '+e.prize+'</div>':'')+'</div>'+
-            '<div style="text-align:right">'+
-              '<div style="font-size:10px;color:var(--td)">'+when+'</div>'+
-              '<div style="font-size:10px;color:var(--td)">'+durationStr+'</div>'+
-            '</div>'+
-          '</div>'+
-          topRows+
-        '</div>';
+      var topRows=top3.length>0?top3.map(function(p,i){
+        var isMe=uid&&p.uid===uid;
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--sf2);border-radius:7px;margin-bottom:3px;'+(isMe?'border:1px solid var(--ct);':'')+'">'+
+          '<span style="font-size:14px;width:20px">'+medals[i]+'</span>'+
+          '<span style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</span>'+
+          '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+(p.time||'—')+sfx+'</span></div>';
+      }).join(''):'<div style="font-size:11px;color:var(--td);padding:4px">Sin resultados</div>';
+      html+='<div style="background:var(--sf);border:1px solid var(--ctm);border-radius:12px;padding:12px;margin-bottom:8px">'+
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">'+
+          '<div><div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:2px">'+getTorneoGameLabel(e.gameMode)+'</div>'+
+          (e.prize?'<div style="font-size:12px;color:var(--wn)">🏆 '+e.prize+'</div>':'')+'</div>'+
+          '<div style="font-size:10px;color:var(--td);text-align:right">'+when+'<br>'+Math.round((e.durationMs||0)/60000)+' min</div>'+
+        '</div>'+topRows+'</div>';
     });
     listEl.innerHTML=html;
-  }).catch(function(err){
-    listEl.innerHTML=activeSection+
-      '<div style="text-align:center;padding:30px 20px">'+
-        '<div style="font-size:13px;color:var(--dg);margin-bottom:6px">No se pudo cargar el historial</div>'+
-        '<div style="font-size:11px;color:var(--td)">Verifica las reglas de Firebase (torneoHistorial debe permitir lectura)</div>'+
-      '</div>';
+  }).catch(function(){
+    listEl.innerHTML=activeSection+'<div style="text-align:center;padding:30px;font-size:12px;color:var(--dg)">No se pudo cargar el historial.<br><span style="color:var(--td)">Verifica las Firebase Rules para torneoHistorial.</span></div>';
   });
 }
 
-// ── Admin torneo section ──────────────────────
+// ── Panel Admin ──
 function renderAdmTorneos(){
   var el=document.getElementById('secTorneos');if(!el)return;
   var now=Date.now();
+  // Sección torneo activo
   var activeHtml='';
   if(torneoData){
     var td=torneoData;
     var partCount=Object.keys(torneoPartic).length;
     var sorted=getTorneoRankSorted();
-    var statusLabel={waiting:'Esperando jugadores',countdown:'Iniciando...',active:'En curso',finished:'Terminado',cancelled:'Cancelado'}[td.status]||td.status;
-    var statusColor={waiting:'var(--wn)',countdown:'var(--ct)',active:'var(--ac)',finished:'var(--tm)',cancelled:'var(--dg)'}[td.status]||'var(--tm)';
+    var statusLabels={waiting:'Esperando jugadores',countdown:'Iniciando...',active:'En curso',finished:'Terminado',cancelled:'Cancelado'};
+    var statusColors={waiting:'var(--wn)',countdown:'var(--ct)',active:'var(--ac)',finished:'var(--tm)',cancelled:'var(--dg)'};
     var timeRemStr='';
-    if(td.status==='active'&&td.startedAt&&td.durationMs){
-      var rem=td.startedAt+td.durationMs-now;
-      timeRemStr=' · Tiempo restante: <strong style="color:var(--ct)">'+fmtMs(Math.max(0,rem))+'</strong>';
-    }
-    if(td.status==='waiting'&&td.waitingStartedAt){
-      var remW=20*60*1000-(now-td.waitingStartedAt);
-      timeRemStr=' · Cancela en: <strong style="color:var(--wn)">'+fmtMs(Math.max(0,remW))+'</strong>';
-    }
-    // Tabla de participantes
-    var rows=sorted.map(function(p,i){
+    if(td.status==='active'&&td.startedAt&&td.durationMs){var rem=td.startedAt+td.durationMs-now;timeRemStr=' · Tiempo restante: <strong style="color:var(--ct)">'+fmtMs(Math.max(0,rem))+'</strong>';}
+    if(td.status==='waiting'&&td.waitingStartedAt){var remW=20*60*1000-(now-td.waitingStartedAt);timeRemStr=' · Cancela en: <strong style="color:var(--wn)">'+fmtMs(Math.max(0,remW))+'</strong>';}
+    var sfxA=getTorneoTimeSuffix(td.gameMode);
+    var participantRows=sorted.map(function(p,i){
       var email=(profiles[p.uid]||{}).email||'—';
       var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
-      var sfx=getTorneoTimeSuffix(td.gameMode);
       return '<tr style="border-top:1px solid var(--bo)">'+
         '<td style="padding:6px 8px;font-size:12px">'+medal+'</td>'+
         '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+p.name+'</td>'+
         '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+email+'</td>'+
-        '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:var(--ct);text-align:center">'+(p.bestTime?p.bestTime+sfx:'—')+'</td>'+
+        '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:var(--ct);text-align:center">'+(p.bestTime?p.bestTime+sfxA:'—')+'</td>'+
         '<td style="padding:6px 8px;font-size:12px;color:var(--tm);text-align:center">'+(p.attempts||0)+'/5</td>'+
-        '<td style="padding:6px 8px;font-size:11px;text-align:center;color:'+(p.attemptsExhausted?'var(--dg)':'var(--tm)')+'">'+( p.attemptsExhausted?'Terminó':'Jugando')+'</td>'+
+        '<td style="padding:6px 8px;font-size:11px;text-align:center;color:'+(p.attemptsExhausted?'var(--dg)':'var(--ac)')+'">'+( p.attemptsExhausted?'Fin':'Jugando')+'</td>'+
       '</tr>';
     }).join('');
-    var admParticRows=Object.entries(torneoPartic).filter(function(e){var found=sorted.findIndex(function(p){return p.uid===e[0];});return found===-1;}).map(function(e){
+    // Participantes sin intentos aún
+    var waitingRows=Object.entries(torneoPartic).filter(function(e){return !sorted.find(function(p){return p.uid===e[0];});}).map(function(e){
       var p=e[1],email=(profiles[e[0]]||{}).email||'—';
       return '<tr style="border-top:1px solid var(--bo)">'+
-        '<td style="padding:6px 8px;font-size:12px;color:var(--td)">—</td>'+
+        '<td style="padding:6px 8px;color:var(--td)">—</td>'+
         '<td style="padding:6px 8px;font-size:12px">'+p.name+'</td>'+
         '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+email+'</td>'+
         '<td style="padding:6px 8px;text-align:center;color:var(--td)">Sin intentos</td>'+
         '<td style="padding:6px 8px;text-align:center;color:var(--td)">0/5</td>'+
-        '<td style="padding:6px 8px;text-align:center;color:var(--tm)">Registrado</td>'+
+        '<td style="padding:6px 8px;text-align:center;color:var(--tm)">Esperando</td>'+
       '</tr>';
     }).join('');
-    activeHtml=
-      '<div style="background:var(--sf2);border:1px solid var(--ct);border-radius:10px;padding:12px;margin-bottom:12px">'+
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">'+
-          '<div>'+
-            '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:2px">Torneo activo</div>'+
-            '<div style="font-size:13px;font-weight:700">'+getTorneoGameLabel(td.gameMode)+' · '+td.prize+'</div>'+
-            '<div style="font-size:11px;color:'+statusColor+';margin-top:2px">'+statusLabel+timeRemStr+'</div>'+
-          '</div>'+
-          (td.status==='active'||td.status==='waiting'||td.status==='countdown'
-            ?'<button class="btn btn-r" onclick="admCloseTorneo()" style="height:36px">Cerrar torneo</button>'
-            :'')+
-        '</div>'+
-        '<div style="font-size:11px;color:var(--tm);margin-bottom:10px">'+partCount+' participante'+(partCount===1?'':'s')+' registrados</div>'+
-        (partCount>0?
-          '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px">'+
-            '<thead><tr>'+
-              '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:left">#</th>'+
-              '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:left">Jugador</th>'+
-              '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:left">Email</th>'+
-              '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Mejor tiempo</th>'+
-              '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Intentos</th>'+
-              '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Estado</th>'+
-            '</tr></thead>'+
-            '<tbody>'+rows+admParticRows+'</tbody>'+
-          '</table></div>'
-          :'<div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Sin jugadores aún</div>')+
-      '</div>';
-  }else{
+    activeHtml='<div style="background:var(--sf2);border:1px solid var(--ct);border-radius:10px;padding:12px;margin-bottom:12px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">'+
+        '<div><div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:2px">Torneo activo</div>'+
+          '<div style="font-size:13px;font-weight:700">'+getTorneoGameLabel(td.gameMode)+' · '+td.prize+'</div>'+
+          '<div style="font-size:11px;color:'+(statusColors[td.status]||'var(--tm)')+'">'+( statusLabels[td.status]||td.status)+timeRemStr+'</div></div>'+
+        (td.status==='active'||td.status==='waiting'||td.status==='countdown'
+          ?'<button class="btn btn-r" onclick="admCloseTorneo()" style="height:36px;flex-shrink:0">Cerrar torneo</button>':'')+'</div>'+
+      '<div style="font-size:11px;color:var(--tm);margin-bottom:10px">'+partCount+' participante'+(partCount===1?'':'s')+'</div>'+
+      (partCount>0
+        ?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px">'+
+          '<thead><tr><th style="padding:4px 8px;font-size:9px;color:var(--tm);">#</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);">Jugador</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);">Email</th>'+
+          '<th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Mejor</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Intentos</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Estado</th></tr></thead>'+
+          '<tbody>'+participantRows+waitingRows+'</tbody></table></div>'
+        :'<div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Sin jugadores aún</div>')+
+    '</div>';
+  } else {
     activeHtml='<div style="font-size:11px;color:var(--td);text-align:center;padding:12px;background:var(--sf2);border-radius:8px;margin-bottom:12px">Sin torneo activo</div>';
   }
-
   // Formulario crear
-  var createHtml=
-    '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px;margin-bottom:12px">'+
-      '<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Crear nuevo torneo</div>'+
-      (torneoData&&(torneoData.status==='waiting'||torneoData.status==='countdown'||torneoData.status==='active')
-        ?'<div style="font-size:11px;color:var(--wn);text-align:center;padding:8px">Ya hay un torneo activo. Ciérralo antes de crear uno nuevo.</div>'
-        :'<div style="display:flex;flex-direction:column;gap:8px">'+
-          '<div class="fld"><label>Premio / descripción</label><input id="tornPrize" placeholder="ej. Tarjeta regalo $500" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
-          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
-            '<div class="fld"><label>Mín. jugadores (= cupo máx)</label><input id="tornMin" type="number" min="2" max="50" value="5" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
-            '<div class="fld"><label>Duración una vez iniciado (min)</label><input id="tornDur" type="number" min="1" max="240" value="30" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
-          '</div>'+
-          '<div style="font-size:10px;color:var(--td);padding:4px 2px;line-height:1.6">ℹ️ La espera de jugadores es siempre <strong style="color:var(--tm)">20 minutos</strong> desde el primer join. La duración aquí es el tiempo de competencia una vez que inicia.</div>'+
-          '<button id="tornCreateBtn" class="btn" onclick="admCreateTorneo()" style="background:var(--ct);color:#fff;height:38px;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;width:100%">⚡ CREAR TORNEO (modo aleatorio)</button>'+
-        '</div>'
-      )+
-    '</div>';
-
-  // Historial (últimos 10)
+  var hasTorneoActivo=torneoData&&(torneoData.status==='waiting'||torneoData.status==='countdown'||torneoData.status==='active');
+  var createHtml='<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px;margin-bottom:12px">'+
+    '<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Crear nuevo torneo</div>'+
+    (hasTorneoActivo
+      ?'<div style="font-size:11px;color:var(--wn);text-align:center;padding:8px">Ya hay un torneo activo. Ciérralo antes de crear uno nuevo.</div>'
+      :'<div style="display:flex;flex-direction:column;gap:8px">'+
+        '<div class="fld"><label>Premio / descripción</label><input id="tornPrize" placeholder="ej. Gift Card $500 MXN" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+          '<div class="fld"><label>Mín. jugadores (= cupo máx)</label><input id="tornMin" type="number" min="2" max="50" value="" placeholder="ej. 5" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
+          '<div class="fld"><label>Duración una vez iniciado (min)</label><input id="tornDur" type="number" min="1" max="240" value="" placeholder="ej. 30" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
+        '</div>'+
+        '<div style="font-size:10px;color:var(--td);padding:2px;line-height:1.6">ℹ️ Espera de jugadores: siempre <strong style="color:var(--tm)">20 min</strong> desde el primer join. La duración es el tiempo de competencia una vez que inicia. El modo de juego se asigna aleatoriamente.</div>'+
+        '<button id="tornCreateBtn" class="btn" onclick="admCreateTorneo()" style="background:var(--ct);color:#fff;height:38px;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;width:100%">⚡ CREAR TORNEO (modo aleatorio)</button>'+
+      '</div>')+
+  '</div>';
   var histHtml='<div id="tornHistWrap"><div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Cargando historial...</div></div>';
-
   el.innerHTML=activeHtml+createHtml+histHtml;
-
   // Cargar historial
-  db.ref('torneoHistorial').orderByKey().limitToLast(10).once('value').then(function(s){
+  db.ref('torneoHistorial').orderByKey().limitToLast(20).once('value').then(function(s){
     var all=s.val()||{};
-    var entries=Object.values(all).sort(function(a,b){return (b.finishedAt||0)-(a.finishedAt||0);});
+    var allKeys=Object.keys(all);
+    var valid=[],garbage=[];
+    allKeys.forEach(function(k){var e=all[k];(e&&e.gameMode&&e.prize&&e.status==='finished'?valid:garbage).push(k);});
+    valid.sort(function(a,b){return (all[b].finishedAt||0)-(all[a].finishedAt||0);});
     var wrap=document.getElementById('tornHistWrap');if(!wrap)return;
-    if(entries.length===0){wrap.innerHTML='<div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Sin historial</div>';return;}
-    var html='<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:8px">Historial de torneos</div>';
-    entries.forEach(function(e){
+    var cleanBtn=garbage.length>0
+      ?'<div style="background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.3);border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px">'+
+          '<span style="font-size:11px;color:var(--dg)">⚠️ '+garbage.length+' entrada'+(garbage.length===1?'':'s')+' inválida'+(garbage.length===1?'':'s')+'</span>'+
+          '<button onclick="admLimpiarHistorial()" class="btn btn-r" style="height:30px;font-size:10px;flex-shrink:0">Limpiar</button></div>'
+      :'';
+    if(valid.length===0){wrap.innerHTML=cleanBtn+'<div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Sin historial válido</div>';return;}
+    var html=cleanBtn+'<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:8px">Historial ('+valid.length+')</div>';
+    valid.forEach(function(k){
+      var e=all[k];
       var sfx=getTorneoTimeSuffix(e.gameMode);
       var when=e.finishedAt?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'}):'—';
       var top3=e.top3||[];var medals=['🥇','🥈','🥉'];
-      var topStr=top3.slice(0,3).map(function(p,i){return medals[i]+'<strong>'+p.name+'</strong> '+p.time+sfx;}).join(' · ')||'Sin datos';
-      html+=
-        '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:9px;padding:10px 12px;margin-bottom:6px">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
-            '<span style="font-size:11px;color:var(--ct)">'+getTorneoGameLabel(e.gameMode)+'</span>'+
-            '<span style="font-size:10px;color:var(--td)">'+when+'</span>'+
-          '</div>'+
-          '<div style="font-size:12px;color:var(--wn);margin-bottom:4px">🏆 '+e.prize+'</div>'+
-          '<div style="font-size:11px;color:var(--tm);line-height:1.7">'+topStr+'</div>'+
-        '</div>';
+      var topStr=top3.length>0?top3.slice(0,3).map(function(p,i){return p&&p.name?medals[i]+'<strong>'+(p.name||'?')+'</strong> '+(p.time||'—')+sfx:'';}).filter(Boolean).join(' · '):'Sin resultados';
+      html+='<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:9px;padding:10px 12px;margin-bottom:6px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
+          '<span style="font-size:11px;color:var(--ct)">'+getTorneoGameLabel(e.gameMode)+'</span>'+
+          '<span style="font-size:10px;color:var(--td)">'+when+'</span></div>'+
+        '<div style="font-size:12px;color:var(--wn);margin-bottom:4px">🏆 '+(e.prize||'—')+'</div>'+
+        '<div style="font-size:11px;color:var(--tm)">'+topStr+'</div></div>';
     });
     wrap.innerHTML=html;
+  }).catch(function(){
+    var wrap=document.getElementById('tornHistWrap');
+    if(wrap)wrap.innerHTML='<div style="font-size:11px;color:var(--dg);text-align:center;padding:10px">Error al cargar — verifica Firebase Rules</div>';
   });
 }
 
 function admCreateTorneo(){
   var prize=(document.getElementById('tornPrize').value||'').trim();
-  var minP=parseInt(document.getElementById('tornMin').value)||5;
-  var durMin=parseInt(document.getElementById('tornDur').value)||30;
-  if(!prize){toast('Escribe una descripción del premio');return;}
-  if(minP<2){toast('El mínimo es 2 jugadores');return;}
-  if(durMin<1){toast('La duración mínima es 1 minuto');return;}
+  var minRaw=document.getElementById('tornMin').value.trim();
+  var durRaw=document.getElementById('tornDur').value.trim();
+  var minP=parseInt(minRaw),durMin=parseInt(durRaw);
+  if(!prize){toast('⚠️ Escribe la descripción del premio');document.getElementById('tornPrize').focus();return;}
+  if(!minRaw||isNaN(minP)||minP<2){toast('⚠️ El mínimo de jugadores debe ser 2 o más');document.getElementById('tornMin').focus();return;}
+  if(!durRaw||isNaN(durMin)||durMin<1){toast('⚠️ La duración debe ser al menos 1 minuto');document.getElementById('tornDur').focus();return;}
   var modes=['t','b','s','r'];
   var gameMode=modes[Math.floor(Math.random()*modes.length)];
   var targetTime=null;
   if(gameMode==='t')targetTime=Math.round((3+Math.random()*12)*1000)/1000;
   else if(gameMode==='b')targetTime=Math.round((5+Math.random()*15)*1000)/1000;
   var tornId=Date.now();
-  var tornEntry={
-    id:tornId,prize:prize,minPlayers:minP,
-    durationMs:durMin*60*1000,gameMode:gameMode,
-    targetTime:targetTime,status:'waiting',
-    createdAt:tornId,waitingStartedAt:null,
-    startedAt:null,finishedAt:null,countdownEndsAt:null
-  };
+  var tornEntry={id:tornId,prize:prize,minPlayers:minP,durationMs:durMin*60*1000,gameMode:gameMode,
+    targetTime:targetTime,status:'waiting',createdAt:tornId,
+    waitingStartedAt:null,startedAt:null,finishedAt:null,countdownEndsAt:null};
   var btn=document.getElementById('tornCreateBtn');
-  if(btn){btn.textContent='Creando...';btn.disabled=true;}
+  if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
   db.ref('torneo/active').set(tornEntry).then(function(){
-    toast('✅ Torneo creado — Modo: '+getTorneoGameLabel(gameMode));
+    toast('✅ Torneo creado — '+getTorneoGameLabel(gameMode)+' · '+minP+' jugadores · '+durMin+'min');
     renderAdmTorneos();
   }).catch(function(err){
-    if(btn){btn.textContent='⚡ CREAR TORNEO (modo aleatorio)';btn.disabled=false;}
-    if(err.code==='PERMISSION_DENIED'){
+    if(btn){btn.textContent='⚡ CREAR TORNEO (modo aleatorio)';btn.disabled=false;btn.style.opacity='1';}
+    if(err.code==='PERMISSION_DENIED'||err.message.indexOf('PERMISSION_DENIED')>=0){
       document.getElementById('modalBody').innerHTML=
         '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div>'+
-        '<p style="font-size:12px;color:var(--tm);margin-bottom:10px">Firebase Rules no permite escritura en <code style="color:var(--ac)">torneo/</code>. Agrega estas reglas en la consola de Firebase:</p>'+
-        '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:10px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;margin-bottom:12px;user-select:all">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div>'+
-        '<p style="font-size:11px;color:var(--td);margin-bottom:12px">Ve a Firebase Console → Realtime Database → Rules y agrega estas líneas dentro del objeto raíz.</p>'+
+        '<p style="font-size:12px;color:var(--tm);margin-bottom:10px">Agrega estas reglas en Firebase Console → Realtime Database → Rules:</p>'+
+        '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:12px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;margin-bottom:10px;user-select:all;cursor:text">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div>'+
         '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';
       document.getElementById('overlay').classList.add('show');
-    } else {
-      toast('❌ Error: '+err.message);
-    }
+    } else {toast('❌ Error: '+err.message);}
   });
 }
 
 function admCloseTorneo(){
   if(!torneoData){toast('Sin torneo activo');return;}
-  window._tornConfirmClose=function(){
-    closeModal();closeTorneo('manual');
-  };
+  window._tornConfirmClose=function(){closeModal();closeTorneo('manual');};
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ CERRAR TORNEO</div>'+
     '<p style="font-size:12px;color:var(--tm);margin-bottom:14px">Se determinará el ganador con los resultados actuales y el torneo quedará archivado en el historial.</p>'+
-    '<div class="mbtns">'+
-      '<button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button>'+
-      '<button class="btn btn-r" onclick="window._tornConfirmClose()" style="height:42px;font-weight:700">Cerrar torneo</button>'+
-    '</div>';
+    '<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button>'+
+    '<button class="btn btn-r" onclick="window._tornConfirmClose()" style="height:42px;font-weight:700">Cerrar torneo</button></div>';
   document.getElementById('overlay').classList.add('show');
+}
+
+function admLimpiarHistorial(){
+  db.ref('torneoHistorial').once('value').then(function(s){
+    var all=s.val()||{};
+    var garbage=Object.keys(all).filter(function(k){var e=all[k];return !e||!e.gameMode||!e.prize||e.status!=='finished';});
+    if(garbage.length===0){toast('Sin entradas inválidas');return;}
+    var updates={};garbage.forEach(function(k){updates['torneoHistorial/'+k]=null;});
+    db.ref().update(updates).then(function(){
+      toast('✅ '+garbage.length+' entrada'+(garbage.length===1?'':'s')+' eliminada'+(garbage.length===1?'':'s'));
+      renderAdmTorneos();
+    }).catch(function(err){toast('❌ Error: '+err.message);});
+  });
 }
 
 function getSorted(g,max){return Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);}).slice(0,max);}
@@ -1953,6 +1984,16 @@ function goTab(t){
     ['global','t','b','s','r','yo'].forEach(function(x){var map={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO'};var el=document.getElementById('rgc'+map[x]);if(el){el.style.background='';el.style.color='';el.style.borderColor='';}});
     setRankGame('global');showScreen('sRanking');
   }
+  else if(t==='admin'&&curUser&&curUser.uid==='U4X0cDD33Ahh2MxDsKCLgaoZMtR2'){
+    openAdminDirect();
+  }
+}
+function openAdminDirect(){
+  // Entrada directa al admin para el UID del admin — sin formulario de contraseña
+  showScreen('sAdmin');
+  document.getElementById('au').value='admin';
+  document.getElementById('ap').value='rival2024';
+  admLogin();
 }
 function showAdmin(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').innerHTML='';document.getElementById('admP').style.display='';document.getElementById('au').value='';document.getElementById('ap').value='';showScreen('sAdmin');}
 function admLogout(){
@@ -1960,8 +2001,6 @@ function admLogout(){
   document.getElementById('admLC').style.display='block';
   document.getElementById('admP').innerHTML='';
   document.getElementById('admP').style.display='';
-  // Si la sesión activa es anónima (creada por admLogin), cerrarla al salir.
-  if(auth.currentUser&&auth.currentUser.isAnonymous){auth.signOut();}
   showScreen('sAuth');
 }
 
@@ -1985,6 +2024,7 @@ function toggleAdmSection(id){
       }
       renderAdmRetoSection(g2);
     }
+    if(id==='secTargetHistory')renderTargetHistory();
   }
 }
 
@@ -2207,34 +2247,159 @@ function admLogin(){
           '<span id="secTorneosArrow" style="color:var(--tm);font-size:12px">▶</span>'+
         '</button>'+
         '<div id="secTorneos" style="display:none;padding:0 14px 14px"></div>'+
+      '</div>'+
+      // HISTORIAL DE TARGETS
+      '<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:10px">'+
+        '<button onclick="toggleAdmSection(\'secTargetHistory\')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent;border:none;color:var(--tx);cursor:pointer;font-family:DM Sans,sans-serif">'+
+          '<span style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">📋 Historial de targets</span>'+
+          '<span id="secTargetHistoryArrow" style="color:var(--tm);font-size:12px">▶</span>'+
+        '</button>'+
+        '<div id="secTargetHistory" style="display:none;padding:0 14px 14px"></div>'+
       '</div>';
       panel.style.display='block';
       updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
       toast('✅ Bienvenido '+u);
     };
-    if(auth.currentUser){
+    if(auth.currentUser && !auth.currentUser.isAnonymous){
       initPanel();
     } else {
-      auth.signInAnonymously().then(initPanel).catch(function(e){
-        console.error('signInAnonymously error:',e.message);
-        toast('❌ Error de autenticación: '+e.message);
-        admLoggedIn=false;
-      });
+      toast('❌ Debes iniciar sesión con tu cuenta de Google primero');
+      admLoggedIn=false;
     }
   } else {
     toast('❌ Credenciales incorrectas');
   }
 }
-function genTargets(){var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+'<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div></div>'+'<p style="font-size:11px;color:var(--tm);margin-bottom:12px">Los scores actuales se conservan. Si quieres limpiar el día, usa "Resetear día" después.</p>'+'<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+'<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
-function saveTargets(tt,tb){
+function genTargets(){
+  var rndTt=Math.round((3+Math.random()*12)*1000)/1000;
+  var rndTb=Math.round((5+Math.random()*15)*1000)/1000;
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎯 TIEMPOS OBJETIVO</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">'+
+      '<div style="background:var(--sf2);border:1px solid var(--ac);border-radius:9px;padding:10px 14px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+          '<span style="font-size:11px;color:var(--ac);font-weight:600">🟢 Reto Tiempo</span>'+
+          '<span style="font-size:10px;color:var(--tm)">3.000 – 15.000s</span>'+
+        '</div>'+
+        '<input id="inputTt" type="number" step="0.001" min="3" max="15" value="'+rndTt.toFixed(3)+'" '+
+          'style="width:100%;height:38px;background:var(--bg);border:1px solid var(--ac);border-radius:7px;color:var(--ac);font-family:DM Mono,monospace;font-size:16px;padding:0 10px;outline:none;text-align:center">'+
+      '</div>'+
+      '<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:9px;padding:10px 14px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+          '<span style="font-size:11px;color:var(--c4b);font-weight:600">🟡 Reto Ciego</span>'+
+          '<span style="font-size:10px;color:var(--tm)">5.000 – 20.000s</span>'+
+        '</div>'+
+        '<input id="inputTb" type="number" step="0.001" min="5" max="20" value="'+rndTb.toFixed(3)+'" '+
+          'style="width:100%;height:38px;background:var(--bg);border:1px solid var(--c4b);border-radius:7px;color:var(--c4b);font-family:DM Mono,monospace;font-size:16px;padding:0 10px;outline:none;text-align:center">'+
+      '</div>'+
+    '</div>'+
+    '<button onclick="genTargetsRandom()" style="width:100%;height:34px;background:transparent;border:1px solid var(--bo);border-radius:8px;color:var(--tm);font-size:11px;cursor:pointer;margin-bottom:12px">🎲 Generar aleatorio</button>'+
+    // Checkbox reset
+    '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.25);border-radius:9px;cursor:pointer;margin-bottom:8px">'+
+      '<input type="checkbox" id="chkReset" checked onchange="toggleResetWarning()" style="width:16px;height:16px;margin-top:1px;accent-color:var(--wn);flex-shrink:0;cursor:pointer">'+
+      '<div>'+
+        '<div style="font-size:12px;font-weight:600;color:var(--wn)">Resetear scores del día</div>'+
+        '<div style="font-size:10px;color:var(--tm);margin-top:2px;line-height:1.5">Los rankings del día empiezan en 0. Los puntos acumulados de la semana no se tocan.</div>'+
+      '</div>'+
+    '</label>'+
+    // Advertencia dinámica — solo visible cuando checkbox está desmarcado
+    '<div id="noResetWarning" style="display:none;background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.3);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--dg);line-height:1.6">'+
+      '⚠️ Los scores actuales se conservan. Los jugadores que ya jugaron hoy competirán con el <strong>nuevo target</strong> — su diferencia será recalculada automáticamente.'+
+    '</div>'+
+    '<div class="mbtns">'+
+      '<button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+
+      '<button class="btn btn-g" onclick="saveTargets()" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button>'+
+    '</div>';
+  document.getElementById('overlay').classList.add('show');
+}
+function toggleResetWarning(){
+  var chk=document.getElementById('chkReset');
+  var warn=document.getElementById('noResetWarning');
+  if(chk&&warn)warn.style.display=chk.checked?'none':'block';
+}
+function genTargetsRandom(){
+  var rndTt=Math.round((3+Math.random()*12)*1000)/1000;
+  var rndTb=Math.round((5+Math.random()*15)*1000)/1000;
+  var inTt=document.getElementById('inputTt');
+  var inTb=document.getElementById('inputTb');
+  if(inTt)inTt.value=rndTt.toFixed(3);
+  if(inTb)inTb.value=rndTb.toFixed(3);
+}
+function saveTargets(){
+  var inTt=document.getElementById('inputTt');
+  var inTb=document.getElementById('inputTb');
+  var chk=document.getElementById('chkReset');
+  if(!inTt||!inTb){toast('❌ Error: campos no encontrados');return;}
+  var tt=parseFloat(inTt.value);
+  var tb=parseFloat(inTb.value);
+  if(isNaN(tt)||tt<3||tt>15){toast('❌ Reto Tiempo debe estar entre 3.000 y 15.000s');return;}
+  if(isNaN(tb)||tb<5||tb>20){toast('❌ Reto Ciego debe estar entre 5.000 y 20.000s');return;}
+  var doReset=chk?chk.checked:true;
   var today=getTodayKey();
-  // gameConfig no requiere auth — scores sí, por eso se resetean por separado si es necesario
-  db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:Date.now()}).then(function(){
+  var now=Date.now();
+  resetInProgress=true;
+  // Guardar en historial antes de aplicar
+  var histEntry={tt:tt,tb:tb,date:today,resetDay:doReset,appliedAt:now};
+  var ops=[
+    db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now}),
+    db.ref('targetHistory/'+now).set(histEntry)
+  ];
+  if(doReset)ops.push(db.ref('scores/'+weekKey+'/'+today).remove());
+  Promise.all(ops).then(function(){
+    if(doReset)wScores={t:{},b:{},s:{},r:{}};
     closeModal();
-    toast('✅ Tiempos actualizados — usa Resetear día si quieres limpiar scores');
+    toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
+    updateHomecards();
+    updateAdmStats();
+    buildWinners();
+    renderAdmTable();
+    renderAdmGlobalTable();
+    // Refrescar historial si está abierto
+    var histEl=document.getElementById('secTargetHistory');
+    if(histEl&&histEl.style.display!=='none')loadTargetHistory();
+    setTimeout(function(){resetInProgress=false;},3000);
   }).catch(function(err){
-    toast('❌ Error al guardar: '+err.message);
+    resetInProgress=false;
+    toast('❌ Error: '+err.message);
     console.error('saveTargets error:',err);
+  });
+}
+function renderTargetHistory(){loadTargetHistory();}
+function loadTargetHistory(){
+  var el=document.getElementById('secTargetHistory');
+  if(!el)return;
+  el.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:12px">Cargando...</div>';
+  db.ref('targetHistory').orderByChild('appliedAt').limitToLast(30).once('value').then(function(snap){
+    var entries=[];
+    snap.forEach(function(child){entries.unshift(child.val());});
+    if(entries.length===0){
+      el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin historial todavía</div>';
+      return;
+    }
+    var DAYS2=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:400px">'+
+      '<thead><tr>'+
+        '<th style="text-align:left;font-size:9px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Fecha y hora</th>'+
+        '<th style="text-align:center;font-size:9px;color:var(--ac);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">🟢 Tiempo</th>'+
+        '<th style="text-align:center;font-size:9px;color:var(--c4b);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">🟡 Ciego</th>'+
+        '<th style="text-align:center;font-size:9px;color:var(--tm);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--bo)">Reset</th>'+
+      '</tr></thead><tbody>';
+    entries.forEach(function(e){
+      var d=new Date(e.appliedAt);
+      var cdmx=new Date(d.toLocaleString('en-US',{timeZone:'America/Mexico_City'}));
+      var dateStr=DAYS2[cdmx.getDay()]+' '+cdmx.getDate()+'/'+( cdmx.getMonth()+1)+
+        ' '+String(cdmx.getHours()).padStart(2,'0')+':'+String(cdmx.getMinutes()).padStart(2,'0');
+      html+='<tr style="border-top:1px solid var(--bo)">'+
+        '<td style="padding:8px;font-size:11px;color:var(--tm)">'+dateStr+'</td>'+
+        '<td style="padding:8px;font-family:DM Mono,monospace;font-size:12px;color:var(--ac);text-align:center">'+parseFloat(e.tt).toFixed(3)+'s</td>'+
+        '<td style="padding:8px;font-family:DM Mono,monospace;font-size:12px;color:var(--c4b);text-align:center">'+parseFloat(e.tb).toFixed(3)+'s</td>'+
+        '<td style="padding:8px;text-align:center;font-size:11px;color:'+(e.resetDay?'var(--dg)':'var(--ac)')+'">'+(e.resetDay?'Sí':'No')+'</td>'+
+      '</tr>';
+    });
+    html+='</tbody></table></div>';
+    el.innerHTML=html;
+  }).catch(function(){
+    el.innerHTML='<div style="font-size:12px;color:var(--dg);text-align:center;padding:12px">Error al cargar historial</div>';
   });
 }
 function updateAdmStats(){
@@ -2302,6 +2467,7 @@ function confResetSemana(){
   document.getElementById('overlay').classList.add('show');
 }
 function doResetSemana(){
+  resetInProgress=true;
   Promise.all([
     db.ref('scores/'+weekKey).remove(),
     db.ref('weekPoints/'+weekKey).remove()
@@ -2313,10 +2479,28 @@ function doResetSemana(){
     updateHomecards();
     updateAdmStats();
     buildWinners();
+    renderAdmGlobalTable();
+    // Re-habilitar recalcPoints después de un momento para asegurarse
+    // de que Firebase procesó todos los deletes antes de permitir nuevas escrituras
+    setTimeout(function(){resetInProgress=false;},3000);
   });
 }
 function confReset(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px">🗑️ RESETEAR DÍA</div><p style="font-size:12px;color:var(--tm);margin-bottom:6px">Borra todos los tiempos de hoy en los 4 retos (Tiempo, Ciego, Secuencia y Reacción).</p><p style="font-size:11px;color:var(--dg);margin-bottom:14px">⚠️ Los perfiles y cuentas no se borran.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-r" onclick="doReset()" style="height:40px;border-radius:9px;font-weight:700">🗑️ RESETEAR</button></div>';document.getElementById('overlay').classList.add('show');}
-function doReset(){var key='scores/'+weekKey+'/'+todayKey;db.ref(key).remove().then(function(){wScores={t:{},b:{},s:{},r:{}};closeModal();toast('✅ Día reseteado');updateHomecards();updateAdmStats();buildWinners();renderAdmTable();});}
+function doReset(){
+  resetInProgress=true;
+  var key='scores/'+weekKey+'/'+todayKey;
+  db.ref(key).remove().then(function(){
+    wScores={t:{},b:{},s:{},r:{}};
+    closeModal();
+    toast('✅ Día reseteado');
+    updateHomecards();
+    updateAdmStats();
+    buildWinners();
+    renderAdmTable();
+    renderAdmGlobalTable();
+    setTimeout(function(){resetInProgress=false;},3000);
+  });
+}
 var weekGame='t';
 function setWeekGame(g){weekGame=g;['t','b','s','r'].forEach(function(x){var el=document.getElementById('wgt'+x);if(!el)return;el.style.background='';el.style.color='';el.style.borderColor='';el.className='rgt';});var active=document.getElementById('wgt'+g);if(active){var cfg=GCOLORS[g];active.style.background=cfg.stroke;active.style.color='#000';active.style.borderColor=cfg.stroke;}renderWeekDays(g);}
 function renderWeekDays(g){var wrap=document.getElementById('weekDaysWrap');if(!wrap)return;wrap.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g),uid=curUser?curUser.uid:null;var d=getCDMX(),dayNum=d.getDay(),diff=dayNum===0?-6:1-dayNum,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}var today=getTodayKey();Promise.all([Promise.all(days.map(function(dayObj){return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};})})),db.ref('weekScores/'+weekKey+'/'+gkey).once('value')]).then(function(res){var results=res[0],legacyData=res[1].val()||{},earliestTs=null;Object.values(legacyData).forEach(function(w){if(w&&w.lastPlayed){if(!earliestTs||w.lastPlayed<earliestTs)earliestTs=w.lastPlayed;}});if(earliestTs){var legacyDayK=dayKeyFromTimestamp(earliestTs),legacyTarget=legacyDayK?results.find(function(r){return r.day.key===legacyDayK;}):null;if(legacyTarget&&Object.keys(legacyTarget.scores).length===0){Object.entries(legacyData).forEach(function(e){var uid2=e[0],w=e[1];if(w&&w.bestDiff!=null)legacyTarget.scores[uid2]=w;});}}var html='';results.forEach(function(r){var isToday=r.day.key===today,isFuture=r.day.key>today,hasScores=Object.keys(r.scores).length>0;if(isFuture||isToday)return;if(!hasScores)return;var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1,myScore=uid?r.scores[uid]:null;html+='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:700;color:var(--tm)">'+r.day.label+'</div>'+(myRank>=0?'<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>':'<div style="font-size:10px;color:var(--td)">No jugaste</div>')+'</div>';var medals=['🥇','🥈','🥉'];sorted.slice(0,3).forEach(function(e,i){var w=e[1],isMe=uid&&e[0]===uid;html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border-radius:8px;margin-bottom:4px;'+(isMe?'border:1px solid '+cfg.stroke+';':'')+'"><span style="font-size:16px;width:22px">'+medals[i]+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});if(myRank>=3&&myScore&&myScore.bestTime){html+='<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div><div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px"><span style="font-size:13px;font-weight:700;color:'+cfg.stroke+';width:22px">#'+(myRank+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(myScore.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:700">'+(myScore.name||'?')+' 👈</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+myScore.bestTime+(isR?'ms':'s')+'</div></div>';}html+='</div>';});if(curUser&&weekPoints[curUser.uid]&&weekPoints[curUser.uid].total>0){var myTotalPts=weekPoints[curUser.uid].total||0;html+='<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Tu total esta semana</div><div style="font-size:11px;color:var(--td)">Suma de todos los juegos y días</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:var(--wn);line-height:1">'+myTotalPts+' <span style="font-size:14px">pts</span></div></div>';}wrap.innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Sin datos esta semana</div>';});}
