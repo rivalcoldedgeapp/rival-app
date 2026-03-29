@@ -29,17 +29,26 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .nav-tabs.show{display:flex}
 /* compact game grid */
 .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
-.gc2{border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;gap:6px;min-height:140px}
+.gc2{border-radius:14px;padding:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1px solid var(--bo);background:var(--sf);display:flex;flex-direction:column;min-height:140px}
 .gc2::before{content:'';position:absolute;inset:0;opacity:.06;pointer-events:none}
 .gc2.gt{border-color:var(--ac)}.gc2.gt::before{background:var(--ac)}
 .gc2.gb{border-color:var(--c4b)}.gc2.gb::before{background:var(--c4b)}
 .gc2.gs{border-color:var(--cs)}.gc2.gs::before{background:var(--cs)}
 .gc2.gr{border-color:var(--cr)}.gc2.gr::before{background:var(--cr)}
 .gc2:hover{transform:translateY(-2px)}
-.gc2-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;line-height:1}
-.gc2-tgt{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;text-shadow:0 0 20px currentColor}
-.gc2-tgtlbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:-2px}
-.gc2-leader{font-size:11px;margin-top:auto;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
+.gc2-name{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;line-height:1}
+/* Target: protagonista de la tarjeta — grande, centrado, con glow */
+.gc2-tgt{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:58px;line-height:1;
+  text-shadow:0 0 30px currentColor;
+  text-align:center;
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  margin:4px 0;
+}
+.gc2-tgtlbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.6;text-align:center;margin-top:-4px}
+.gc2-leader{font-size:11px;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
 .gc2-pos{font-size:10px;color:var(--tm)}
 .nav-brand{display:flex;align-items:baseline;gap:8px}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--ac)}
@@ -312,9 +321,9 @@ tr:hover td{background:var(--sf2)}
     grid-template-rows:minmax(0,1fr) minmax(0,1fr);
     max-height:calc(2 * 200px + 8px);
   }
-  .gc2{min-height:0;padding:12px 10px;gap:4px}
-  .gc2-name{font-size:14px}
-  .gc2-tgt{font-size:26px}
+  .gc2{min-height:0;padding:10px 10px 8px}
+  .gc2-name{font-size:13px}
+  .gc2-tgt{font-size:42px;margin:2px 0}
   .gc2-tgtlbl{font-size:7px}
   .gc2-leader{font-size:10px;padding-top:4px}
   .gc2-pos{font-size:9px}
