@@ -1673,7 +1673,7 @@ function _showPerfilModalWith(p){
 
 // Helper: devuelve {best, pos} del torneo activo para mostrar en srBest/srPos
 function getTorneoScoreRow(uid,isMs){
-  if(!curTorneoMode||!torneoData||!torneoData.participantes||!uid)return null;
+  if((!curTorneoMode&&!lastWasTorneo)||!torneoData||!torneoData.participantes||!uid)return null;
   var myScore=torneoData.participantes[uid];
   var best=myScore&&myScore.bestTime?myScore.bestTime+(isMs?'ms':'s'):'—';
   if(!myScore||!myScore.bestTime)return{best:'—',pos:'—'};
@@ -1816,14 +1816,21 @@ function showResult(fmt,diff,isRec,g){
       irS.style.display='block';
       document.getElementById('irTimeS').textContent=fmt+'s';
       if(lastWasTorneo){
-        // Modo torneo — mostrar info de torneo, no ranking diario
+        var tRowS2=getTorneoScoreRow(uid,false);
+        var tornPosS=tRowS2&&tRowS2.pos!=='—'?tRowS2.pos:'🏆';
+        document.getElementById('irPosS').textContent=tornPosS;
+        if(tRowS2&&tRowS2.best!=='—'){
+          document.getElementById('srBestS').textContent=tRowS2.best;
+          document.getElementById('srPosS').textContent=tRowS2.pos;
+        }
         var intentosUsados=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
         var intentosLeft=5-intentosUsados;
-        document.getElementById('irPosS').textContent='🏆';
         var recS=document.getElementById('irRecS');
         if(recS){recS.style.display='block';recS.style.background='var(--ctd)';recS.style.borderColor='var(--ctm)';recS.style.color='var(--ct)';recS.textContent='🏆 Torneo · Intento '+intentosUsados+'/5'+(intentosLeft>0?' · '+intentosLeft+' restantes':' · Sin más intentos');}
       } else {
         document.getElementById('irPosS').textContent='#'+rank;
+        document.getElementById('srBestS').textContent=wScores['s'][uid]&&wScores['s'][uid].bestTime?wScores['s'][uid].bestTime+'s':'—';
+        document.getElementById('srPosS').textContent='#'+rank+' de '+total;
         var recS=document.getElementById('irRecS');
         if(recS)recS.style.display=isRec?'block':'none';
       }
@@ -1851,20 +1858,25 @@ function showResult(fmt,diff,isRec,g){
       irR.style.display='block';
       document.getElementById('irTimeR').textContent=fmt+'ms';
       if(lastWasTorneo){
+        var tRowR2=getTorneoScoreRow(uid,true);
+        var tornPosR=tRowR2&&tRowR2.pos!=='—'?tRowR2.pos:'🏆';
+        document.getElementById('irPosR').textContent=tornPosR;
+        // Actualizar score row superior con datos del torneo
+        if(tRowR2&&tRowR2.best!=='—'){
+          document.getElementById('srBestR').textContent=tRowR2.best;
+          document.getElementById('srPosR').textContent=tRowR2.pos;
+        }
         var intentosUsados2=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
         var intentosLeft2=5-intentosUsados2;
-        document.getElementById('irPosR').textContent='🏆';
         var recR=document.getElementById('irRecR');
         if(recR){recR.style.display='block';recR.style.background='var(--ctd)';recR.style.borderColor='var(--ctm)';recR.style.color='var(--ct)';recR.textContent='🏆 Torneo · Intento '+intentosUsados2+'/5'+(intentosLeft2>0?' · '+intentosLeft2+' restantes':' · Sin más intentos');}
       } else {
         document.getElementById('irPosR').textContent='#'+rank;
+        document.getElementById('srBestR').textContent=wScores['r'][uid]&&wScores['r'][uid].bestTime?wScores['r'][uid].bestTime+'ms':'—';
+        document.getElementById('srPosR').textContent='#'+rank+' de '+total;
         var recR=document.getElementById('irRecR');
         if(recR)recR.style.display=isRec?'block':'none';
       }
-    }
-    if(!lastWasTorneo){
-      document.getElementById('srBestR').textContent=wScores['r'][uid]&&wScores['r'][uid].bestTime?wScores['r'][uid].bestTime+'ms':'—';
-      document.getElementById('srPosR').textContent='#'+rank+' de '+total;
     }
     if(curTorneoMode){torneoRegistrarIntento(fmt,diff,g);curTorneoMode=false;}
     return;
