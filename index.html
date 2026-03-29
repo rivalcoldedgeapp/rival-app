@@ -1140,7 +1140,15 @@ function goTab(t){
   }
 }
 function showAdmin(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').innerHTML='';document.getElementById('admP').style.display='';document.getElementById('au').value='';document.getElementById('ap').value='';showScreen('sAdmin');}
-function admLogout(){admLoggedIn=false;document.getElementById('admLC').style.display='block';document.getElementById('admP').innerHTML='';document.getElementById('admP').style.display='';showScreen('sAuth');}
+function admLogout(){
+  admLoggedIn=false;
+  document.getElementById('admLC').style.display='block';
+  document.getElementById('admP').innerHTML='';
+  document.getElementById('admP').style.display='';
+  // Si la sesión activa es anónima (creada por admLogin), cerrarla al salir.
+  if(auth.currentUser&&auth.currentUser.isAnonymous){auth.signOut();}
+  showScreen('sAuth');
+}
 
 function toggleAdmSection(id){
   var el=document.getElementById(id);if(!el)return;
@@ -1316,11 +1324,14 @@ function admLogin(){
   var u=document.getElementById('au').value,p=document.getElementById('ap').value;
   if((u==='admin'||u==='socio')&&p==='rival2024'){
     admLoggedIn=true;
-    startListeners();
-    document.getElementById('admLC').style.display='none';
-    // Esperar 1.5s para que Firebase cargue los datos antes de renderizar stats
-    setTimeout(updateAdmStats, 1500);
-    var panel=document.getElementById('admP');
+    // Si no hay sesión Firebase activa (admin entró desde la pantalla de login sin
+    // autenticarse), firmar anónimamente para que auth!=null y las reglas de DB
+    // permitan operaciones de escritura (reset de scores, etc.).
+    var initPanel=function(){
+      startListeners();
+      document.getElementById('admLC').style.display='none';
+      setTimeout(updateAdmStats,1500);
+      var panel=document.getElementById('admP');
     panel.innerHTML=
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">'+
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>'+
@@ -1373,9 +1384,19 @@ function admLogin(){
       '</div>'+
       // RETOS
       '<div id="secRetosWrap"></div>';
-    panel.style.display='block';
-    updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
-    toast('✅ Bienvenido '+u);
+      panel.style.display='block';
+      updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
+      toast('✅ Bienvenido '+u);
+    };
+    if(auth.currentUser){
+      initPanel();
+    } else {
+      auth.signInAnonymously().then(initPanel).catch(function(e){
+        console.error('signInAnonymously error:',e.message);
+        toast('❌ Error de autenticación: '+e.message);
+        admLoggedIn=false;
+      });
+    }
   } else {
     toast('❌ Credenciales incorrectas');
   }
