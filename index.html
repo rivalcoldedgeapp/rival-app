@@ -760,14 +760,14 @@ function checkDailyReset(){
   // recibe cfg=null, proponiendo un write innecesario que genera un target nuevo.
   db.ref('gameConfig').once('value').then(function(snap){
     var cfg=snap.val();
-    if(cfg&&cfg.lastDay===currentDay)return; // Ya está actualizado para hoy — no hacer nada
+    if(cfg&&cfg.lastDay===currentDay&&cfg.tt&&cfg.tb)return; // Ya está completo para hoy — no hacer nada
     // Generar valores fuera de la transaction para que sean idempotentes en cada reintento
     var newTt=Math.round((3+Math.random()*12)*1000)/1000;
     var newTb=Math.round((5+Math.random()*15)*1000)/1000;
     var now=Date.now();
     // Transaction para proteger contra race condition entre múltiples clientes simultáneos
     db.ref('gameConfig').transaction(function(cfg2){
-      if(cfg2&&cfg2.lastDay===currentDay)return; // Otro cliente ya actualizó — abortar
+      if(cfg2&&cfg2.lastDay===currentDay&&cfg2.tt&&cfg2.tb)return; // Otro cliente ya actualizó con datos completos — abortar
       return{tt:newTt,tb:newTb,lastDay:currentDay,updatedAt:now};
     });
   });
