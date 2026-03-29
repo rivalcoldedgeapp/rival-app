@@ -1212,7 +1212,16 @@ function renderTorneoAdminPanel(){
           '</tbody></table></div>':
         '<div style="font-size:11px;color:var(--td);margin-top:6px">Sin participantes aún</div>')+
       '<div style="font-size:10px;color:var(--td);margin-top:4px">Al cerrar el torneo se revelará el ganador y su correo para que lo contactes.</div>'+
+    '</div>'+
+    // Banco de códigos siempre visible
+    '<div style="margin-top:12px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 14px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+        '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎟 Banco de códigos</div>'+
+        '<button onclick="admGenerarCodigos()" style="background:var(--sf2);border:1px solid var(--bo);border-radius:6px;color:var(--tm);font-size:11px;padding:4px 10px;cursor:pointer">+ Generar 100</button>'+
+      '</div>'+
+      '<div id="bancoCodigos" style="font-size:11px;color:var(--td)">Cargando...</div>'+
     '</div>';
+  setTimeout(admCargarBanco, 0);
   } else {
     // Torneo cerrado — mostrar ganador + participantes del último torneo
     var isR=torneoData&&torneoData.ganadorReto==='r';
@@ -2198,6 +2207,8 @@ function admLogin(){
     admLoggedIn=true;
     startListeners();
     document.getElementById('admLC').style.display='none';
+    // Esperar 1.5s para que Firebase cargue los datos antes de renderizar stats
+    setTimeout(updateAdmStats, 1500);
     var panel=document.getElementById('admP');
     panel.innerHTML=
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">'+
