@@ -744,7 +744,7 @@ db.ref('appVersion').on('value',function(s){
 });
 
 setInterval(function(){
-  if(torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
+  if(admLoggedIn&&torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
     autoCerrarTorneo();
   }
 },60000);
@@ -753,8 +753,8 @@ db.ref('torneo').on('value',function(s){
   updateTorneoHomeCard();
   if(admLoggedIn)renderTorneoAdminPanel();
   if(torneoData&&torneoData.activo&&document.getElementById('sTorneo').classList.contains('on'))renderTorneoScreen();
-  // auto-cerrar si pasaron las horas definidas
-  if(torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
+  // auto-cerrar solo si es admin logueado (evita que múltiples clientes lo cierren)
+  if(admLoggedIn&&torneoData&&torneoData.activo&&torneoData.cierreAt&&Date.now()>torneoData.cierreAt){
     autoCerrarTorneo();
   }
 });
