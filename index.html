@@ -17,9 +17,6 @@
   --ac:#00e87a;--adim:#00e87a15;--amid:#00e87a40;
   --dg:#ff3d5a;--wn:#ffb800;--bl:#3d9bff;
   --tx:#f0f0f0;--tm:#666;--td:#333;
-  --c5:#00e87a;--c5d:#00e87a15;--c5m:#00e87a40;
-  --c10:#3d9bff;--c10d:#3d9bff15;--c10m:#3d9bff40;
-  --c15:#b319ff;--c15d:#b319ff15;--c15m:#b319ff40;
   --c4b:#ff9f00;--c4bd:#ff9f0015;--c4bm:#ff9f0040;
   --cs:#00c2e0;--csd:#00c2e015;--csm:#00c2e040;
   --cr:#ff6b00;--crd:#ff6b0015;--crm:#ff6b0040;
@@ -46,7 +43,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .gc2-pos{font-size:10px;color:var(--tm)}
 .nav-brand{display:flex;align-items:baseline;gap:8px}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--ac)}
-.demo-tag{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.6);text-transform:uppercase;padding:2px 7px;border:1px solid rgba(255,255,255,.2);border-radius:4px}
 .ntab{padding:6px 12px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--tm);transition:all .2s;white-space:nowrap}
 .ntab.on{background:var(--ac);color:#000}
 .nav-right{display:none;align-items:center;gap:8px}
@@ -108,21 +104,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .game-cards{display:flex;flex-direction:column;gap:12px}
 .gc{border-radius:14px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1px solid var(--bo);background:var(--sf)}
 .gc::before{content:'';position:absolute;inset:0;opacity:.05;pointer-events:none}
-.gc.g5{border-color:var(--c5)}.gc.g5::before{background:var(--c5)}
-.gc.g10{border-color:var(--c10)}.gc.g10::before{background:var(--c10)}
-.gc.g15{border-color:var(--c15)}.gc.g15::before{background:var(--c15)}
-.gc.g4b{border-color:var(--c4b)}.gc.g4b::before{background:var(--c4b)}
 .gc.gs{border-color:var(--cs)}.gc.gs::before{background:var(--cs)}
 .gc.gr{border-color:var(--cr)}.gc.gr::before{background:var(--cr)}
 .gc:hover{transform:translateY(-2px)}
 .gc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;line-height:1}
 .gc-sub{font-size:11px;color:var(--tm);margin-top:2px}
 .gc-objective{font-family:DM Mono,monospace;font-size:11px;margin-top:3px}
-.g5 .gc-objective{color:var(--c5)}.g10 .gc-objective{color:var(--c10)}.g15 .gc-objective{color:var(--c15)}.g4b .gc-objective{color:var(--c4b)}
 .gc-stats{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
-.gc-stat{font-size:12px;color:var(--tm)}.gc-stat span{font-weight:700;color:var(--tx)}
-.gc-rank{font-size:12px;font-weight:700}
-.g5 .gc-rank{color:var(--c5)}.g10 .gc-rank{color:var(--c10)}.g15 .gc-rank{color:var(--c15)}.g4b .gc-rank{color:var(--c4b)}.gs .gc-rank{color:var(--cs)}.gr .gc-rank{color:var(--cr)}
 /* INVITE CARD */
 .invite-card{border-radius:14px;padding:16px;border:1px solid var(--bo);background:var(--sf);margin-bottom:12px}
 .invite-code{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:8px;color:var(--ac);text-align:center;margin:8px 0}
@@ -289,7 +277,6 @@ tr:hover td{background:var(--sf2)}
 @media(max-width:600px){
   nav{padding:8px 10px;gap:4px}
   .logo{font-size:18px;letter-spacing:4px}
-  .demo-tag{display:none}
   .out-btn{display:none}
   .nav-tabs{gap:2px}.ntab{padding:5px 10px;font-size:11px}
   .nav-av{width:28px;height:28px;font-size:12px}
@@ -322,7 +309,7 @@ body.playing{overflow:hidden}
 <div class="overlay" id="overlay"><div class="modal" id="modalBody"></div></div>
 
 <nav>
-  <div class="nav-brand"><div class="logo">RIVAL</div><div class="demo-tag">DEMO</div></div>
+  <div class="nav-brand"><div class="logo">RIVAL</div></div>
   <div class="nav-tabs" id="navTabs">
     <button class="ntab on" id="nt-home" onclick="goTab('home')">🎮 Juegos</button>
     <button class="ntab" id="nt-rank" onclick="goTab('rank')">🏆 Ranking</button>
@@ -451,8 +438,8 @@ body.playing{overflow:hidden}
   <div class="gi">
     <div class="gh">
       <button class="gh-back" onclick="gameBack()">← Volver</button>
-      <div class="gh-title" id="ghTitle">RETO 5s</div>
-      <div class="gh-sub" id="ghSub" style="color:var(--c5)">—</div>
+      <div class="gh-title" id="ghTitle">RETO</div>
+      <div class="gh-sub" id="ghSub" style="color:var(--ac)">—</div>
     </div>
     <div class="score-row">
       <div><div class="sr-lbl">Tu mejor</div><div class="sr-val" id="srBest" style="color:var(--ac)">—</div></div>
@@ -642,6 +629,9 @@ db.ref('appVersion').on('value',function(s){
 });
 
 // ══ FIREBASE ══
+
+// Migración única: transfiere puntos del esquema antiguo (g5/g10/g15/g4b) al nuevo.
+// Protegida por flag en system/legacyPointsDone_<weekKey> — solo corre una vez por semana.
 function backfillLegacyPoints(){
   var flag='legacyPointsDone_'+weekKey;
   db.ref('system/'+flag).once('value').then(function(s){
@@ -945,7 +935,7 @@ function saveScore(fmt,diff,g){
 function recalcPoints(g){var key=getGameKey(g);db.ref('scores/'+weekKey+'/'+todayKey+'/'+key).once('value').then(function(s){var dayScores=s.val()||{};var sorted=Object.entries(dayScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var updates={};sorted.forEach(function(e,i){var uid2=e[0],w=e[1],pts=i<POINTS.length?POINTS[i]:0,p=profiles[uid2]||{};updates['weekPoints/'+weekKey+'/'+uid2+'/days/'+todayKey+'/'+key]=pts;updates['weekPoints/'+weekKey+'/'+uid2+'/name']=w.name||p.name||'?';updates['weekPoints/'+weekKey+'/'+uid2+'/photoURL']=w.photoURL||p.photoURL||null;});if(Object.keys(updates).length>0){db.ref().update(updates).then(function(){sorted.map(function(e){return e[0];}).forEach(function(uid2){db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds){var days=ds.val()||{},total=0;Object.values(days).forEach(function(dg){Object.values(dg).forEach(function(pts){total+=(pts||0);});});db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);});});});}});}
 
 function showResult(fmt,diff,isRec,g){
-  var uid=curUser.uid,isR=g==='r',isBlind=g===4,isSeq=g==='s',cfg=GCOLORS[g];
+  var uid=curUser.uid,isR=g==='r',isBlind=g==='b',isSeq=g==='s',cfg=GCOLORS[g];
   var rank=getRank(uid,g);
   var total=Object.values(wScores[g]).filter(function(w){return w.bestDiff!=null;}).length;
 
@@ -1390,7 +1380,7 @@ function admLogin(){
     toast('❌ Credenciales incorrectas');
   }
 }
-function genTargets(){var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+'<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div></div>'+'<p style="font-size:11px;color:var(--dg);margin-bottom:12px">⚠️ Los scores de hoy se borrarán automáticamente.</p>'+'<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+'<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
+function genTargets(){var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+'<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div></div>'+'<p style="font-size:11px;color:var(--tm);margin-bottom:12px">Los scores actuales se conservan. Si quieres limpiar el día, usa "Resetear día" después.</p>'+'<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+'<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
 function saveTargets(tt,tb){
   var today=getTodayKey();
   // gameConfig no requiere auth — scores sí, por eso se resetean por separado si es necesario
@@ -1480,10 +1470,10 @@ function doResetSemana(){
     buildWinners();
   });
 }
-function confReset(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px">🗑️ RESETEAR DÍA</div><p style="font-size:12px;color:var(--tm);margin-bottom:6px">Borra todos los tiempos de hoy en los 6 juegos.</p><p style="font-size:11px;color:var(--dg);margin-bottom:14px">⚠️ Los perfiles y cuentas no se borran.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-r" onclick="doReset()" style="height:40px;border-radius:9px;font-weight:700">🗑️ RESETEAR</button></div>';document.getElementById('overlay').classList.add('show');}
+function confReset(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px">🗑️ RESETEAR DÍA</div><p style="font-size:12px;color:var(--tm);margin-bottom:6px">Borra todos los tiempos de hoy en los 4 retos (Tiempo, Ciego, Secuencia y Reacción).</p><p style="font-size:11px;color:var(--dg);margin-bottom:14px">⚠️ Los perfiles y cuentas no se borran.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-r" onclick="doReset()" style="height:40px;border-radius:9px;font-weight:700">🗑️ RESETEAR</button></div>';document.getElementById('overlay').classList.add('show');}
 function doReset(){var key='scores/'+weekKey+'/'+todayKey;db.ref(key).remove().then(function(){wScores={t:{},b:{},s:{},r:{}};closeModal();toast('✅ Día reseteado');updateHomecards();updateAdmStats();buildWinners();renderAdmTable();});}
-var weekGame=5;
-function setWeekGame(g){weekGame=g;[5,10,15,4,'s','r'].forEach(function(x){var el=document.getElementById('wgt'+(x==='r'?'r':x==='s'?'s':x));if(!el)return;el.style.background='';el.style.color='';el.style.borderColor='';el.className='rgt';});var active=document.getElementById('wgt'+(g==='r'?'r':g==='s'?'s':g));if(active){var cfg=GCOLORS[g];active.style.background=cfg.stroke;active.style.color='#000';active.style.borderColor=cfg.stroke;}renderWeekDays(g);}
+var weekGame='t';
+function setWeekGame(g){weekGame=g;['t','b','s','r'].forEach(function(x){var el=document.getElementById('wgt'+x);if(!el)return;el.style.background='';el.style.color='';el.style.borderColor='';el.className='rgt';});var active=document.getElementById('wgt'+g);if(active){var cfg=GCOLORS[g];active.style.background=cfg.stroke;active.style.color='#000';active.style.borderColor=cfg.stroke;}renderWeekDays(g);}
 function renderWeekDays(g){var wrap=document.getElementById('weekDaysWrap');if(!wrap)return;wrap.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g),uid=curUser?curUser.uid:null;var d=getCDMX(),dayNum=d.getDay(),diff=dayNum===0?-6:1-dayNum,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}var today=getTodayKey();Promise.all([Promise.all(days.map(function(dayObj){return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};})})),db.ref('weekScores/'+weekKey+'/'+gkey).once('value')]).then(function(res){var results=res[0],legacyData=res[1].val()||{},earliestTs=null;Object.values(legacyData).forEach(function(w){if(w&&w.lastPlayed){if(!earliestTs||w.lastPlayed<earliestTs)earliestTs=w.lastPlayed;}});if(earliestTs){var legacyDayK=dayKeyFromTimestamp(earliestTs),legacyTarget=legacyDayK?results.find(function(r){return r.day.key===legacyDayK;}):null;if(legacyTarget&&Object.keys(legacyTarget.scores).length===0){Object.entries(legacyData).forEach(function(e){var uid2=e[0],w=e[1];if(w&&w.bestDiff!=null)legacyTarget.scores[uid2]=w;});}}var html='';results.forEach(function(r){var isToday=r.day.key===today,isFuture=r.day.key>today,hasScores=Object.keys(r.scores).length>0;if(isFuture||isToday)return;if(!hasScores)return;var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1,myScore=uid?r.scores[uid]:null;html+='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:700;color:var(--tm)">'+r.day.label+'</div>'+(myRank>=0?'<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>':'<div style="font-size:10px;color:var(--td)">No jugaste</div>')+'</div>';var medals=['🥇','🥈','🥉'];sorted.slice(0,3).forEach(function(e,i){var w=e[1],isMe=uid&&e[0]===uid;html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border-radius:8px;margin-bottom:4px;'+(isMe?'border:1px solid '+cfg.stroke+';':'')+'"><span style="font-size:16px;width:22px">'+medals[i]+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});if(myRank>=3&&myScore&&myScore.bestTime){html+='<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div><div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px"><span style="font-size:13px;font-weight:700;color:'+cfg.stroke+';width:22px">#'+(myRank+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(myScore.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:700">'+(myScore.name||'?')+' 👈</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+myScore.bestTime+(isR?'ms':'s')+'</div></div>';}html+='</div>';});if(curUser&&weekPoints[curUser.uid]&&weekPoints[curUser.uid].total>0){var myTotalPts=weekPoints[curUser.uid].total||0;html+='<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Tu total esta semana</div><div style="font-size:11px;color:var(--td)">Suma de todos los juegos y días</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:var(--wn);line-height:1">'+myTotalPts+' <span style="font-size:14px">pts</span></div></div>';}wrap.innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Sin datos esta semana</div>';});}
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});var el=document.getElementById(id);el.classList.add('on');el.style.display='flex';}
 function findRef(code){return Object.keys(profiles).find(function(uid){return profiles[uid].referralCode===code;})||null;}
