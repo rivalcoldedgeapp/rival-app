@@ -1442,12 +1442,18 @@ function updateTorneoCard(){
   var el=document.getElementById('torneoCard');if(!el)return;
   var uid=curUser?curUser.uid:null;
   if(!torneoData&&torneoCancelledDisplay){var sec=Math.floor((Date.now()-torneoCancelledDisplay.at)/1000);if(300-sec>0){el.innerHTML='<div class="torneo-card"><span class="torneo-badge cancelled">⚡ CANCELADO</span><div style="font-size:13px;color:var(--dg);margin-bottom:4px">Torneo cancelado</div><div style="font-size:11px;color:var(--tm)">No se alcanzó el mínimo de jugadores a tiempo.</div></div>';clearTimeout(window._tornCardTO);window._tornCardTO=setTimeout(updateTorneoCard,1000);return;}else{torneoCancelledDisplay=null;}}
-  if(!torneoData){el.innerHTML='';return;}
+  if(!torneoData){
+    el.innerHTML='<div class="torneo-card" style="opacity:.75"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ct)">⚡ TORNEOS RELÁMPAGO</span></div><div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px">Próximo torneo en camino</div><div style="font-size:11px;color:var(--tm);line-height:1.6">Pronto activaremos el siguiente torneo con premios. ¡Mantente atento!</div></div>';
+    return;
+  }
   var td=torneoData;var myData=uid?torneoPartic[uid]:null;var partCount=Object.keys(torneoPartic).length;
   var isJoined=!!(myData);var attUsed=myData?(myData.attempts||0):0;var exhausted=myData&&myData.attemptsExhausted;
   var sfx=getTorneoTimeSuffix(td.gameMode);var gameLabel=getTorneoGameLabel(td.gameMode);var targetLabel=getTorneoTargetLabel(td);var now=Date.now();
   if(td.status==='cancelled'){el.innerHTML='<div class="torneo-card"><span class="torneo-badge cancelled">⚡ CANCELADO</span><div style="font-size:13px;color:var(--dg)">Torneo cancelado — no se alcanzó el mínimo.</div></div>';return;}
-  if(td.status==='finished'){el.innerHTML='';return;}
+  if(td.status==='finished'){
+    el.innerHTML='<div class="torneo-card" style="opacity:.75"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ct)">⚡ TORNEOS RELÁMPAGO</span></div><div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px">Próximo torneo en camino</div><div style="font-size:11px;color:var(--tm);line-height:1.6">Pronto activaremos el siguiente torneo con premios. ¡Mantente atento!</div></div>';
+    return;
+  }
   if(td.status==='waiting'){
     var wRem=td.waitingStartedAt?(20*60*1000-(now-td.waitingStartedAt)):null;var tStr=wRem&&wRem>0?'<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--ct)">'+fmtMs(wRem)+'</span>':'';
     var pLine='<div style="font-size:12px;color:var(--tm);margin-bottom:12px"><strong style="color:var(--tx)">'+partCount+'</strong> / '+td.minPlayers+' jugadores'+(tStr?' · '+tStr:'')+'</div>';
