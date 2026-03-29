@@ -1775,6 +1775,16 @@ function showResult(fmt,diff,isRec,g){
   var uid=curUser.uid,isR=g==='r',isBlind=g===4,isSeq=g==='s',cfg=GCOLORS[g];
   var rank=getRank(uid,g);
   var total=Object.values(wScores[g]).filter(function(w){return w.bestDiff!=null;}).length;
+  // Si es modo torneo, calcular posición dentro del torneo
+  var torneoRank=null,torneoTotal=null;
+  if(lastWasTorneo&&torneoData&&torneoData.participantes){
+    var tParts=Object.entries(torneoData.participantes)
+      .filter(function(e){return e[1].bestDiff!=null;})
+      .sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+    torneoTotal=tParts.length;
+    torneoRank=tParts.findIndex(function(e){return e[0]===uid;})+1;
+    if(torneoRank===0)torneoRank=null;
+  }
 
   if(isSeq){
     // Resultado inline en sSeq
@@ -1833,7 +1843,7 @@ function showResult(fmt,diff,isRec,g){
       else irDiff.textContent='±'+(diff*1000).toFixed(0)+'ms';
       irDiff.style.color=diff<0.05?'var(--ac)':diff<0.15?'var(--wn)':'var(--dg)';
     }
-    if(irPos)irPos.textContent='#'+rank+' de '+total;
+    if(irPos)irPos.textContent=torneoRank?'#'+torneoRank+' de '+torneoTotal+' en torneo':'#'+rank+' de '+total;
     if(irRec)irRec.style.display=isRec?'block':'none';
     // Torneo
     if(irTorneo&&lastWasTorneo){
