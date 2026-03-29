@@ -89,9 +89,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .amsg.err{color:var(--dg)}.amsg.ok{color:var(--ac)}
 .fl{font-size:10px;color:var(--tm);text-align:right;cursor:pointer;display:block;margin-top:3px}
 .fl:hover{color:var(--ac)}
-.adm-link{margin-top:12px;padding-top:10px;border-top:1px solid var(--bo);text-align:center}
-.adm-link button{background:transparent;border:none;color:var(--td);font-size:10px;cursor:pointer}
-.adm-link button:hover{color:var(--tm)}
+
 /* VERIFY */
 #sVerify{padding:20px}
 .vc{width:100%;max-width:320px;background:var(--sf);border:1px solid var(--bo);border-radius:16px;padding:28px;text-align:center}
@@ -463,7 +461,7 @@ body.playing{overflow:hidden}
       <button class="sbtn" onclick="emailReg()">CREAR CUENTA</button>
       <div class="amsg" id="rMsg"></div>
     </div>
-    <div class="adm-link"><button onclick="showAdmin()">⚙️ Admin</button></div>
+
   </div>
 </div>
 
@@ -756,7 +754,7 @@ function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g)
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
 // ══ VERSIÓN / FORCE RELOAD ══
-var APP_VERSION='v6.6';
+var APP_VERSION='v6.7';
 db.ref('appVersion').on('value',function(s){
   var serverVersion=s.val();
   if(!serverVersion)return;
