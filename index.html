@@ -212,19 +212,41 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 /* RANKING */
 #sRanking{align-items:flex-start;justify-content:flex-start;padding:0}
 .rank-inner{width:100%;max-width:500px;margin:0 auto;padding:16px}
-.rg-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.rg-chips::-webkit-scrollbar{display:none}
-.rgc{padding:7px 13px;border-radius:20px;border:1px solid var(--bo);background:var(--sf2);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.rgc:active{transform:scale(.95)}
+/* Grid de selección 2×3 — mismo idioma visual que las game cards */
+.rk-sel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.rk-sel-card{
+  border-radius:13px;padding:12px 11px;cursor:pointer;
+  border:1px solid var(--bo);background:var(--sf);
+  position:relative;overflow:hidden;
+  transition:transform .15s,border-color .15s;
+  display:flex;flex-direction:column;gap:3px;min-height:76px;
+}
+.rk-sel-card::before{content:'';position:absolute;inset:0;opacity:.05;pointer-events:none;transition:opacity .15s}
+.rk-sel-card:active{transform:scale(.97)}
+/* Colores por categoría */
+.rks-global{border-color:var(--bo)}.rks-global::before{background:var(--wn)}
+.rks-t{border-color:var(--bo)}.rks-t::before{background:var(--ac)}
+.rks-b{border-color:var(--bo)}.rks-b::before{background:var(--c4b)}
+.rks-s{border-color:var(--bo)}.rks-s::before{background:var(--cs)}
+.rks-r{border-color:var(--bo)}.rks-r::before{background:var(--cr)}
+.rks-yo{border-color:var(--bo)}.rks-yo::before{background:var(--bl)}
+/* Estado activo — igual que gc2 pero con glow */
+.rk-sel-card.active.rks-global{border-color:var(--wn);box-shadow:0 0 14px rgba(255,184,0,.15)}.rk-sel-card.active.rks-global::before{opacity:.1}
+.rk-sel-card.active.rks-t{border-color:var(--ac);box-shadow:0 0 14px rgba(0,232,122,.15)}.rk-sel-card.active.rks-t::before{opacity:.1}
+.rk-sel-card.active.rks-b{border-color:var(--c4b);box-shadow:0 0 14px rgba(255,159,0,.15)}.rk-sel-card.active.rks-b::before{opacity:.1}
+.rk-sel-card.active.rks-s{border-color:var(--cs);box-shadow:0 0 14px rgba(0,194,224,.15)}.rk-sel-card.active.rks-s::before{opacity:.1}
+.rk-sel-card.active.rks-r{border-color:var(--cr);box-shadow:0 0 14px rgba(255,107,0,.15)}.rk-sel-card.active.rks-r::before{opacity:.1}
+.rk-sel-card.active.rks-yo{border-color:var(--bl);box-shadow:0 0 14px rgba(61,155,255,.15)}.rk-sel-card.active.rks-yo::before{opacity:.1}
+.rk-sel-name{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;line-height:1;color:var(--tm);transition:color .15s}
+.rk-sel-card.active .rk-sel-name{color:var(--tx)}
+.rk-sel-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto}
+.rk-sel-sub{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--td)}
+.rank-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;margin-bottom:2px}
 @media(min-width:768px){
   #sRanking{padding:24px}
-  .rank-inner{max-width:860px;display:grid;grid-template-columns:180px 1fr;gap:24px;align-items:start;padding:0}
-  .rank-hdr-desktop{grid-column:1/-1;margin-bottom:4px}
-  .rg-chips{flex-direction:column;overflow-x:visible;padding-bottom:0;margin-bottom:0;position:sticky;top:76px;background:var(--sf);border:1px solid var(--bo);border-radius:14px;padding:8px!important}
-  .rgc{border-radius:9px;white-space:normal;text-align:left}
-  .rank-list-col{min-width:0}
+  .rank-inner{max-width:600px}
+  .rk-sel-grid{grid-template-columns:repeat(3,1fr)}
 }
-.rank-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;margin-bottom:2px}
 .rank-sub{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:14px}
 .rg-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
 .rgt{padding:7px 14px;border-radius:9px;border:1px solid var(--bo);background:var(--sf2);color:var(--tm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
@@ -632,27 +654,47 @@ body.playing{overflow:hidden}
 <!-- RANKING -->
 <div class="screen" id="sRanking" style="align-items:flex-start;justify-content:flex-start">
   <div class="rank-inner">
-    <!-- Header — span completo en desktop -->
-    <div class="rank-hdr-desktop">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;margin-top:2px">
-        <div class="rank-title" id="rankTitle">RANKING</div>
-        <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+    <!-- Header -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;margin-top:2px">
+      <div class="rank-title" id="rankTitle">RANKING</div>
+      <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+    </div>
+    <!-- Grid de selección — 2×3 igual que las game cards -->
+    <div class="rk-sel-grid" id="rgChips">
+      <div class="rk-sel-card rks-global" id="rgcG" onclick="setRankGame('global')">
+        <div class="rk-sel-name">🏅 GLOBAL</div>
+        <div class="rk-sel-val" id="rksv-global">—</div>
+        <div class="rk-sel-sub" id="rkss-global">puntos semana</div>
+      </div>
+      <div class="rk-sel-card rks-t" id="rgcT" onclick="setRankGame('t')">
+        <div class="rk-sel-name">🟢 TIEMPO</div>
+        <div class="rk-sel-val" id="rksv-t">—</div>
+        <div class="rk-sel-sub" id="rkss-t">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-b" id="rgcB" onclick="setRankGame('b')">
+        <div class="rk-sel-name">🟡 CIEGO</div>
+        <div class="rk-sel-val" id="rksv-b">—</div>
+        <div class="rk-sel-sub" id="rkss-b">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-s" id="rgcS" onclick="setRankGame('s')">
+        <div class="rk-sel-name">🩵 SECUENCIA</div>
+        <div class="rk-sel-val" id="rksv-s">—</div>
+        <div class="rk-sel-sub" id="rkss-s">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-r" id="rgcR" onclick="setRankGame('r')">
+        <div class="rk-sel-name">⚡ REACCIÓN</div>
+        <div class="rk-sel-val" id="rksv-r">—</div>
+        <div class="rk-sel-sub" id="rkss-r">líder hoy</div>
+      </div>
+      <div class="rk-sel-card rks-yo" id="rgcYO" onclick="setRankGame('yo')">
+        <div class="rk-sel-name">👤 YO</div>
+        <div class="rk-sel-val" id="rksv-yo">—</div>
+        <div class="rk-sel-sub" id="rkss-yo">mis stats</div>
       </div>
     </div>
-    <!-- Chips — sidebar en desktop, scroll horizontal en móvil -->
-    <div class="rg-chips" id="rgChips">
-      <button class="rgc" id="rgcG" onclick="setRankGame('global')">🏅 Global</button>
-      <button class="rgc" id="rgcT" onclick="setRankGame('t')">🟢 Tiempo</button>
-      <button class="rgc" id="rgcB" onclick="setRankGame('b')">🟡 Ciego</button>
-      <button class="rgc" id="rgcS" onclick="setRankGame('s')">🩵 Sec</button>
-      <button class="rgc" id="rgcR" onclick="setRankGame('r')">⚡ Reac</button>
-      <button class="rgc" id="rgcYO" onclick="setRankGame('yo')">👤 Yo</button>
-    </div>
     <!-- Lista -->
-    <div class="rank-list-col">
-      <div id="rankList"></div>
-      <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
-    </div>
+    <div id="rankList" style="margin-top:6px"></div>
+    <div id="rankMy" class="rank-my"><div class="rmy-pos" id="rmyPos">—</div><div class="rmy-time" id="rmyTime">—</div></div>
   </div>
 </div>
 
@@ -759,7 +801,7 @@ function backfillLegacyPoints(){
 
 db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
-db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
+db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
 function startListeners(){
   // Cancelar listeners anteriores y re-registrar con auth activo
@@ -778,6 +820,7 @@ function listenWeekScore(g){
   db.ref(getScorePath(g)).on('value',function(s){
     wScores[g]=s.val()||{};
     updateHomecards();
+    updateRankCards();
     if(document.getElementById('sRanking').classList.contains('on')){
       if(rankGame===g)renderTop10(g);
       else if(rankGame==='global')renderGlobalRank();
@@ -1122,80 +1165,95 @@ function playAgain(){
 
 function renderLB(hUid,g){var sorted=getSorted(g,10),cfg=GCOLORS[g],isR=g==='r',isS=g==='s',html='',myInTop=sorted.some(function(e){return e[0]===hUid;});sorted.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=uid2===hUid,isTop=i===0,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';var avHtml=w.photoURL?'<div class="li-av"><img src="'+w.photoURL+'"></div>':'<div class="li-av">'+(w.name||'?')[0].toUpperCase()+'</div>';html+='<div class="li'+(isTop?' top1':'')+(isMe?' me':'')+'"><div class="li-pos">'+medal+'</div>'+avHtml+'<div class="li-info"><div class="li-name">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+(isR||isS?'':'<div class="li-diff">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div class="li-time" style="color:'+(isTop?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});if(!myInTop&&hUid&&wScores[g][hUid]&&wScores[g][hUid].bestTime){var rank=getRank(hUid,g),me=wScores[g][hUid];html+='<div class="li-sep">···</div><div class="li me"><div class="li-pos">'+rank+'</div><div class="li-av">'+(me.name||'?')[0].toUpperCase()+'</div><div class="li-info"><div class="li-name">'+(me.name||'?')+' 👈</div>'+(isR||isS?'':'<div class="li-diff">±'+(me.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div class="li-time">'+me.bestTime+(isR?'ms':'s')+'</div></div>';}var el=document.getElementById('lbList');if(el)el.innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:20px;font-size:13px">Sé el primero esta semana</div>';}
 
+function updateRankCards(){
+  // Actualiza los valores de las tarjetas de selección con datos actuales
+  var uid=curUser?curUser.uid:null;
+  var games=[
+    {g:'t',id:'t',sfx:'s'},
+    {g:'b',id:'b',sfx:'s'},
+    {g:'s',id:'s',sfx:'s'},
+    {g:'r',id:'r',sfx:'ms'}
+  ];
+  games.forEach(function(item){
+    var sorted=getSorted(item.g,1);
+    var valEl=document.getElementById('rksv-'+item.id);
+    if(!valEl)return;
+    if(sorted.length>0){
+      valEl.textContent=sorted[0][1].name||'?';
+    } else {
+      valEl.textContent='Sin partidas';
+    }
+  });
+  // Global: líder por puntos
+  var gValEl=document.getElementById('rksv-global');
+  if(gValEl){
+    var allWp=Object.entries(weekPoints).filter(function(e){return e[1].total>0;}).sort(function(a,b){return (b[1].total||0)-(a[1].total||0);});
+    gValEl.textContent=allWp.length>0?(allWp[0][1].name||'?'):' Sin puntos';
+  }
+  // Yo: puntos de la semana
+  var yValEl=document.getElementById('rksv-yo'),ySubEl=document.getElementById('rkss-yo');
+  if(yValEl){
+    if(uid&&weekPoints[uid]&&weekPoints[uid].total>0){
+      yValEl.textContent=(weekPoints[uid].total||0)+' pts';
+      if(ySubEl)ySubEl.textContent='esta semana';
+    } else {
+      yValEl.textContent='Juega hoy';
+    }
+  }
+}
 function setRankGame(g){
   rankGame=g;
-  var chipMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO'};
-  Object.keys(chipMap).forEach(function(k){var el=document.getElementById('rgc'+chipMap[k]);if(!el)return;el.style.background='';el.style.color='';el.style.borderColor='';});
-  var activeEl=document.getElementById('rgc'+chipMap[g]);
-  if(activeEl){
-    if(g==='global'){activeEl.style.background='var(--wn)';activeEl.style.color='#000';activeEl.style.borderColor='var(--wn)';}
-    else if(g==='yo'){activeEl.style.background='var(--tx)';activeEl.style.color='#000';activeEl.style.borderColor='var(--tx)';}
-    else{var cfg=GCOLORS[g];activeEl.style.background=cfg.stroke;activeEl.style.color='#000';activeEl.style.borderColor=cfg.stroke;}
-  }
+  // Activar tarjeta seleccionada
+  var idMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO'};
+  Object.keys(idMap).forEach(function(k){
+    var el=document.getElementById('rgc'+idMap[k]);
+    if(el)el.classList.remove('active');
+  });
+  var activeEl=document.getElementById('rgc'+idMap[g]);
+  if(activeEl)activeEl.classList.add('active');
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
   if(g==='yo'){renderYoRanking();return;}
-  if(g==='global'){document.getElementById('rankTitle').textContent='RANKING';document.getElementById('rankSub').textContent='Puntos · '+getWeekLabel();renderGlobalRank();return;}
+  if(g==='global'){
+    document.getElementById('rankTitle').textContent='RANKING';
+    document.getElementById('rankSub').textContent='Puntos · '+getWeekLabel();
+    renderGlobalRank();return;
+  }
   var labels={'t':'Reto Tiempo','b':'Reto Ciego','s':'Secuencia','r':'Reacción'};
   document.getElementById('rankTitle').textContent=labels[g]||'—';
   document.getElementById('rankSub').textContent='Hoy · '+getTodayDate();
   renderTop10(g);
 }
-// ── Ranking: helper compartido para construir tarjetas de jugador ──
-function _rkAvatar(photoURL,name,size,stroke){
-  if(photoURL)return'<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid '+stroke+'"><img src="'+photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>';
-  return'<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:var(--sf2);border:2px solid '+stroke+';display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:'+(size*0.45|0)+'px;color:'+stroke+';flex-shrink:0">'+(name||'?')[0].toUpperCase()+'</div>';
-}
-function _rkCard(pos,medal,photoURL,name,isMe,isTop3,isTop1,accentColor,rightHtml,subHtml){
-  var borderColor=isMe?'var(--bl)':isTop3?accentColor:'var(--bo)';
-  var bg=isTop1?'rgba(255,184,0,.06)':isTop3?'var(--sf2)':'var(--sf)';
-  var leftBorder=isTop1?'border-left:3px solid var(--wn);':'';
-  var posSize=isTop1?36:isTop3?24:15;
-  var posColor=isTop1?'var(--wn)':isTop3?'var(--wn)':'var(--td)';
-  var avSize=isTop1?40:34;
-  return'<div style="display:flex;align-items:center;gap:12px;padding:'+(isTop1?'14px 14px 14px 11px':'11px 12px')+';background:'+bg+';border:1px solid '+borderColor+';'+leftBorder+'border-radius:13px;margin-bottom:6px">'+
-    '<div style="width:30px;text-align:center;font-family:\'Bebas Neue\',sans-serif;font-size:'+posSize+'px;color:'+posColor+';line-height:1;flex-shrink:0">'+(medal||pos)+'</div>'+
-    _rkAvatar(photoURL,name,avSize,isMe?'var(--bl)':isTop3?accentColor:'var(--bo)')+
-    '<div style="flex:1;min-width:0">'+
-      '<div style="font-size:'+(isTop1?'15':'13')+'px;font-weight:'+(isTop3?'700':'500')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(name||'?')+(isMe?' 👈':'')+'</div>'+
-      (subHtml?'<div style="font-size:10px;color:var(--tm);margin-top:1px">'+subHtml+'</div>':'')+
-    '</div>'+
-    '<div style="text-align:right;flex-shrink:0">'+rightHtml+'</div>'+
-  '</div>';
-}
-
 function renderTop10(g){
   var uid=curUser?curUser.uid:null,cfg=GCOLORS[g],isR=g==='r',isS=g==='s';
   var sorted=getSorted(g,50);var top10=sorted.slice(0,10),myIdx=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
   var html='';
-  if(top10.length===0){
-    html='<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';
-  } else {
-    top10.forEach(function(e,i){
-      var uid2=e[0],w=e[1],isMe=uid&&uid2===uid,isTop3=i<3,isTop1=i===0;
-      var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-      var timeStr='<div style="font-family:\'DM Mono\',monospace;font-size:'+(isTop1?'16':isTop3?'14':'13')+'px;color:'+(isTop3?cfg.stroke:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div>';
-      var sub=isR||isS?null:'±'+(w.bestDiff*1000).toFixed(0)+'ms';
-      html+=_rkCard(i+1,medal,w.photoURL,w.name,isMe,isTop3,isTop1,cfg.stroke,timeStr,sub);
-    });
-  }
+  if(top10.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}
+  else{top10.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=uid&&uid2===uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',num=i+1;
+    var av=w.photoURL?'<div style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+w.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:34px;height:34px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:'+cfg.stroke+'">'+(w.name||'?')[0].toUpperCase()+'</div>';
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;background:'+(isMe?'rgba(61,155,255,.08)':isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?cfg.stroke+'40':'var(--bo)')+';border-radius:11px;margin-bottom:6px">'+
+      '<div style="width:28px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'15')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+'">'+(medal||num)+'</div>'+av+
+      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
+      (isR||isS?'':'<div style="font-size:10px;color:var(--tm);margin-top:1px">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:'+(isTop3?'15':'13')+'px;color:'+(isTop3?cfg.stroke:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});}
   document.getElementById('rankList').innerHTML=html;
   var myDiv=document.getElementById('rankMy');
   if(myDiv){
     if(myIdx>=10&&uid&&wScores[g][uid]&&wScores[g][uid].bestTime){
       var me=wScores[g][uid];myDiv.classList.add('show');myDiv.style.borderColor=cfg.stroke;
-      myDiv.innerHTML='<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Tu posición</div>'+
-        _rkCard(myIdx+1,'',me.photoURL,me.name,true,false,false,cfg.stroke,
-          '<div style="font-family:\'DM Mono\',monospace;font-size:13px;color:var(--bl)">'+me.bestTime+(isR?'ms':'s')+'</div>',
-          isR||isS?null:'±'+(me.bestDiff*1000).toFixed(0)+'ms')+
-        '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:2px">de '+sorted.length+' jugadores</div>';
-    } else { myDiv.classList.remove('show'); }
+      myDiv.innerHTML='<div style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Tu posición</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(61,155,255,.08);border:1px solid var(--bl);border-radius:11px">'+
+        '<div style="width:28px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--bl)">'+(myIdx+1)+'</div>'+
+        '<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(me.name||'?')+' 👈</div>'+
+        (isR||isS?'':'<div style="font-size:10px;color:var(--tm)">±'+(me.bestDiff*1000).toFixed(0)+'ms</div>')+'</div>'+
+        '<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--bl)">'+me.bestTime+(isR?'ms':'s')+'</div></div>'+
+        '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">de '+sorted.length+' jugadores</div>';
+    }else{myDiv.classList.remove('show');}
   }
 }
-
 function renderYoRanking(){
   var uid=curUser?curUser.uid:null;
   document.getElementById('rankTitle').textContent='MIS STATS';
-  document.getElementById('rankSub').textContent='Esta semana · '+getWeekLabel();
+  document.getElementById('rankSub').textContent='Hoy · '+getTodayDate();
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
   if(!uid){document.getElementById('rankList').innerHTML='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Inicia sesión para ver tus stats</div>';return;}
   var gameList=[
@@ -1209,19 +1267,23 @@ function renderYoRanking(){
   var totalHoy=Object.values(todayPts).reduce(function(a,b){return a+(b||0);},0);
   var p=profiles[uid]||{};
   var html='';
-  // Tarjeta de perfil
-  html+='<div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--sf2);border:1px solid var(--bo);border-radius:14px;margin-bottom:10px">'+
-    _rkAvatar(p.photoURL,p.name,48,'var(--ac)')+
+  html+='<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--sf2);border:1px solid var(--bo);border-radius:12px;margin-bottom:12px">'+
+    (p.photoURL?'<img src="'+p.photoURL+'" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0">':
+      '<div style="width:44px;height:44px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--ac);flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>')+
     '<div style="flex:1;min-width:0">'+
       '<div style="font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(p.name||'?')+'</div>'+
       '<div style="font-size:11px;color:var(--tm);margin-top:2px">'+(p.email||'')+'</div>'+
     '</div>'+
     '<div style="text-align:right;flex-shrink:0">'+
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:30px;color:var(--wn);line-height:1">'+totalSemana+'</div>'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--wn);line-height:1">'+totalSemana+'</div>'+
       '<div style="font-size:9px;color:var(--tm);letter-spacing:1px;text-transform:uppercase">pts semana</div>'+
     '</div>'+
   '</div>';
-  // Tarjetas por reto
+  html+='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;overflow:hidden;margin-bottom:12px">'+
+    '<div style="padding:10px 14px;border-bottom:1px solid var(--bo);display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-size:9px;letter-spacing:3px;color:var(--wn);text-transform:uppercase">🏅 Puntos hoy</span>'+
+      '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--wn)">+'+(totalHoy||0)+' pts</span>'+
+    '</div>';
   gameList.forEach(function(item){
     var gkey=getGameKey(item.g);
     var pts=todayPts[gkey]||0;
@@ -1230,86 +1292,39 @@ function renderYoRanking(){
     var rank=ws&&ws.bestTime?getRank(uid,item.g):'—';
     var total=Object.values(wScores[item.g]).filter(function(w){return w.bestDiff!=null;}).length;
     var ptsColor=pts>=10?'var(--ac)':pts>=5?'var(--wn)':pts>0?'var(--bl)':'var(--td)';
-    var played=ws&&ws.bestTime;
-    html+='<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--sf);border:1px solid '+(played?item.cfg.stroke+'40':'var(--bo)')+';border-radius:13px;margin-bottom:6px">'+
-      '<div style="font-size:20px;flex-shrink:0">'+item.icon+'</div>'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:2px;color:'+(played?item.cfg.stroke:'var(--tm)')+'">'+item.label+'</div>'+
-        (played?'<div style="font-family:\'DM Mono\',monospace;font-size:13px;color:var(--tx)">'+ws.bestTime+(isR?'ms':'s')+(isR||isS?'':' <span style="color:var(--tm);font-size:11px">±'+(ws.bestDiff*1000).toFixed(0)+'ms</span>')+'</div>':
-          '<div style="font-size:11px;color:var(--td)">Sin jugar hoy</div>')+
-      '</div>'+
-      '<div style="text-align:right;flex-shrink:0">'+
-        (played?'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:13px;color:var(--bl)">#'+rank+' / '+total+'</div>':'')+
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:'+ptsColor+'">'+(pts>0?'+'+pts+' pts':'— pts')+'</div>'+
+    html+='<div style="display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04)">'+
+      '<span style="font-size:14px;width:24px">'+item.icon+'</span>'+
+      '<span style="flex:1;font-size:12px;color:var(--tm);margin-left:4px">'+item.label+'</span>'+
+      (ws&&ws.bestTime?
+        '<div style="text-align:right;margin-right:12px">'+
+          '<div style="font-family:DM Mono,monospace;font-size:12px;color:'+item.cfg.stroke+'">'+ws.bestTime+(isR?'ms':'s')+'</div>'+
+          (isR||isS?'':'<div style="font-size:10px;color:var(--tm)">±'+(ws.bestDiff*1000).toFixed(0)+'ms</div>')+
+        '</div>':
+        '<div style="text-align:right;margin-right:12px;font-size:11px;color:var(--td)">Sin jugar</div>')+
+      '<div style="text-align:right;min-width:64px">'+
+        (ws&&ws.bestTime?'<div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--bl)">#'+rank+' / '+total+'</div>':'')+
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:'+ptsColor+'">'+(pts>0?'+'+pts+' pts':'0 pts')+'</div>'+
       '</div>'+
     '</div>';
   });
+  html+='</div>';
   document.getElementById('rankList').innerHTML=html;
 }
-
-function renderGlobalRank(){
-  var allUids=new Set(Object.keys(weekPoints));
-  ['t','b','s','r'].forEach(function(g){Object.keys(wScores[g]).forEach(function(u){allUids.add(u);});});
-  var allUsers=Array.from(allUids).map(function(uid2){
-    var wp=weekPoints[uid2]||{};
-    var name=wp.name||(profiles[uid2]&&profiles[uid2].name)||'?';
-    var photoURL=wp.photoURL||(profiles[uid2]&&profiles[uid2].photoURL)||null;
-    if(name==='?'){['t','b','s','r'].forEach(function(g){if(wScores[g][uid2]&&wScores[g][uid2].name)name=wScores[g][uid2].name;});}
-    return[uid2,{total:wp.total||0,name:name,photoURL:photoURL}];
-  });
-  var sorted=allUsers.sort(function(a,b){return b[1].total!==a[1].total?b[1].total-a[1].total:a[1].name.localeCompare(b[1].name);}).slice(0,10);
-  var uid=curUser?curUser.uid:null,html='';
-  if(sorted.length===0){
-    html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Aún no hay puntos.<br>¡Juega para aparecer aquí!</div>';
-  } else {
-    sorted.forEach(function(e,i){
-      var uid2=e[0],p=e[1],isMe=uid&&uid2===uid,isTop3=i<3,isTop1=i===0;
-      var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-      var ptsHtml='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:'+(isTop1?'28':isTop3?'22':'16')+'px;color:'+(isTop3?'var(--wn)':'var(--tx)');+';line-height:1">'+(p.total||0)+'<span style="font-size:'+(isTop1?'12':'10')+'px;color:var(--tm);margin-left:2px">pts</span></div>';
-      html+=_rkCard(i+1,medal,p.photoURL,p.name,isMe,isTop3,isTop1,'var(--wn)',ptsHtml,'puntos esta semana');
-    });
-  }
-  var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
+function renderGlobalRank(){var allUids=new Set(Object.keys(weekPoints));['t','b','s','r'].forEach(function(g){Object.keys(wScores[g]).forEach(function(u){allUids.add(u);});});var allUsers=Array.from(allUids).map(function(uid2){var wp=weekPoints[uid2]||{};var name=wp.name||(profiles[uid2]&&profiles[uid2].name)||'?';var photoURL=wp.photoURL||(profiles[uid2]&&profiles[uid2].photoURL)||null;if(name==='?'){[5,10,15,4,'s','r'].forEach(function(g){if(wScores[g][uid2]&&wScores[g][uid2].name)name=wScores[g][uid2].name;});}return[uid2,{total:wp.total||0,name:name,photoURL:photoURL}];});var sorted=allUsers.sort(function(a,b){return b[1].total!==a[1].total?b[1].total-a[1].total:a[1].name.localeCompare(b[1].name);}).slice(0,10);var uid=curUser?curUser.uid:null,html='';if(sorted.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Aún no hay puntos.<br>¡Juega para aparecer aquí!</div>';}else{sorted.forEach(function(e,i){var uid2=e[0],p=e[1],isMe=uid&&uid2===uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',pos=i+1;var avHtml=p.photoURL?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+p.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(p.name||'?')[0].toUpperCase()+'</div>';html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?'var(--wn)':'var(--bo)')+';border-radius:11px;margin-bottom:5px"><div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+avHtml+'<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</div><div style="font-size:10px;color:var(--tm);margin-top:1px">puntos esta semana</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'22':'16')+'px;color:'+(isTop3?'var(--wn)':'var(--tx)')+'">'+( p.total||0)+'</div></div>';});}var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}): -1;
   var myDiv2=document.getElementById('rankMy');
   if(myDiv2){
     if(myRank>=10&&uid&&weekPoints[uid]&&weekPoints[uid].total>0){
       myDiv2.classList.add('show');myDiv2.style.borderColor='var(--wn)';
-      myDiv2.innerHTML='<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Tu posición</div>'+
-        _rkCard(myRank+1,'',weekPoints[uid].photoURL,weekPoints[uid].name,true,false,false,'var(--wn)',
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--wn)">'+(weekPoints[uid].total||0)+' pts</div>',
-          'puntos esta semana')+
-        '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:2px">de '+sorted.length+' jugadores</div>';
-    } else { myDiv2.classList.remove('show'); }
+      myDiv2.innerHTML='<div style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Tu posición</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,184,0,.08);border:1px solid var(--wn);border-radius:11px">'+
+        '<div style="width:28px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--wn)">'+(myRank+1)+'</div>'+
+        '<div style="flex:1;font-size:13px;font-weight:700">'+(weekPoints[uid].name||'?')+' 👈</div>'+
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--wn)">'+(weekPoints[uid].total||0)+' pts</div></div>'+
+        '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">de '+sorted.length+' jugadores</div>';
+    }else{myDiv2.classList.remove('show');}
   }
-  document.getElementById('rankList').innerHTML=html;
-}
-
-function renderFullRank(g){
-  var sorted=getSorted(g,50),cfg=GCOLORS[g],isR=g==='r',isS=g==='s';
-  var gameLabel=GAME_LABELS[g]||g;
-  document.getElementById('rankSub').textContent='TOP 50 · '+gameLabel+' · '+getWeekLabel();
-  var html='';
-  if(sorted.length===0){
-    html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';
-  } else {
-    sorted.forEach(function(e,i){
-      var uid2=e[0],w=e[1],isMe=curUser&&uid2===curUser.uid,isTop3=i<3,isTop1=i===0;
-      var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-      var timeStr='<div style="font-family:\'DM Mono\',monospace;font-size:'+(isTop1?'16':isTop3?'14':'12')+'px;color:'+(isTop3?cfg.stroke:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div>';
-      var sub=isR||isS?null:'±'+(w.bestDiff*1000).toFixed(0)+'ms';
-      html+=_rkCard(i+1,medal,w.photoURL,w.name,isMe,isTop3,isTop1,cfg.stroke,timeStr,sub);
-    });
-  }
-  document.getElementById('rankList').innerHTML=html;
-  if(curUser){
-    var rank=getRank(curUser.uid,g),myW=wScores[g][curUser.uid],myDiv=document.getElementById('rankMy');
-    myDiv.classList.toggle('show',!!(myW&&myW.bestTime));
-    myDiv.style.borderColor=cfg.stroke;
-    document.getElementById('rmyPos').textContent=myW&&myW.bestTime?'#'+rank+' de '+sorted.length:'—';
-    document.getElementById('rmyPos').style.color=cfg.color;
-    document.getElementById('rmyTime').textContent=myW&&myW.bestTime?myW.bestTime+(isR?'ms':'s')+(isR||isS?'':'  ±'+(myW.bestDiff*1000).toFixed(0)+'ms'):'Juega para aparecer aquí';
-  }
-}
+  document.getElementById('rankList').innerHTML=html;}
+function renderFullRank(g){var sorted=getSorted(g,50),cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isBlind=g==='b';var gameLabel=GAME_LABELS[g]||g;document.getElementById('rankSub').textContent='TOP 50 · '+gameLabel+' · '+getWeekLabel();var html='';if(sorted.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}else{sorted.forEach(function(e,i){var uid2=e[0],w=e[1],isMe=curUser&&uid2===curUser.uid,isTop3=i<3,medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'',pos=i+1;var avHtml=w.photoURL?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+w.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>':'<div style="width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div>';html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:'+(isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?'var(--bl)':isTop3?cfg.stroke:'var(--bo)')+';border-radius:11px;margin-bottom:5px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:'+(isTop3?'20':'14')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+';width:28px;text-align:center">'+(medal||pos)+'</div>'+avHtml+'<div style="flex:1"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+(isR||isS?'':'<div style="font-size:10px;color:var(--tm);margin-top:1px">±'+(w.bestDiff*1000).toFixed(0)+'ms</div>')+'</div><div style="font-family:\'DM Mono\',monospace;font-size:'+(isTop3?'14':'12')+'px;color:'+(isTop3?cfg.color:'var(--tm)')+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});}document.getElementById('rankList').innerHTML=html;if(curUser){var rank=getRank(curUser.uid,g),myW=wScores[g][curUser.uid],myDiv=document.getElementById('rankMy');myDiv.classList.toggle('show',!!(myW&&myW.bestTime));myDiv.style.borderColor=cfg.stroke;document.getElementById('rmyPos').textContent=myW&&myW.bestTime?'#'+rank+' de '+sorted.length:'—';document.getElementById('rmyPos').style.color=cfg.color;document.getElementById('rmyTime').textContent=myW&&myW.bestTime?myW.bestTime+'s'+(isR||isS?'':'  ±'+(myW.bestDiff*1000).toFixed(0)+'ms'):'Juega para aparecer aquí';}}
 function getSorted(g,max){return Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);}).slice(0,max);}
 function getRank(uid,g){var sorted=Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});var idx=sorted.findIndex(function(e){return e[0]===uid;});return idx>=0?idx+1:'—';}
 function goTab(t){
