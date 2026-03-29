@@ -1599,35 +1599,72 @@ function admLogin(){
   }
 }
 function genTargets(){
-  var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;
+  var rndTt=Math.round((3+Math.random()*12)*1000)/1000;
+  var rndTb=Math.round((5+Math.random()*15)*1000)/1000;
   document.getElementById('modalBody').innerHTML=
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+
-    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+
-      '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+
-      '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div>'+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎯 TIEMPOS OBJETIVO</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">'+
+      // Input Tiempo
+      '<div style="background:var(--sf2);border:1px solid var(--ac);border-radius:9px;padding:10px 14px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+          '<span style="font-size:11px;color:var(--ac);font-weight:600">🟢 Reto Tiempo</span>'+
+          '<span style="font-size:10px;color:var(--tm)">3.000 – 15.000s</span>'+
+        '</div>'+
+        '<input id="inputTt" type="number" step="0.001" min="3" max="15" value="'+rndTt.toFixed(3)+'" '+
+          'style="width:100%;height:38px;background:var(--bg);border:1px solid var(--ac);border-radius:7px;color:var(--ac);font-family:DM Mono,monospace;font-size:16px;padding:0 10px;outline:none;text-align:center">'+
+      '</div>'+
+      // Input Ciego
+      '<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:9px;padding:10px 14px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+          '<span style="font-size:11px;color:var(--c4b);font-weight:600">🟡 Reto Ciego</span>'+
+          '<span style="font-size:10px;color:var(--tm)">5.000 – 20.000s</span>'+
+        '</div>'+
+        '<input id="inputTb" type="number" step="0.001" min="5" max="20" value="'+rndTb.toFixed(3)+'" '+
+          'style="width:100%;height:38px;background:var(--bg);border:1px solid var(--c4b);border-radius:7px;color:var(--c4b);font-family:DM Mono,monospace;font-size:16px;padding:0 10px;outline:none;text-align:center">'+
+      '</div>'+
     '</div>'+
-    '<div style="background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.3);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--wn);line-height:1.6">'+
-      '⚠️ Al aplicar se <strong>resetean los scores del día actual</strong>.<br>'+
-      'Los puntos acumulados y el ranking global no se tocan.'+
-    '</div>'+
+    // Botón generar aleatorio
+    '<button onclick="genTargetsRandom()" style="width:100%;height:34px;background:transparent;border:1px solid var(--bo);border-radius:8px;color:var(--tm);font-size:11px;cursor:pointer;margin-bottom:12px;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--tm)\'" onmouseout="this.style.borderColor=\'var(--bo)\'">🎲 Generar aleatorio</button>'+
+    // Checkbox reset
+    '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.25);border-radius:9px;cursor:pointer;margin-bottom:14px">'+
+      '<input type="checkbox" id="chkReset" checked style="width:16px;height:16px;margin-top:1px;accent-color:var(--wn);flex-shrink:0;cursor:pointer">'+
+      '<div>'+
+        '<div style="font-size:12px;font-weight:600;color:var(--wn)">Resetear scores del día</div>'+
+        '<div style="font-size:10px;color:var(--tm);margin-top:2px;line-height:1.5">Los rankings del día empiezan en 0. Los puntos acumulados de la semana no se tocan.</div>'+
+      '</div>'+
+    '</label>'+
     '<div class="mbtns">'+
       '<button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+
-      '<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR Y RESETEAR DÍA</button>'+
+      '<button class="btn btn-g" onclick="saveTargets()" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button>'+
     '</div>';
   document.getElementById('overlay').classList.add('show');
 }
-function saveTargets(tt,tb){
+function genTargetsRandom(){
+  var rndTt=Math.round((3+Math.random()*12)*1000)/1000;
+  var rndTb=Math.round((5+Math.random()*15)*1000)/1000;
+  var inTt=document.getElementById('inputTt');
+  var inTb=document.getElementById('inputTb');
+  if(inTt)inTt.value=rndTt.toFixed(3);
+  if(inTb)inTb.value=rndTb.toFixed(3);
+}
+function saveTargets(){
+  var inTt=document.getElementById('inputTt');
+  var inTb=document.getElementById('inputTb');
+  var chk=document.getElementById('chkReset');
+  if(!inTt||!inTb){toast('❌ Error: campos no encontrados');return;}
+  var tt=parseFloat(inTt.value);
+  var tb=parseFloat(inTb.value);
+  if(isNaN(tt)||tt<3||tt>15){toast('❌ Tiempo (Reto) debe estar entre 3 y 15 segundos');return;}
+  if(isNaN(tb)||tb<5||tb>20){toast('❌ Tiempo (Ciego) debe estar entre 5 y 20 segundos');return;}
+  var doReset=chk?chk.checked:true;
   resetInProgress=true;
   var today=getTodayKey();
-  var scoresKey='scores/'+weekKey+'/'+today;
-  // 1. Actualizar targets  2. Resetear scores del día en paralelo
-  Promise.all([
-    db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:Date.now()}),
-    db.ref(scoresKey).remove()
-  ]).then(function(){
-    wScores={t:{},b:{},s:{},r:{}};
+  var ops=[db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:Date.now()})];
+  if(doReset)ops.push(db.ref('scores/'+weekKey+'/'+today).remove());
+  Promise.all(ops).then(function(){
+    if(doReset)wScores={t:{},b:{},s:{},r:{}};
     closeModal();
-    toast('✅ Nuevos tiempos aplicados — día reseteado');
+    toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
     updateHomecards();
     updateAdmStats();
     buildWinners();
