@@ -298,8 +298,81 @@ tr:hover td{background:var(--sf2)}
   .ap-stats{grid-template-columns:1fr 1fr}.adm-inner{padding:12px}
   #sAuth{padding:12px}.auth-card{padding:20px}
   .seq-area{width:280px;height:320px}
-  
+
+  /* ── Home mobile: sin scroll, grid + teaser llenan pantalla ── */
+  #sHome{overflow:hidden;padding:0;align-items:stretch;justify-content:flex-start}
+  .home-inner{
+    width:100%;height:100%;
+    display:flex;flex-direction:column;
+    padding:14px 12px 10px;
+  }
+  .home-hdr{flex-shrink:0;margin-bottom:10px}
+  .game-grid{
+    flex:1;min-height:0;gap:8px;
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+    max-height:calc(2 * 200px + 8px);
+  }
+  .gc2{min-height:0;padding:12px 10px;gap:4px}
+  .gc2-name{font-size:14px}
+  .gc2-tgt{font-size:26px}
+  .gc2-tgtlbl{font-size:7px}
+  .gc2-leader{font-size:10px;padding-top:4px}
+  .gc2-pos{font-size:9px}
+  /* Teaser más compacto en móvil */
+  .torneo-teaser{flex-shrink:0;margin-top:8px}
+  .torneo-teaser-inner{padding:10px 14px}
+  .torneo-teaser-icon{font-size:28px}
+  .torneo-teaser-title{font-size:18px;letter-spacing:3px}
+  .torneo-teaser-sub{font-size:9px}
 }
+/* ══ TORNEO TEASER ══ */
+.torneo-teaser{
+  position:relative;width:100%;border-radius:16px;overflow:hidden;
+  border:1px solid var(--ct);
+  background:linear-gradient(135deg,rgba(255,45,120,.08) 0%,rgba(255,45,120,.03) 100%);
+  cursor:default;user-select:none;
+  margin-top:10px;
+}
+/* Línea brillante animada en el borde superior */
+.torneo-teaser-glow{
+  position:absolute;top:0;left:-100%;width:60%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--ct),transparent);
+  animation:teaserSweep 3s ease-in-out infinite;
+}
+@keyframes teaserSweep{0%{left:-60%}100%{left:160%}}
+.torneo-teaser-inner{padding:14px 16px}
+.torneo-teaser-badge{
+  display:inline-block;font-family:'Bebas Neue',sans-serif;font-size:10px;
+  letter-spacing:3px;color:var(--ct);
+  border:1px solid var(--ct);border-radius:4px;padding:2px 8px;
+  margin-bottom:10px;opacity:.9;
+}
+.torneo-teaser-body{display:flex;align-items:center;gap:14px}
+.torneo-teaser-icon{
+  font-size:38px;line-height:1;
+  filter:drop-shadow(0 0 12px var(--ct));
+  animation:teaserPulse 2s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes teaserPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.92)}}
+.torneo-teaser-title{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;
+  color:var(--ct);line-height:1;text-shadow:0 0 20px var(--ctm);
+}
+.torneo-teaser-sub{
+  font-size:10px;color:var(--tm);letter-spacing:1px;margin-top:4px;line-height:1.5;
+}
+.torneo-teaser-dots{
+  display:flex;gap:5px;margin-top:12px;justify-content:flex-end;
+}
+.torneo-teaser-dots span{
+  width:6px;height:6px;border-radius:50%;background:var(--ct);opacity:.3;
+  animation:teaserDot 1.4s ease-in-out infinite;
+}
+.torneo-teaser-dots span:nth-child(2){animation-delay:.2s}
+.torneo-teaser-dots span:nth-child(3){animation-delay:.4s}
+@keyframes teaserDot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
 body.playing{overflow:hidden}
 </style>
 </head>
@@ -430,6 +503,25 @@ body.playing{overflow:hidden}
         <div class="gc2-pos" id="hrr">—</div>
       </div>
     </div>
+
+    <!-- TORNEOS RELÁMPAGO — teaser, no interactivo -->
+    <div class="torneo-teaser">
+      <div class="torneo-teaser-glow"></div>
+      <div class="torneo-teaser-inner">
+        <div class="torneo-teaser-badge">PRÓXIMAMENTE</div>
+        <div class="torneo-teaser-body">
+          <div class="torneo-teaser-icon">⚡</div>
+          <div>
+            <div class="torneo-teaser-title">TORNEOS RELÁMPAGO</div>
+            <div class="torneo-teaser-sub">Compite en tiempo real · Premios · Adrenalina pura</div>
+          </div>
+        </div>
+        <div class="torneo-teaser-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
