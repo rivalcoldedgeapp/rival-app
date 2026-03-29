@@ -755,7 +755,7 @@ function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g)
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
 // ══ VERSIÓN / FORCE RELOAD ══
-var APP_VERSION='v6.2';
+var APP_VERSION='v6.3';
 db.ref('appVersion').on('value',function(s){
   var serverVersion=s.val();
   if(!serverVersion)return;
@@ -1082,7 +1082,8 @@ function recalcPoints(g){
           db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds){
             if(resetInProgress)return;
             var days=ds.val()||{},total=0;
-            Object.values(days).forEach(function(dg){Object.values(dg).forEach(function(pts){total+=(pts||0);});});
+            var validKeys={'gt':1,'gb':1,'gs':1,'gr':1};
+            Object.values(days).forEach(function(dg){Object.entries(dg).forEach(function(kv){if(validKeys[kv[0]])total+=(kv[1]||0);});});
             db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);
           });
         });
