@@ -1109,7 +1109,7 @@ function renderTorneoHistorial(){
       var motivo=t.cierreMotivo==='automatico_tiempo'?'Auto':'Manual';
       var partsHtml='';
       if(t.participantes&&Object.keys(t.participantes).length>0){
-        var histTarget=GCFG[t.reto]||0;
+        var histTarget=t.target||GCFG[t.reto]||0;
         var pSorted=Object.entries(t.participantes)
           .sort(function(a,b){
             var ta=a[1].bestTime!=null?Math.abs(parseFloat(a[1].bestTime)-histTarget):Infinity;
@@ -1160,10 +1160,10 @@ function renderTorneoAdminPanel(){
     var gameLabel=GAME_LABELS[torneoData.reto]||'—';
     var remaining=torneoData.cierreAt-Date.now();
     var parts=torneoData.participantes||{};
-    var tornReto=torneoData.reto,tornTarget=GCFG[tornReto]||0;
+    var tornReto=torneoData.reto,tornTarget=torneoData.target||GCFG[tornReto]||0;
     var sortedP=Object.entries(parts).sort(function(a,b){
-      var ta=a[1].bestTime!=null?Math.abs(parseFloat(a[1].bestTime)-(tornReto==='r'?0:tornTarget)):Infinity;
-      var tb=b[1].bestTime!=null?Math.abs(parseFloat(b[1].bestTime)-(tornReto==='r'?0:tornTarget)):Infinity;
+      var ta=a[1].bestTime!=null?Math.abs(parseFloat(a[1].bestTime)-tornTarget):Infinity;
+      var tb=b[1].bestTime!=null?Math.abs(parseFloat(b[1].bestTime)-tornTarget):Infinity;
       return ta-tb;
     });
     var ganador=sortedP.length>0?sortedP[0][1]:null;
@@ -1242,7 +1242,7 @@ function renderTorneoAdminPanel(){
     var partsHtml='';
     var lastParts=torneoData&&torneoData.participantes?torneoData.participantes:{};
     var lastReto=torneoData&&torneoData.reto?torneoData.reto:null;
-    var lastTarget=lastReto&&GCFG[lastReto]?GCFG[lastReto]:0;
+    var lastTarget=torneoData&&torneoData.target?torneoData.target:(lastReto&&GCFG[lastReto]?GCFG[lastReto]:0);
     var lastSorted=Object.entries(lastParts)
       .sort(function(a,b){
         var ta=a[1].bestTime!=null?Math.abs(parseFloat(a[1].bestTime)-lastTarget):Infinity;
@@ -1382,6 +1382,7 @@ function confirmActivarTorneo(){
     return db.ref('torneo').set({
       activo:true,
       reto:reto,
+      target:GCFG[reto]||0,
       premio:window._tornPremio||'$50 pesos',
       limite:window._tornLimite||20,
       inicioAt:ahora,
@@ -1433,6 +1434,7 @@ function confirmCerrarTorneo(){
   // Guardar en historial antes de sobrescribir torneo activo
   var torneoArchivado={
     reto:torneoData?torneoData.reto:null,
+    target:torneoData?(torneoData.target||GCFG[torneoData.reto]||0):0,
     premio:torneoData?torneoData.premio:null,
     limite:torneoData?torneoData.limite:null,
     inicioAt:torneoData?torneoData.inicioAt:null,
