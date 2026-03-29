@@ -654,15 +654,21 @@ function backfillLegacyPoints(){
 }
 function checkDailyReset(){
   var currentDay=getTodayKey();
-  // IMPORTANTE: los valores aleatorios se generan UNA sola vez FUERA del callback.
-  // Firebase puede ejecutar el callback varias veces (optimistic + server confirm).
-  // Si Math.random() estuviera dentro, cada reintento generaría un target distinto.
-  var newTt=Math.round((3+Math.random()*12)*1000)/1000;   // Tiempo: 3.000–15.000s
-  var newTb=Math.round((5+Math.random()*15)*1000)/1000;   // Ciego:  5.000–20.000s
-  var now=Date.now();
-  db.ref('gameConfig').transaction(function(cfg){
-    if(cfg&&cfg.lastDay===currentDay)return; // ya actualizado hoy — abortar sin cambios
-    return{tt:newTt,tb:newTb,lastDay:currentDay,updatedAt:now};
+  // Lee el valor REAL del servidor antes de decidir si escribir.
+  // Sin este once(), el caché local está vacío en cada refresh y la transaction
+  // recibe cfg=null, proponiendo un write innecesario que genera un target nuevo.
+  db.ref('gameConfig').once('value').then(function(snap){
+    var cfg=snap.val();
+    if(cfg&&cfg.lastDay===currentDay)return; // Ya está actualizado para hoy — no hacer nada
+    // Generar valores fuera de la transaction para que sean idempotentes en cada reintento
+    var newTt=Math.round((3+Math.random()*12)*1000)/1000;
+    var newTb=Math.round((5+Math.random()*15)*1000)/1000;
+    var now=Date.now();
+    // Transaction para proteger contra race condition entre múltiples clientes simultáneos
+    db.ref('gameConfig').transaction(function(cfg2){
+      if(cfg2&&cfg2.lastDay===currentDay)return; // Otro cliente ya actualizó — abortar
+      return{tt:newTt,tb:newTb,lastDay:currentDay,updatedAt:now};
+    });
   });
 }
 setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();['t','b','s','r'].forEach(function(g){listenWeekScore(g);});wScores={t:{},b:{},s:{},r:{}};}},60000);
