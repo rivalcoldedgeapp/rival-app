@@ -756,7 +756,7 @@ function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g)
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
 // ══ VERSIÓN / FORCE RELOAD ══
-var APP_VERSION='v6.5';
+var APP_VERSION='v6.6';
 db.ref('appVersion').on('value',function(s){
   var serverVersion=s.val();
   if(!serverVersion)return;
@@ -1345,6 +1345,7 @@ function goTab(t){
 }
 function openAdminDirect(){
   // Entrada directa al admin para el UID del admin — sin formulario de contraseña
+  showScreen('sAdmin');
   document.getElementById('au').value='admin';
   document.getElementById('ap').value='rival2024';
   admLogin();
