@@ -299,20 +299,33 @@ tr:hover td{background:var(--sf2)}
   #sAuth{padding:12px}.auth-card{padding:20px}
   .seq-area{width:280px;height:320px}
 
-  /* ── Home: tarjetas rectangulares bien distribuidas, sin scroll ── */
-  #sHome{overflow:hidden;justify-content:center;padding:12px}
-  .home-inner{width:100%;padding:0}
-  .home-hdr{margin-bottom:10px}
-  .game-grid{gap:8px}
-  /* clamp: mínimo 130px, ideal proporcional al viewport, máximo 210px
-     Resultado: ~200px en iPhone SE, ~210px en iPhone 14+ → siempre rectangulares */
-  .gc2{
-    height:clamp(130px,calc((100dvh - 175px) / 2),210px);
-    min-height:0;
-    padding:12px 10px;
-    gap:4px;
+  /* ── Home: sin scroll, tarjetas rectangulares llenando la pantalla ── */
+  /* Sobreescribe overflow-y:auto y padding-top:12px de .screen */
+  #sHome{
+    overflow:hidden;
+    padding:0;
+    align-items:stretch;
+    justify-content:flex-start;
   }
-  .gc2-tgt{font-size:28px}
+  .home-inner{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    padding:14px 12px 10px;
+  }
+  .home-hdr{flex-shrink:0;margin-bottom:10px}
+  .game-grid{
+    flex:1;
+    min-height:0;
+    gap:8px;
+    /* Filas iguales con altura máxima para mantener proporción rectangular */
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+    max-height:calc(2 * 210px + 8px); /* nunca más de 210px por tarjeta */
+  }
+  .gc2{min-height:0;padding:12px 10px;gap:4px}
+  .gc2-name{font-size:14px}
+  .gc2-tgt{font-size:26px}
   .gc2-tgtlbl{font-size:7px}
   .gc2-leader{font-size:10px;padding-top:4px}
   .gc2-pos{font-size:9px}
