@@ -378,7 +378,7 @@ body.playing{overflow:hidden}
     <button class="ntab" id="nt-rank" onclick="goTab('rank')">🏆 Ranking</button>
   </div>
   <div class="nav-right" id="navRight">
-    <div id="navPts" style="display:none;align-items:center;gap:4px;background:var(--sf);border:1px solid var(--wn);border-radius:20px;padding:3px 10px">
+    <div id="navPts" onclick="showHowPoints()" style="display:none;align-items:center;gap:4px;background:var(--sf);border:1px solid var(--wn);border-radius:20px;padding:3px 10px;cursor:pointer" title="¿Cómo se ganan puntos?">
       <span style="font-size:12px">🏅</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--wn);line-height:1" id="navPtsNum">0</span>
       <span style="font-size:10px;color:var(--tm)">pts</span>
@@ -602,7 +602,10 @@ body.playing{overflow:hidden}
     <!-- Header -->
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;margin-top:2px">
       <div class="rank-title" id="rankTitle">RANKING</div>
-      <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-size:11px;color:var(--tm);font-family:DM Mono,monospace" id="rankSub"></div>
+        <button id="rankHowBtn" onclick="showHowPoints()" style="display:none;background:transparent;border:1px solid var(--wn);border-radius:50%;width:18px;height:18px;color:var(--wn);font-size:9px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0" title="¿Cómo se ganan puntos?">?</button>
+      </div>
     </div>
     <!-- Grid de selección — 2×3 igual que las game cards -->
     <div class="rk-sel-grid" id="rgChips">
@@ -1193,18 +1196,21 @@ function setRankGame(g){
   var activeEl=document.getElementById('rgc'+idMap[g]);
   if(activeEl)activeEl.classList.add('active');
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
-  if(g==='yo'){renderYoRanking();return;}
-  if(g==='torneo'){
+  var howBtn=document.getElementById('rankHowBtn');
+  if(g==='yo'){if(howBtn)howBtn.style.display='none';renderYoRanking();return;}
+  if(g==='torneo'){if(howBtn)howBtn.style.display='none';
     document.getElementById('rankTitle').textContent='TORNEOS';
     document.getElementById('rankSub').textContent='Historial · relámpago';
     renderTorneoRanking();return;
   }
   if(g==='global'){
+    if(howBtn)howBtn.style.display='flex';
     document.getElementById('rankTitle').textContent='RANKING';
     document.getElementById('rankSub').textContent='Puntos · '+getWeekLabel();
     renderGlobalRank();return;
   }
   var labels={'t':'Reto Tiempo','b':'Reto Ciego','s':'Secuencia','r':'Reacción'};
+  if(howBtn)howBtn.style.display='none';
   document.getElementById('rankTitle').textContent=labels[g]||'—';
   document.getElementById('rankSub').textContent='Hoy · '+getTodayDate();
   renderTop10(g);
@@ -1514,7 +1520,7 @@ function renderAdmTorneos(){
     activeHtml='<div style="background:var(--sf2);border:1px solid var(--ct);border-radius:10px;padding:12px;margin-bottom:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px"><div><div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:2px">Torneo activo</div><div style="font-size:13px;font-weight:700">'+getTorneoGameLabel(td.gameMode)+' · '+td.prize+'</div><div style="font-size:11px;color:'+(sColors[td.status]||'var(--tm)')+'">'+( sLbls[td.status]||td.status)+tRemStr+'</div></div>'+(td.status==='active'||td.status==='waiting'||td.status==='countdown'?'<button class="btn btn-r" onclick="admCloseTorneo()" style="height:36px;flex-shrink:0">Cerrar torneo</button>':'')+'</div><div style="font-size:11px;color:var(--tm);margin-bottom:10px">'+pc+' participante'+(pc===1?'':'s')+'</div>'+(pc>0?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px"><thead><tr><th style="padding:4px 8px;font-size:9px;color:var(--tm)">#</th><th style="padding:4px 8px;font-size:9px;color:var(--tm)">Jugador</th><th style="padding:4px 8px;font-size:9px;color:var(--tm)">Email</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Mejor</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Intentos</th><th style="padding:4px 8px;font-size:9px;color:var(--tm);text-align:center">Estado</th></tr></thead><tbody>'+pRows+wRows+'</tbody></table></div>':'<div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Sin jugadores aún</div>')+'</div>';
   }else{activeHtml='<div style="font-size:11px;color:var(--td);text-align:center;padding:12px;background:var(--sf2);border-radius:8px;margin-bottom:12px">Sin torneo activo</div>';}
   var hasActivo=torneoData&&(torneoData.status==='waiting'||torneoData.status==='countdown'||torneoData.status==='active');
-  var createHtml='<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Crear nuevo torneo</div>'+(hasActivo?'<div style="font-size:11px;color:var(--wn);text-align:center;padding:8px">Ya hay un torneo activo. Ciérralo antes de crear uno nuevo.</div>':'<div style="display:flex;flex-direction:column;gap:8px"><div class="fld"><label>Premio / descripción</label><input id="tornPrize" placeholder="ej. Gift Card $500 MXN" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 11px;outline:none;width:100%"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="fld"><label>Mín. jugadores</label><input id="tornMin" type="number" min="2" max="50" value="" placeholder="ej. 5" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div><div class="fld"><label>Duración al iniciar (min)</label><input id="tornDur" type="number" min="1" max="240" value="" placeholder="ej. 30" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div></div><div style="font-size:10px;color:var(--td);line-height:1.6">ℹ️ Espera: 20 min desde el primer join. Duración = tiempo de competencia. Modo asignado al azar.</div><button id="tornCreateBtn" class="btn" onclick="admCreateTorneo()" style="background:var(--ct);color:#fff;height:38px;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;width:100%">⚡ CREAR TORNEO (modo aleatorio)</button></div>')+'</div>';
+  var createHtml='<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:10px">Crear nuevo torneo</div>'+(hasActivo?'<div style="font-size:11px;color:var(--wn);text-align:center;padding:8px">Ya hay un torneo activo. Ciérralo antes de crear uno nuevo.</div>':'<div style="display:flex;flex-direction:column;gap:8px"><div class="fld"><label>Premio / descripción</label><input id="tornPrize" placeholder="ej. Gift Card $500 MXN" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 11px;outline:none;width:100%"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="fld"><label>Mín. jugadores</label><input id="tornMin" type="number" min="2" max="50" value="" placeholder="ej. 5" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div><div class="fld"><label>Duración al iniciar (min)</label><input id="tornDur" type="number" min="1" max="240" value="" placeholder="ej. 30" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div></div><div class="fld"><label>Modo de juego</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px"><button type="button" onclick="selectTorneoMode(\'t\')" id="tornModeT" style="height:36px;border-radius:8px;border:1px solid var(--bo);background:var(--sf);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🟢 Tiempo</button><button type="button" onclick="selectTorneoMode(\'b\')" id="tornModeB" style="height:36px;border-radius:8px;border:1px solid var(--bo);background:var(--sf);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🟡 Ciego</button><button type="button" onclick="selectTorneoMode(\'s\')" id="tornModeS" style="height:36px;border-radius:8px;border:1px solid var(--bo);background:var(--sf);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🩵 Secuencia</button><button type="button" onclick="selectTorneoMode(\'r\')" id="tornModeR" style="height:36px;border-radius:8px;border:1px solid var(--bo);background:var(--sf);color:var(--tm);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;transition:all .15s">⚡ Reacción</button></div><input type="hidden" id="tornMode" value=""></div><div id="tornTargetWrap" style="display:none"><div class="fld"><label id="tornTargetLbl">Tiempo objetivo (segundos)</label><input id="tornTarget" type="number" step="0.001" placeholder="ej. 7.500" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%;margin-top:2px"></div></div><div style="font-size:10px;color:var(--td);line-height:1.6">ℹ️ El torneo espera 20 min desde el primer join para alcanzar el mínimo de jugadores.</div><button id="tornCreateBtn" class="btn" onclick="admCreateTorneo()" style="background:var(--ct);color:#fff;height:38px;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;width:100%">⚡ CREAR TORNEO</button></div>')+'</div>';
   var histHtml='<div id="tornHistWrap"><div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Cargando historial...</div></div>';
   el.innerHTML=activeHtml+createHtml+histHtml;
   db.ref('torneoHistorial').orderByKey().limitToLast(20).once('value').then(function(s){
@@ -1527,14 +1533,50 @@ function renderAdmTorneos(){
     wrap.innerHTML=html;
   }).catch(function(){var wrap=document.getElementById('tornHistWrap');if(wrap)wrap.innerHTML='<div style="font-size:11px;color:var(--dg);text-align:center;padding:10px">Error — verifica Firebase Rules</div>';});
 }
+function selectTorneoMode(m){
+  var colors={t:'var(--ac)',b:'var(--c4b)',s:'var(--cs)',r:'var(--cr)'};
+  var ranges={t:{min:3,max:15,lbl:'Tiempo objetivo — Reto Tiempo (3–15s)'},b:{min:5,max:20,lbl:'Tiempo objetivo — Reto Ciego (5–20s)'}};
+  ['t','b','s','r'].forEach(function(x){
+    var btn=document.getElementById('tornMode'+x.toUpperCase());
+    if(!btn)return;
+    if(x===m){btn.style.background=colors[m];btn.style.color='#000';btn.style.borderColor=colors[m];btn.style.fontWeight='700';}
+    else{btn.style.background='var(--sf)';btn.style.color='var(--tm)';btn.style.borderColor='var(--bo)';btn.style.fontWeight='';}
+  });
+  document.getElementById('tornMode').value=m;
+  var wrap=document.getElementById('tornTargetWrap');
+  var lbl=document.getElementById('tornTargetLbl');
+  var inp=document.getElementById('tornTarget');
+  if(m==='t'||m==='b'){
+    if(wrap)wrap.style.display='block';
+    if(lbl)lbl.textContent=ranges[m].lbl;
+    if(inp){inp.min=ranges[m].min;inp.max=ranges[m].max;inp.placeholder='ej. '+(m==='t'?'7.500':'12.000');}
+  } else {
+    if(wrap)wrap.style.display='none';
+    if(inp)inp.value='';
+  }
+}
 function admCreateTorneo(){
-  var prize=(document.getElementById('tornPrize').value||'').trim();var minRaw=document.getElementById('tornMin').value.trim();var durRaw=document.getElementById('tornDur').value.trim();var minP=parseInt(minRaw);var durMin=parseInt(durRaw);
+  var prize=(document.getElementById('tornPrize').value||'').trim();
+  var minRaw=document.getElementById('tornMin').value.trim();
+  var durRaw=document.getElementById('tornDur').value.trim();
+  var gameMode=(document.getElementById('tornMode').value||'').trim();
+  var minP=parseInt(minRaw);var durMin=parseInt(durRaw);
   if(!prize){toast('⚠️ Escribe la descripción del premio');document.getElementById('tornPrize').focus();return;}
   if(!minRaw||isNaN(minP)||minP<2){toast('⚠️ El mínimo debe ser 2 o más');document.getElementById('tornMin').focus();return;}
   if(!durRaw||isNaN(durMin)||durMin<1){toast('⚠️ La duración debe ser al menos 1 minuto');document.getElementById('tornDur').focus();return;}
-  var modes=['t','b','s','r'];var gameMode=modes[Math.floor(Math.random()*modes.length)];var targetTime=null;if(gameMode==='t')targetTime=Math.round((3+Math.random()*12)*1000)/1000;else if(gameMode==='b')targetTime=Math.round((5+Math.random()*15)*1000)/1000;
+  if(!gameMode){toast('⚠️ Selecciona el modo de juego');return;}
+  var targetTime=null;
+  if(gameMode==='t'||gameMode==='b'){
+    var tRaw=document.getElementById('tornTarget').value.trim();
+    var tVal=parseFloat(tRaw);
+    var tMin=gameMode==='t'?3:5,tMax=gameMode==='t'?15:20;
+    if(!tRaw||isNaN(tVal)||tVal<tMin||tVal>tMax){toast('⚠️ Tiempo objetivo inválido ('+(gameMode==='t'?'3–15':'5–20')+'s)');document.getElementById('tornTarget').focus();return;}
+    targetTime=Math.round(tVal*1000)/1000;
+  }
+  var tornId=Date.now();
+  var btn=document.getElementById('tornCreateBtn');if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
   var tornId=Date.now();var btn=document.getElementById('tornCreateBtn');if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
-  db.ref('torneo/active').set({id:tornId,prize:prize,minPlayers:minP,durationMs:durMin*60*1000,gameMode:gameMode,targetTime:targetTime,status:'waiting',createdAt:tornId,waitingStartedAt:null,startedAt:null,finishedAt:null,countdownEndsAt:null}).then(function(){toast('✅ Torneo creado — '+getTorneoGameLabel(gameMode)+' · '+minP+' jug · '+durMin+'min');renderAdmTorneos();}).catch(function(err){if(btn){btn.textContent='⚡ CREAR TORNEO (modo aleatorio)';btn.disabled=false;btn.style.opacity='1';}if(err.message.indexOf('PERMISSION_DENIED')>=0){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div><p style="font-size:12px;color:var(--tm);margin-bottom:10px">Agrega en Firebase Console → Realtime Database → Rules:</p><div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:12px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;user-select:all;cursor:text;margin-bottom:10px">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';document.getElementById('overlay').classList.add('show');}else{toast('❌ Error: '+err.message);}});
+  db.ref('torneo/active').set({id:tornId,prize:prize,minPlayers:minP,durationMs:durMin*60*1000,gameMode:gameMode,targetTime:targetTime,status:'waiting',createdAt:tornId,waitingStartedAt:null,startedAt:null,finishedAt:null,countdownEndsAt:null}).then(function(){toast('✅ Torneo creado — '+getTorneoGameLabel(gameMode)+' · '+minP+' jug · '+durMin+'min');renderAdmTorneos();}).catch(function(err){if(btn){btn.textContent='⚡ CREAR TORNEO';btn.disabled=false;btn.style.opacity='1';}if(err.message.indexOf('PERMISSION_DENIED')>=0){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div><p style="font-size:12px;color:var(--tm);margin-bottom:10px">Agrega en Firebase Console → Realtime Database → Rules:</p><div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:12px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;user-select:all;cursor:text;margin-bottom:10px">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';document.getElementById('overlay').classList.add('show');}else{toast('❌ Error: '+err.message);}});
 }
 function admCloseTorneo(){if(!torneoData){toast('Sin torneo activo');return;}window._tornConfirmClose=function(){closeModal();closeTorneo('manual');};document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ CERRAR TORNEO</div><p style="font-size:12px;color:var(--tm);margin-bottom:14px">Se determinará el ganador con los resultados actuales y el torneo quedará archivado en el historial.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button><button class="btn btn-r" onclick="window._tornConfirmClose()" style="height:42px;font-weight:700">Cerrar torneo</button></div>';document.getElementById('overlay').classList.add('show');}
 function admLimpiarHistorial(){db.ref('torneoHistorial').once('value').then(function(s){var all=s.val()||{};var garbage=Object.keys(all).filter(function(k){var e=all[k];return !e||!e.gameMode||!e.prize||e.status!=='finished';});if(garbage.length===0){toast('Sin entradas inválidas');return;}var upd={};garbage.forEach(function(k){upd['torneoHistorial/'+k]=null;});db.ref().update(upd).then(function(){toast('✅ '+garbage.length+' entrada'+(garbage.length===1?'':'s')+' eliminada'+(garbage.length===1?'':'s'));renderAdmTorneos();}).catch(function(err){toast('❌ '+err.message);});});}
