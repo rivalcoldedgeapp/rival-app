@@ -1734,8 +1734,12 @@ function saveSeqScore(ms){
   if(isRec){upd.bestTime=bestTime;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
   // Actualizar local inmediatamente
   wScores['s'][uid]=Object.assign({},ws,upd);
+  if(curTorneoMode){
+    torneoRegistrarIntento(bestTime,diff,'s');
+    showResult(bestTime,diff,false,'s');
+    return;
+  }
   db.ref(getScorePath('s')+'/'+uid).update(upd).then(function(){
-    if(curTorneoMode)torneoRegistrarIntento(bestTime,diff,'s');
     showResult(bestTime,diff,isRec,'s');
     recalcPoints('s');
   });
@@ -1749,15 +1753,20 @@ function reactTap(){if(reactState==='idle'){reactState='waiting';var z=document.
 // ══ SAVE SCORE ══
 function saveScore(fmt,diff,g){
   if(!curUser)return;
+  // En modo torneo: el diff es contra el target del torneo (diferente al diario)
+  // → NO guardar en el leaderboard diario, solo en torneo/participantes
+  if(curTorneoMode){
+    torneoRegistrarIntento(fmt,diff,g);
+    showResult(fmt,diff,false,g);
+    return;
+  }
   var uid=curUser.uid,ws=wScores[g][uid]||{};
   var isRec=ws.bestDiff==null||diff<ws.bestDiff;
   var pname=(profiles[uid]||{}).name||'?',pphoto=(profiles[uid]||{}).photoURL||null;
   var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};
   if(isRec){upd.bestTime=fmt;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
-  // Actualizar local inmediatamente para que la UI refleje el nuevo score
   wScores[g][uid]=Object.assign({},ws,upd);
   db.ref(getScorePath(g)+'/'+uid).update(upd).then(function(){
-    if(curTorneoMode)torneoRegistrarIntento(fmt,diff,g);
     showResult(fmt,diff,isRec,g);
     recalcPoints(g);
   });
