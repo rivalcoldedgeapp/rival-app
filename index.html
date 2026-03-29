@@ -771,7 +771,6 @@ function updateTorneoHomeCard(){
   if(remaining<=0){el.style.display='none';return;}
   el.style.display='block';
   var gameLabel=GAME_LABELS[torneoData.reto]||'—';
-  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
   var intentosUsados=torneoData.participantes&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
   var intentosLeft=5-intentosUsados;
   var limite=torneoData.limite||null;
@@ -786,15 +785,10 @@ function updateTorneoHomeCard(){
     '<div class="torneo-countdown" id="homeCountdown" style="font-size:32px;margin:10px 0">'+fmtCountdown(remaining)+'</div>'+
     (limitePlaces!=null?'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:6px;color:'+(limitePlaces<=3?'var(--dg)':'var(--ct)')+'">'+
       (limitePlaces>0?'🔥 '+limitePlaces+' lugar'+(limitePlaces===1?'':'es')+' disponible'+(limitePlaces===1?'':'s'):'🔴 TORNEO LLENO')+'</div>':'')+
-    (canPlay?
-      '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Intentos restantes: <strong style="color:var(--ct)">'+intentosLeft+'</strong></div>':
-      '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Necesitas un <strong style="color:var(--tx)">código de invitación</strong> de alguien que se registre en RIVAL.</div>')+
-    (canPlay?
-      '<button class="torneo-enter-btn" '+(intentosLeft>0&&limitePlaces!==0?'':'disabled')+' onclick="event.stopPropagation();goTorneo()">'+
-      (intentosLeft>0?'ENTRAR AL TORNEO':'SIN INTENTOS')+'</button>':
-      '<button class="torneo-enter-btn" onclick="event.stopPropagation();goTorneo()" style="background:var(--ac);color:#000">🔑 INGRESAR CÓDIGO</button>')+
+    '<div style="font-size:12px;color:var(--tm);margin-bottom:8px">Intentos restantes: <strong style="color:var(--ct)">'+intentosLeft+'</strong></div>'+
+    '<button class="torneo-enter-btn" '+(intentosLeft>0&&limitePlaces!==0?'':'disabled')+' onclick="event.stopPropagation();goTorneo()">'+
+    (intentosLeft>0?'ENTRAR AL TORNEO':'SIN INTENTOS')+'</button>'+
     '<div style="display:flex;gap:8px;margin-top:10px;justify-content:center">'+
-      '<button onclick="event.stopPropagation();showComoParticipar()" style="background:transparent;border:1px solid var(--bo);border-radius:7px;color:var(--tm);font-size:11px;padding:5px 10px;cursor:pointer">❓ ¿Cómo participar?</button>'+
       '<button onclick="event.stopPropagation();showTerminos()" style="background:transparent;border:1px solid var(--bo);border-radius:7px;color:var(--tm);font-size:11px;padding:5px 10px;cursor:pointer">📋 Términos</button>'+
     '</div>'+
   '</div>';
@@ -809,26 +803,12 @@ function updateTorneoHomeCard(){
   torneoCountdownTO=setTimeout(tickHome,1000);
 }
 
-function showComoParticipar(){
-  document.getElementById('modalBody').innerHTML=
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ac)">❓ CÓMO PARTICIPAR</div>'+
-    '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:24px">1️⃣</span><div><strong style="color:var(--tx)">Pídele a alguien que se registre</strong><div style="font-size:12px;color:var(--tm);margin-top:3px;line-height:1.6">Dile que descargue RIVAL y que al registrarse te pase su código de invitación. Cada usuario tiene el suyo.</div></div></div>'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:24px">2️⃣</span><div><strong style="color:var(--tx)">Ingrésalo aquí</strong><div style="font-size:12px;color:var(--tm);margin-top:3px;line-height:1.6">Toca el botón <strong style="color:var(--ac)">🔑 INGRESAR CÓDIGO</strong> y escríbelo. Solo funciona una vez por código.</div></div></div>'+
-      '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:24px">3️⃣</span><div><strong style="color:var(--tx)">¡Ya puedes competir!</strong><div style="font-size:12px;color:var(--tm);margin-top:3px;line-height:1.6">Tienes <strong style="color:var(--ct)">5 intentos</strong> para hacer el mejor tiempo. El mejor al cerrar el torneo gana el premio en efectivo.</div></div></div>'+
-    '</div>'+
-    '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:9px;padding:10px 12px;font-size:11px;color:var(--td);margin-bottom:14px;line-height:1.6">'+
-      '💡 Tu propio código aparece abajo en la sección <strong style="color:var(--tm)">Tu código de invitación</strong>. Compártelo y cuando alguien lo use, también podrán jugar torneos.'+
-    '</div>'+
-    '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';
-  document.getElementById('overlay').classList.add('show');
-}
 function showTerminos(){
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">📋 TÉRMINOS Y CONDICIONES</div>'+
     '<div style="max-height:300px;overflow-y:auto;padding-right:4px">'+
     '<div style="font-size:12px;color:var(--tm);line-height:1.8;display:flex;flex-direction:column;gap:10px">'+
-      '<div><strong style="color:var(--tx)">1. Participación</strong><br>Solo pueden participar usuarios registrados en RIVAL que hayan ingresado un código de invitación válido. Cada código es de un solo uso.</div>'+
+      '<div><strong style="color:var(--tx)">1. Participación</strong><br>Solo pueden participar usuarios registrados en RIVAL. Cada jugador tiene 5 intentos por torneo.</div>'+
       '<div><strong style="color:var(--tx)">2. Intentos</strong><br>Cada jugador tiene 5 intentos por torneo. El mejor tiempo de todos tus intentos es el que cuenta para el ranking.</div>'+
       '<div><strong style="color:var(--tx)">3. Premio</strong><br>El ganador es quien registre el mejor tiempo al momento del cierre del torneo. El organizador contactará al ganador por correo electrónico para coordinar la transferencia del premio.</div>'+
       '<div><strong style="color:var(--tx)">4. Cierre del torneo</strong><br>El torneo puede cerrarse por tiempo (máximo 4 horas), por límite de jugadores alcanzado, o manualmente por el organizador en cualquier momento.</div>'+
@@ -838,71 +818,8 @@ function showTerminos(){
     '<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:14px">ACEPTAR</button>';
   document.getElementById('overlay').classList.add('show');
 }
-function aplicarCodigoTorneo(){
-  var inp=document.getElementById('modalRefInput');
-  var msg=document.getElementById('modalRefMsg');
-  if(!inp||!msg)return;
-  var code=inp.value.trim().toUpperCase();
-  if(!code){msg.style.color='var(--dg)';msg.textContent='Escribe un código';return;}
-  msg.style.color='var(--tm)';msg.textContent='Verificando...';
-  // Primero buscar en banco de códigos admin
-  db.ref('codigosBanco/'+code).once('value').then(function(snap){
-    var banco=snap.val();
-    if(banco&&!banco.usado){
-      // Es un código del banco — admitir y quemar
-      var updates={};
-      updates['torneo/admitidos/'+curUser.uid]=true;
-      updates['codigosBanco/'+code+'/usado']=true;
-      updates['codigosBanco/'+code+'/usadoPor']=curUser.uid;
-      updates['codigosBanco/'+code+'/usadoAt']=Date.now();
-      db.ref().update(updates).then(function(){
-        if(torneoData){if(!torneoData.admitidos)torneoData.admitidos={};torneoData.admitidos[curUser.uid]=true;}
-        closeModal();
-        toast('✅ Código aceptado — ya puedes entrar al torneo');
-        setTimeout(function(){goTorneo();},400);
-      });
-      return;
-    }
-    if(banco&&banco.usado){
-      msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;
-    }
-    // No es del banco — buscar por torneoCode de usuario
-    var codeOwner=findTorneoRef(code);
-    if(!codeOwner){msg.style.color='var(--dg)';msg.textContent='Código inválido — verifica con quien te lo dio';return;}
-    if(codeOwner===curUser.uid){msg.style.color='var(--dg)';msg.textContent='No puedes usar tu propio código';return;}
-    db.ref('torneoInvites/'+code).once('value').then(function(s){
-      if(s.val()){msg.style.color='var(--dg)';msg.textContent='Ese código ya fue usado y no está disponible';return;}
-      var updates={};
-      updates['torneo/admitidos/'+curUser.uid]=true;
-      updates['torneoInvites/'+code]={usedBy:curUser.uid,usedAt:Date.now(),ownerUid:codeOwner};
-      updates['profiles/'+codeOwner+'/torneoCode']=null;
-      updates['profiles/'+codeOwner+'/torneoCodeUsed']=true;
-      db.ref().update(updates).then(function(){
-        if(torneoData){if(!torneoData.admitidos)torneoData.admitidos={};torneoData.admitidos[curUser.uid]=true;}
-        closeModal();
-        toast('✅ Código aceptado — ya puedes entrar al torneo');
-        setTimeout(function(){goTorneo();},400);
-      });
-    });
-  });
-}
 function goTorneo(){
   if(!torneoData||!torneoData.activo){toast('No hay torneo activo');return;}
-  var canPlay=curUser&&torneoData.admitidos&&torneoData.admitidos[curUser.uid]===true;
-  if(!canPlay){
-    document.getElementById('modalBody').innerHTML=
-      '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px;color:var(--ct)">🏆 TORNEO RELÁMPAGO</div>'+
-      '<p style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.7">Para participar necesitas un <strong style="color:var(--tx)">código de invitación</strong> de alguien que se registre en RIVAL. Ingrésalo aquí:</p>'+
-      '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">'+
-        '<input id="modalRefInput" placeholder="Ej. CARL4X" maxlength="8" style="height:46px;background:var(--sf2);border:2px solid var(--ac);border-radius:10px;color:var(--tx);font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:6px;text-align:center;outline:none;text-transform:uppercase">'+
-        '<div id="modalRefMsg" style="font-size:11px;text-align:center;min-height:14px;color:var(--tm)">Pídele su código a alguien que ya juega</div>'+
-      '</div>'+
-      '<button onclick="aplicarCodigoTorneo()" style="width:100%;height:44px;background:var(--ac);color:#000;border:none;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;margin-bottom:8px">✅ INGRESAR CÓDIGO</button>'+
-      '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:38px;border-radius:9px;font-size:12px">Cancelar</button>';
-    document.getElementById('overlay').classList.add('show');
-    setTimeout(function(){var inp=document.getElementById('modalRefInput');if(inp)inp.focus();},100);
-    return;
-  }
   renderTorneoScreen();
   showScreen('sTorneo');
 }
@@ -1188,16 +1105,7 @@ function renderTorneoAdminPanel(){
           '</tbody></table></div>':
         '<div style="font-size:11px;color:var(--td);margin-top:6px">Sin participantes aún</div>')+
       '<div style="font-size:10px;color:var(--td);margin-top:4px">Al cerrar el torneo se revelará el ganador y su correo para que lo contactes.</div>'+
-    '</div>'+
-    // Banco de códigos siempre visible
-    '<div style="margin-top:12px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 14px">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
-        '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎟 Banco de códigos</div>'+
-        '<button onclick="admGenerarCodigos()" style="background:var(--sf2);border:1px solid var(--bo);border-radius:6px;color:var(--tm);font-size:11px;padding:4px 10px;cursor:pointer">+ Generar 100</button>'+
-      '</div>'+
-      '<div id="bancoCodigos" style="font-size:11px;color:var(--td)">Cargando...</div>'+
     '</div>';
-  setTimeout(admCargarBanco, 0);
   } else {
     // Torneo cerrado — mostrar ganador + participantes del último torneo
     var isR=torneoData&&torneoData.ganadorReto==='r';
@@ -1254,46 +1162,10 @@ function renderTorneoAdminPanel(){
       '<div style="display:flex;justify-content:center;padding:8px 0 4px">'+
         '<button class="btn btn-t" onclick="showNuevoTorneoForm()" style="height:44px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px;color:#fff;padding:0 28px">🏆 NUEVO TORNEO RELÁMPAGO</button>'+
       '</div>'+
-      '<div style="margin-top:12px;background:var(--sf);border:1px solid var(--bo);border-radius:10px;padding:12px 14px">'+
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
-          '<div style="font-size:9px;letter-spacing:3px;color:var(--tm);text-transform:uppercase">🎟 Banco de códigos</div>'+
-          '<button onclick="admGenerarCodigos()" style="background:var(--sf2);border:1px solid var(--bo);border-radius:6px;color:var(--tm);font-size:11px;padding:4px 10px;cursor:pointer">+ Generar 100</button>'+
-        '</div>'+
-        '<div id="bancoCodigos" style="font-size:11px;color:var(--td)">Cargando...</div>'+
-      '</div>'+
       '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">El sistema elige el reto aleatoriamente · Duración configurable</div>';
-    setTimeout(admCargarBanco, 0);
   }
 }
 
-function admGenerarCodigos(){
-  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var updates={};
-  for(var i=0;i<100;i++){
-    var code='';
-    for(var j=0;j<8;j++)code+=chars[Math.floor(Math.random()*chars.length)];
-    updates['codigosBanco/'+code]={usado:false,creadoAt:Date.now()};
-  }
-  db.ref().update(updates).then(function(){
-    toast('✅ 100 códigos generados');
-    admCargarBanco();
-  }).catch(function(err){toast('❌ Error: '+err.message);});
-}
-function admCargarBanco(){
-  var el=document.getElementById('bancoCodigos');if(!el)return;
-  db.ref('codigosBanco').once('value').then(function(s){
-    var data=s.val()||{};
-    var todos=Object.keys(data);
-    var disponibles=todos.filter(function(k){return !data[k].usado;});
-    var usados=todos.length-disponibles.length;
-    if(todos.length===0){el.innerHTML='<span style="color:var(--td)">Sin códigos — genera 100 para empezar</span>';return;}
-    var codesHtml=disponibles.slice(0,20).map(function(c){
-      return '<span style="font-family:DM Mono,monospace;background:var(--sf2);padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;cursor:pointer" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+c+'\').then(function(){toast(\'📋 '+c+' copiado\');})">'+c+'</span>';
-    }).join('');
-    el.innerHTML='<div style="margin-bottom:6px"><strong style="color:var(--ac)">'+disponibles.length+'</strong> disponibles · <span style="color:var(--td)">'+usados+' usados</span></div>'+
-      '<div style="line-height:2">'+codesHtml+(disponibles.length>20?'<span style="color:var(--td)"> +más en Firebase</span>':'')+'</div>';
-  }).catch(function(){el.innerHTML='<span style="color:var(--dg)">Error al cargar</span>';});
-}
 function showNuevoTorneoForm(){
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px;color:var(--ct)">🏆 NUEVO TORNEO</div>'+
@@ -1340,7 +1212,6 @@ function admActivarTorneo(){
     '</div>'+
     '<div style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.8">'+
       '• 5 intentos por usuario<br>'+
-      '• Solo usuarios invitados pueden participar<br>'+
       ((reto==='t'||reto==='b')?'• Objetivo torneo: <strong style="color:var(--tx)">'+window._tornTarget.toFixed(3)+'s</strong> (≠ objetivo del día)<br>':'')+
       '• Límite: <strong style="color:var(--tx)">'+limite+' jugadores</strong><br>'+
       '• Duración máxima: <strong style="color:var(--tx)">'+duracion+' hora'+(duracion>1?'s':'')+'</strong><br>'+
@@ -1357,19 +1228,16 @@ function confirmActivarTorneo(){
   var reto=window._tornReto;
   if(!reto){toast('❌ Error: reto no definido');return;}
   var ahora=Date.now();
-  // Primero borrar admitidos del torneo anterior para que no persistan
-  db.ref('torneo/admitidos').remove().then(function(){
-    return db.ref('torneo').set({
-      activo:true,
-      reto:reto,
-      target:window._tornTarget||0,
-      premio:window._tornPremio||'$50 pesos',
-      limite:window._tornLimite||20,
-      inicioAt:ahora,
-      cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
-      participantes:{},
-      ganadorUid:null
-    });
+  db.ref('torneo').set({
+    activo:true,
+    reto:reto,
+    target:window._tornTarget||0,
+    premio:window._tornPremio||'$50 pesos',
+    limite:window._tornLimite||20,
+    inicioAt:ahora,
+    cierreAt:ahora+((window._tornDuracion||4)*60*60*1000),
+    participantes:{},
+    ganadorUid:null
   }).then(function(){
     closeModal();
     toast('🏆 Torneo activado — '+GAME_LABELS[reto]);
@@ -1520,7 +1388,7 @@ function copyInviteCode(){
 }
 function shareInviteCode(){
   var p=profiles[curUser.uid];if(!p||!p.referralCode)return;
-  var text='¡Únete a RIVAL! 🎮\nUsa mi código '+p.referralCode+' para registrarte y poder entrar a torneos con premio en efectivo.\n'+window.location.origin;
+  var text='¡Únete a RIVAL! 🎮\nUsa mi código '+p.referralCode+' para registrarte.\n'+window.location.origin;
   if(navigator.share){navigator.share({title:'RIVAL — Únete con mi código',text:text}).catch(function(){});}
   else{navigator.clipboard.writeText(text).then(function(){toast('📋 Mensaje copiado para compartir');});}
 }
@@ -1550,8 +1418,8 @@ function emailReg(){
 function doCreateAccount(name,email,pass,refCode,refOwnerUid){
   auth.createUserWithEmailAndPassword(email,pass).then(function(r){
     return r.user.updateProfile({displayName:name}).then(function(){return r.user.sendEmailVerification();}).then(function(){
-      var uid=r.user.uid,rc=genRef(name),tc=genTorneoCode();
-      var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,torneoCode:tc,referredBy:refOwnerUid||null,createdAt:Date.now()};
+      var uid=r.user.uid,rc=genRef(name);
+      var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,referredBy:refOwnerUid||null,createdAt:Date.now()};
       if(refOwnerUid&&refCode){
         // referral ilimitado — solo guardamos referredBy en el perfil
       }
@@ -1563,8 +1431,7 @@ function forgotPw(){var e=document.getElementById('inE').value.trim();if(!e){set
 function chkVerified(){document.getElementById('vMsg').textContent='Verificando...';curUser.reload().then(function(){if(curUser.emailVerified){document.getElementById('vMsg').textContent='';loadAndEnter(curUser);}else document.getElementById('vMsg').textContent='❌ Aún no verificado';});}
 function resendV(){curUser.sendEmailVerification().then(function(){document.getElementById('vMsg').textContent='✅ Reenviado';}).catch(function(){document.getElementById('vMsg').textContent='❌ Espera antes de reenviar';});}
 function doLogout(){gState='idle';cancelAnimationFrame(raf);cancelAnimationFrame(seqRaf);clearTimeout(reactTO);setMsg('lMsg','','');setMsg('rMsg','','');auth.signOut();}
-function loadAndEnter(fu){checkDailyReset();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL'),tc=genTorneoCode();var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,torneoCode:tc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}
-          if(!p.torneoCode&&!p.torneoCodeUsed){var tc2=genTorneoCode();db.ref('profiles/'+fu.uid+'/torneoCode').set(tc2).then(function(){p.torneoCode=tc2;showApp(fu,p);});return;}showApp(fu,p);}});}
+function loadAndEnter(fu){checkDailyReset();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
 function showApp(fu,profile){
   var av=document.getElementById('navAv');
   if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
@@ -1621,7 +1488,7 @@ function updateHomecards(){
 
 function showPerfilModal(){
   if(!curUser)return;
-  // Leer perfil directo de Firebase para tener datos frescos (torneoCode, etc.)
+  // Leer perfil directo de Firebase para datos frescos
   db.ref('profiles/'+curUser.uid).once('value').then(function(snap){
     var p=snap.val()||profiles[curUser.uid]||{};
     // Actualizar cache local también
@@ -1647,23 +1514,6 @@ function _showPerfilModalWith(p){
         '<button onclick="copyInviteCode()" style="width:100%;height:36px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tm);font-size:12px;cursor:pointer">📋 Copiar código de referido</button>'+
       '</div>'+
     '</div>'+
-    // Código de torneo
-    (function(){
-      var tc=p.torneoCode;
-      if(tc){
-        return '<div style="background:var(--sf2);border:1px solid var(--ctm);border-radius:10px;padding:14px;margin-bottom:12px;text-align:center">'+
-          '<div style="font-size:9px;letter-spacing:3px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">🏆 Tu código de torneo</div>'+
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;letter-spacing:6px;color:var(--ct);margin-bottom:4px">'+tc+'</div>'+
-          '<div style="font-size:11px;color:var(--td);margin-bottom:10px;line-height:1.6">Un solo uso · Quien lo use entra al siguiente torneo activo</div>'+
-          '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+tc+'\').then(function(){toast(\'✅ Código de torneo copiado\');})" style="width:100%;height:36px;background:var(--sf);border:1px solid var(--ctm);border-radius:8px;color:var(--ct);font-size:12px;cursor:pointer">📋 Copiar código de torneo</button>'+
-        '</div>';
-      } else {
-        return '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:12px 14px;margin-bottom:12px;text-align:center">'+
-          '<div style="font-size:9px;letter-spacing:3px;color:var(--td);text-transform:uppercase;margin-bottom:4px">🏆 Código de torneo</div>'+
-          '<div style="font-size:12px;color:var(--td)">Ya fue usado — no disponible</div>'+
-        '</div>';
-      }
-    })()+
     '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-bottom:8px">Cerrar</button>'+
     '<button onclick="closeModal();doLogout()" style="width:100%;height:38px;background:transparent;border:1px solid var(--dg);border-radius:9px;color:var(--dg);font-size:12px;cursor:pointer">Cerrar sesión</button>';
   document.getElementById('overlay').classList.add('show');
@@ -2447,8 +2297,6 @@ function setWeekGame(g){weekGame=g;[5,10,15,4,'s','r'].forEach(function(x){var e
 function renderWeekDays(g){var wrap=document.getElementById('weekDaysWrap');if(!wrap)return;wrap.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g),uid=curUser?curUser.uid:null;var d=getCDMX(),dayNum=d.getDay(),diff=dayNum===0?-6:1-dayNum,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}var today=getTodayKey();Promise.all([Promise.all(days.map(function(dayObj){return db.ref('scores/'+weekKey+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};})})),db.ref('weekScores/'+weekKey+'/'+gkey).once('value')]).then(function(res){var results=res[0],legacyData=res[1].val()||{},earliestTs=null;Object.values(legacyData).forEach(function(w){if(w&&w.lastPlayed){if(!earliestTs||w.lastPlayed<earliestTs)earliestTs=w.lastPlayed;}});if(earliestTs){var legacyDayK=dayKeyFromTimestamp(earliestTs),legacyTarget=legacyDayK?results.find(function(r){return r.day.key===legacyDayK;}):null;if(legacyTarget&&Object.keys(legacyTarget.scores).length===0){Object.entries(legacyData).forEach(function(e){var uid2=e[0],w=e[1];if(w&&w.bestDiff!=null)legacyTarget.scores[uid2]=w;});}}var html='';results.forEach(function(r){var isToday=r.day.key===today,isFuture=r.day.key>today,hasScores=Object.keys(r.scores).length>0;if(isFuture||isToday)return;if(!hasScores)return;var sorted=Object.entries(r.scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});var myRank=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1,myScore=uid?r.scores[uid]:null;html+='<div style="background:var(--sf);border:1px solid var(--bo);border-radius:12px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:13px;font-weight:700;color:var(--tm)">'+r.day.label+'</div>'+(myRank>=0?'<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+'">Tu pos: #'+(myRank+1)+'</div>':'<div style="font-size:10px;color:var(--td)">No jugaste</div>')+'</div>';var medals=['🥇','🥈','🥉'];sorted.slice(0,3).forEach(function(e,i){var w=e[1],isMe=uid&&e[0]===uid;html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border-radius:8px;margin-bottom:4px;'+(isMe?'border:1px solid '+cfg.stroke+';':'')+'"><span style="font-size:16px;width:22px">'+medals[i]+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+(w.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(w.name||'?')+(isMe?' 👈':'')+'</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+w.bestTime+(isR?'ms':'s')+'</div></div>';});if(myRank>=3&&myScore&&myScore.bestTime){html+='<div style="font-size:10px;color:var(--td);text-align:center;padding:3px">···</div><div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--sf2);border:1px solid '+cfg.stroke+';border-radius:8px"><span style="font-size:13px;font-weight:700;color:'+cfg.stroke+';width:22px">#'+(myRank+1)+'</span><div style="width:24px;height:24px;border-radius:50%;background:var(--bo);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(myScore.name||'?')[0].toUpperCase()+'</div><div style="flex:1;font-size:12px;font-weight:700">'+(myScore.name||'?')+' 👈</div><div style="font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+'">'+myScore.bestTime+(isR?'ms':'s')+'</div></div>';}html+='</div>';});if(curUser&&weekPoints[curUser.uid]&&weekPoints[curUser.uid].total>0){var myTotalPts=weekPoints[curUser.uid].total||0;html+='<div style="background:var(--sf);border:2px solid var(--wn);border-radius:12px;padding:14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Tu total esta semana</div><div style="font-size:11px;color:var(--td)">Suma de todos los juegos y días</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:var(--wn);line-height:1">'+myTotalPts+' <span style="font-size:14px">pts</span></div></div>';}wrap.innerHTML=html||'<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px">Sin datos esta semana</div>';});}
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');el.style.display='';});var el=document.getElementById(id);el.classList.add('on');el.style.display='flex';}
 function findRef(code){return Object.keys(profiles).find(function(uid){return profiles[uid].referralCode===code;})||null;}
-function findTorneoRef(code){return Object.keys(profiles).find(function(uid){return profiles[uid].torneoCode===code;})||null;}
-function genTorneoCode(){return Math.random().toString(36).slice(2,6).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase();}
 function genRef(name){var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase();}
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera'};return m[code]||('Error: '+code);}
