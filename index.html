@@ -1682,42 +1682,83 @@ function renderTorneoRanking(){
   var uid=curUser?curUser.uid:null;
   var myDiv=document.getElementById('rankMy');if(myDiv)myDiv.classList.remove('show');
   var listEl=document.getElementById('rankList');
-  listEl.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando...</div>';
-  // Leer historial de la semana (usando weekKey como prefijo de búsqueda haría más queries; leemos todo y filtramos)
+  listEl.innerHTML='<div style="text-align:center;color:var(--tm);padding:30px;font-size:13px">Cargando torneos...</div>';
+
+  // Mostrar torneo activo si existe (en tiempo real ya está en memoria)
+  var activeSection='';
+  if(torneoData&&(torneoData.status==='waiting'||torneoData.status==='active'||torneoData.status==='countdown')){
+    var partCount=Object.keys(torneoPartic).length;
+    var statusLabels={waiting:'Esperando jugadores',countdown:'Iniciando...',active:'En curso'};
+    var statusColors={waiting:'var(--wn)',countdown:'var(--ct)',active:'var(--ac)'};
+    activeSection=
+      '<div style="background:var(--sf);border:2px solid var(--ct);border-radius:12px;padding:12px;margin-bottom:12px">'+
+        '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:6px">⚡ Torneo activo ahora</div>'+
+        '<div style="font-size:14px;font-weight:700;margin-bottom:2px">'+getTorneoGameLabel(torneoData.gameMode)+'</div>'+
+        (torneoData.prize?'<div style="font-size:12px;color:var(--wn);margin-bottom:6px">🏆 '+torneoData.prize+'</div>':'')+
+        '<div style="display:flex;align-items:center;justify-content:space-between">'+
+          '<span style="font-size:11px;color:'+(statusColors[torneoData.status]||'var(--tm)')+'">'+( statusLabels[torneoData.status]||'')+'</span>'+
+          '<span style="font-size:11px;color:var(--tm)">'+partCount+' jugador'+(partCount===1?'':'es')+'</span>'+
+        '</div>'+
+      '</div>';
+  }
+
   db.ref('torneoHistorial').orderByKey().limitToLast(20).once('value').then(function(s){
     var all=s.val()||{};
-    var entries=Object.values(all).filter(function(e){return e.status==='finished';})
+    var entries=Object.values(all)
+      .filter(function(e){return e&&e.status==='finished';})
       .sort(function(a,b){return (b.finishedAt||0)-(a.finishedAt||0);});
+
     if(entries.length===0){
-      listEl.innerHTML='<div style="text-align:center;color:var(--tm);padding:40px;font-size:13px;line-height:2">Sin torneos finalizados aún.</div>';
+      listEl.innerHTML=activeSection+
+        '<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">'+
+          'Aún no hay torneos finalizados.<br>'+
+          '<span style="font-size:11px;color:var(--td)">El historial aparecerá aquí cuando termine el primer torneo.</span>'+
+        '</div>';
       return;
     }
-    var html='';
+
+    var html=activeSection;
+    var medals=['🥇','🥈','🥉'];
     entries.forEach(function(e){
       var sfx=getTorneoTimeSuffix(e.gameMode);
       var gameLabel=getTorneoGameLabel(e.gameMode);
-      var when=e.finishedAt?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Mexico_City'}):'—';
+      var when=e.finishedAt
+        ?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'})
+        :'—';
       var top3=e.top3||[];
-      var medals=['🥇','🥈','🥉'];
-      var topRows=top3.map(function(p,i){
-        var isMe=uid&&p.uid===uid;
-        return '<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--sf2);border-radius:7px;margin-bottom:3px;'+(isMe?'border:1px solid var(--ct);':'')+'">'+
-          '<span style="font-size:14px;width:20px">'+medals[i]+'</span>'+
-          '<span style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</span>'+
-          '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+p.time+sfx+'</span>'+
-        '</div>';
-      }).join('');
+      var topRows=top3.length>0
+        ?top3.map(function(p,i){
+          var isMe=uid&&p.uid===uid;
+          return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--sf2);border-radius:7px;margin-bottom:3px;'+(isMe?'border:1px solid var(--ct);':'')+'">'+
+            '<span style="font-size:14px;width:20px">'+medals[i]+'</span>'+
+            '<span style="flex:1;font-size:12px;font-weight:'+(isMe?'700':'400')+'">'+(p.name||'?')+(isMe?' 👈':'')+'</span>'+
+            '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--ct)">'+(p.time||'—')+sfx+'</span>'+
+          '</div>';
+        }).join('')
+        :'<div style="font-size:11px;color:var(--td);padding:6px">Sin resultados registrados</div>';
+
+      var durationStr=e.durationMs?Math.round(e.durationMs/60000)+' min':'—';
       html+=
-        '<div style="background:var(--sf);border:1px solid var(--ct)30;border-radius:12px;padding:12px;margin-bottom:8px">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
-            '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase">'+gameLabel+'</div>'+
-            '<div style="font-size:10px;color:var(--td)">'+when+'</div>'+
+        '<div style="background:var(--sf);border:1px solid var(--ctm);border-radius:12px;padding:12px;margin-bottom:8px">'+
+          '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">'+
+            '<div>'+
+              '<div style="font-size:9px;letter-spacing:2px;color:var(--ct);text-transform:uppercase;margin-bottom:2px">'+gameLabel+'</div>'+
+              (e.prize?'<div style="font-size:12px;color:var(--wn)">🏆 '+e.prize+'</div>':'')+'</div>'+
+            '<div style="text-align:right">'+
+              '<div style="font-size:10px;color:var(--td)">'+when+'</div>'+
+              '<div style="font-size:10px;color:var(--td)">'+durationStr+'</div>'+
+            '</div>'+
           '</div>'+
-          (e.prize?'<div style="font-size:12px;color:var(--wn);margin-bottom:8px">🏆 '+e.prize+'</div>':'')+
           topRows+
         '</div>';
     });
     listEl.innerHTML=html;
+  }).catch(function(err){
+    listEl.innerHTML=activeSection+
+      '<div style="text-align:center;padding:30px 20px">'+
+        '<div style="font-size:13px;color:var(--dg);margin-bottom:6px">No se pudo cargar el historial</div>'+
+        '<div style="font-size:11px;color:var(--td)">Verifica las reglas de Firebase (torneoHistorial debe permitir lectura)</div>'+
+      '</div>';
   });
 }
 
@@ -1806,10 +1847,11 @@ function renderAdmTorneos(){
         :'<div style="display:flex;flex-direction:column;gap:8px">'+
           '<div class="fld"><label>Premio / descripción</label><input id="tornPrize" placeholder="ej. Tarjeta regalo $500" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Sans,sans-serif;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
-            '<div class="fld"><label>Mínimo de jugadores</label><input id="tornMin" type="number" min="2" max="50" value="5" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
-            '<div class="fld"><label>Duración (minutos)</label><input id="tornDur" type="number" min="5" max="240" value="30" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
+            '<div class="fld"><label>Mín. jugadores (= cupo máx)</label><input id="tornMin" type="number" min="2" max="50" value="5" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
+            '<div class="fld"><label>Duración una vez iniciado (min)</label><input id="tornDur" type="number" min="1" max="240" value="30" style="height:38px;background:var(--sf);border:1px solid var(--bo);border-radius:8px;color:var(--tx);font-family:DM Mono,monospace;font-size:13px;padding:0 11px;outline:none;width:100%"></div>'+
           '</div>'+
-          '<button class="btn" onclick="admCreateTorneo()" style="background:var(--ct);color:#fff;height:38px;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;width:100%">⚡ CREAR TORNEO (modo aleatorio)</button>'+
+          '<div style="font-size:10px;color:var(--td);padding:4px 2px;line-height:1.6">ℹ️ La espera de jugadores es siempre <strong style="color:var(--tm)">20 minutos</strong> desde el primer join. La duración aquí es el tiempo de competencia una vez que inicia.</div>'+
+          '<button id="tornCreateBtn" class="btn" onclick="admCreateTorneo()" style="background:var(--ct);color:#fff;height:38px;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;width:100%">⚡ CREAR TORNEO (modo aleatorio)</button>'+
         '</div>'
       )+
     '</div>';
@@ -1851,6 +1893,7 @@ function admCreateTorneo(){
   var durMin=parseInt(document.getElementById('tornDur').value)||30;
   if(!prize){toast('Escribe una descripción del premio');return;}
   if(minP<2){toast('El mínimo es 2 jugadores');return;}
+  if(durMin<1){toast('La duración mínima es 1 minuto');return;}
   var modes=['t','b','s','r'];
   var gameMode=modes[Math.floor(Math.random()*modes.length)];
   var targetTime=null;
@@ -1864,10 +1907,25 @@ function admCreateTorneo(){
     createdAt:tornId,waitingStartedAt:null,
     startedAt:null,finishedAt:null,countdownEndsAt:null
   };
+  var btn=document.getElementById('tornCreateBtn');
+  if(btn){btn.textContent='Creando...';btn.disabled=true;}
   db.ref('torneo/active').set(tornEntry).then(function(){
     toast('✅ Torneo creado — Modo: '+getTorneoGameLabel(gameMode));
     renderAdmTorneos();
-  }).catch(function(err){toast('❌ Error: '+err.message);});
+  }).catch(function(err){
+    if(btn){btn.textContent='⚡ CREAR TORNEO (modo aleatorio)';btn.disabled=false;}
+    if(err.code==='PERMISSION_DENIED'){
+      document.getElementById('modalBody').innerHTML=
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div>'+
+        '<p style="font-size:12px;color:var(--tm);margin-bottom:10px">Firebase Rules no permite escritura en <code style="color:var(--ac)">torneo/</code>. Agrega estas reglas en la consola de Firebase:</p>'+
+        '<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:10px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;margin-bottom:12px;user-select:all">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div>'+
+        '<p style="font-size:11px;color:var(--td);margin-bottom:12px">Ve a Firebase Console → Realtime Database → Rules y agrega estas líneas dentro del objeto raíz.</p>'+
+        '<button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';
+      document.getElementById('overlay').classList.add('show');
+    } else {
+      toast('❌ Error: '+err.message);
+    }
+  });
 }
 
 function admCloseTorneo(){
