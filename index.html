@@ -1402,11 +1402,13 @@ function showTorneoResult(fmt,diff,isRec,attempts,g){
     irS.style.display='block';document.getElementById('irTimeS').textContent=fmt+sfx;document.getElementById('irPosS').textContent='#'+getTorneoMyRank();
     var recS=document.getElementById('irRecS');if(recS){recS.style.display=isRec?'block':'none';if(isRec)recS.textContent='🎉 ¡Nuevo mejor en el torneo!';}
     injectTorneoLBAfter('inlineResultS',remaining);
-    var btn=document.getElementById('seqBtn');if(btn){btn.className='gbtn gbs';btn.style.background='var(--ct)';btn.style.color='#fff';btn.style.border='none';btn.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';btn.disabled=remaining<=0;btn.style.opacity='1';btn.onclick=remaining>0?function(){irS.style.display='none';removeTorneoLBInject();handleSeqBtn();}:null;}
+    var btn=document.getElementById('seqBtn');if(btn){btn.className='gbtn gbs';btn.style.background='var(--ct)';btn.style.color='#fff';btn.style.border='none';btn.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';btn.disabled=remaining<=0;btn.style.opacity='1';btn.onclick=remaining>0?function(){nextTorneoAttempt('s');}:null;}
   }else if(isR&&irR){
     irR.style.display='block';document.getElementById('irTimeR').textContent=fmt+sfx;document.getElementById('irPosR').textContent='#'+getTorneoMyRank();
     var recR=document.getElementById('irRecR');if(recR){recR.style.display=isRec?'block':'none';if(isRec)recR.textContent='🎉 ¡Nuevo mejor en el torneo!';}
     injectTorneoLBAfter('inlineResultR',remaining);
+    var prevBtnR=document.getElementById('torneoReactRetry');if(prevBtnR)prevBtnR.remove();
+    var bR=document.createElement('button');bR.id='torneoReactRetry';bR.className='btn';bR.style.cssText='background:'+(remaining>0?'var(--ct)':'var(--sf2)')+';color:'+(remaining>0?'#fff':'var(--tm)')+';width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;margin-top:8px;pointer-events:'+(remaining>0?'auto':'none');bR.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';if(remaining>0)bR.onclick=function(){nextTorneoAttempt('r');};if(irR)irR.appendChild(bR);
   }else if(ir){
     ir.style.display='block';
     var irTime=document.getElementById('irTime'),irDiff=document.getElementById('irDiff'),irPos=document.getElementById('irPos'),irRec=document.getElementById('irRec');
@@ -1415,7 +1417,7 @@ function showTorneoResult(fmt,diff,isRec,attempts,g){
     if(irPos)irPos.textContent='#'+getTorneoMyRank();
     if(irRec){irRec.style.display=isRec?'block':'none';if(isRec)irRec.textContent='🎉 ¡Nuevo mejor en el torneo!';}
     injectTorneoLBAfter('inlineResult',remaining);
-    var btn2=document.getElementById('gBtn');if(btn2){btn2.className='gbtn gbs';btn2.style.background='var(--ct)';btn2.style.color='#fff';btn2.style.border='none';btn2.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';btn2.disabled=remaining<=0;btn2.style.opacity='1';btn2.onclick=remaining>0?function(){ir.style.display='none';removeTorneoLBInject();resetClock();}:null;}
+    var btn2=document.getElementById('gBtn');if(btn2){btn2.className='gbtn gbs';btn2.style.background='var(--ct)';btn2.style.color='#fff';btn2.style.border='none';btn2.textContent=remaining>0?'▶ INTENTO '+(attempts+1)+'/5':'✅ TERMINADO';btn2.disabled=remaining<=0;btn2.style.opacity='1';btn2.onclick=remaining>0?function(){nextTorneoAttempt(g);}:null;}
   }
 }
 function injectTorneoLBAfter(afterId,remaining){
@@ -1444,6 +1446,15 @@ function ensureTorneoBanner(){
   for(var i=0;i<screens.length;i++){var scr=document.getElementById(screens[i]);if(scr&&scr.classList.contains('on')){var wrap=scr.querySelector(wrappers[i]);if(wrap)scr.insertBefore(banner,wrap);break;}}
 }
 function removeTorneoBanner(){var el=document.getElementById('torneoBanner');if(el)el.remove();}
+function nextTorneoAttempt(g){
+  inTorneoGame=true;
+  var md=curUser?torneoPartic[curUser.uid]:null;var done=md?(md.attempts||0):0;
+  var ba=document.getElementById('tornBannerAttempts');if(ba)ba.textContent='INTENTO '+(done+1)+'/5';
+  removeTorneoLBInject();
+  if(g==='s'){var irS2=document.getElementById('inlineResultS');if(irS2)irS2.style.display='none';seqState='idle';seqCurrent=1;var sa=document.getElementById('seqArea');if(sa)sa.innerHTML='';handleSeqBtn();}
+  else if(g==='r'){var irR2=document.getElementById('inlineResultR');if(irR2)irR2.style.display='none';var pr=document.getElementById('torneoReactRetry');if(pr)pr.remove();reactState='idle';showReactIdle();}
+  else{var ir2=document.getElementById('inlineResult');if(ir2)ir2.style.display='none';resetClock();}
+}
 function updateTorneoCard(){
   var el=document.getElementById('torneoCard');if(!el)return;
   var uid=curUser?curUser.uid:null;
@@ -1548,7 +1559,7 @@ if(garbage.length>0){var upd={};garbage.forEach(function(k){upd['torneoHistorial
 var cleanBtn='';
     if(valid.length===0){wrap.innerHTML=cleanBtn+'<div style="font-size:11px;color:var(--td);text-align:center;padding:10px">Sin historial válido</div>';return;}
     var html=cleanBtn+'<div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:8px">Historial ('+valid.length+')</div>';
-    valid.forEach(function(k){var e=all[k];var sfx=getTorneoTimeSuffix(e.gameMode);var when=e.finishedAt?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'}):'—';var top3=e.top3||[];var medals=['🥇','🥈','🥉'];var topStr=top3.length>0?top3.slice(0,3).map(function(p,i){return p&&p.name?medals[i]+'<strong>'+(p.name||'?')+'</strong> '+(p.time||'—')+sfx:'';}).filter(Boolean).join(' · '):'Sin resultados';html+='<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:9px;padding:10px 12px;margin-bottom:6px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--ct)">'+getTorneoGameLabel(e.gameMode)+'</span><span style="font-size:10px;color:var(--td)">'+when+'</span></div><div style="font-size:12px;color:var(--wn);margin-bottom:4px">🏆 '+(e.prize||'—')+'</div><div style="font-size:11px;color:var(--tm)">'+topStr+'</div></div>';});
+    valid.forEach(function(k){var e=all[k];var sfx=getTorneoTimeSuffix(e.gameMode);var when=e.finishedAt?new Date(e.finishedAt).toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'America/Mexico_City'}):'—';var top3=e.top3||[];var medals=['🥇','🥈','🥉'];var topStr=top3.length>0?top3.slice(0,3).map(function(p,i){return p&&p.name?medals[i]+'<strong>'+(p.name||'?')+'</strong> '+(p.time||'—')+sfx:'';}).filter(Boolean).join(' · '):'Sin resultados';html+='<div style="background:var(--sf2);border:1px solid var(--bo);border-radius:9px;padding:10px 12px;margin-bottom:6px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--ct)">'+getTorneoGameLabel(e.gameMode)+'</span><div style="display:flex;align-items:center;gap:8px"><span style="font-size:10px;color:var(--td)">'+when+'</span><button onclick="admDeleteTorneoEntry(\''+k+'\')" style="background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.3);border-radius:6px;color:var(--dg);font-size:10px;padding:2px 7px;cursor:pointer;line-height:1.6">🗑️</button></div></div><div style="font-size:12px;color:var(--wn);margin-bottom:4px">🏆 '+(e.prize||'—')+'</div><div style="font-size:11px;color:var(--tm)">'+topStr+'</div></div>';});
     wrap.innerHTML=html;
   }).catch(function(){var wrap=document.getElementById('tornHistWrap');if(wrap)wrap.innerHTML='<div style="font-size:11px;color:var(--dg);text-align:center;padding:10px">Error — verifica Firebase Rules</div>';});
 }
@@ -1599,7 +1610,12 @@ function admCreateTorneo(){
 }
 function admDoCloseTorneo(){closeModal();closeTorneo('manual');}
 function admCloseTorneo(){if(!torneoData){toast('Sin torneo activo');return;}document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ CERRAR TORNEO</div><p style="font-size:12px;color:var(--tm);margin-bottom:14px">Se determinará el ganador con los resultados actuales y el torneo quedará archivado en el historial.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button><button class="btn btn-r" onclick="admDoCloseTorneo()" style="height:42px;font-weight:700">Cerrar torneo</button></div>';document.getElementById('overlay').classList.add('show');}
-function admLimpiarHistorial(){db.ref('torneoHistorial').once('value').then(function(s){var all=s.val()||{};var garbage=Object.keys(all).filter(function(k){var e=all[k];return !e||!e.gameMode||!e.prize||e.status!=='finished';});if(garbage.length===0){toast('Sin entradas inválidas');return;}var upd={};garbage.forEach(function(k){upd['torneoHistorial/'+k]=null;});db.ref().update(upd).then(function(){toast('✅ '+garbage.length+' entrada'+(garbage.length===1?'':'s')+' eliminada'+(garbage.length===1?'':'s'));renderAdmTorneos();}).catch(function(err){toast('❌ '+err.message);});});}
+function admLimpiarHistorial(){db.ref('torneoHistorial').once('value').then(function(s){var all=s.val()||{};var garbage=Object.keys(all).filter(function(k){var e=all[k];return !e||!e.gameMode||!e.prize||e.status!=='finished';});if(garbage.length===0){toast('Sin entradas inválidas');return;}var upd={};garbage.forEach(function(k){upd['torneoHistorial/'+k]=null;});db.ref().update(upd).then(function(){toast('✅ '+garbage.length+' entrada'+(garbage.length===1?'':'s')+' eliminada'+(garbage.length===1?'':'s'));renderAdmTorneos();}).catch(function(err){toast('❌ '+err.message);});});
+}
+function admDeleteTorneoEntry(k){
+  document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">🗑️ ELIMINAR TORNEO</div><p style="font-size:12px;color:var(--tm);margin-bottom:14px">¿Eliminar esta entrada del historial? Esta acción no se puede deshacer.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button><button class="btn btn-r" onclick="closeModal();db.ref(\'torneoHistorial/'+k+'\').remove().then(function(){toast(\'✅ Entrada eliminada\');renderAdmTorneos();}).catch(function(e){toast(\'❌ \'+e.message);})" style="height:42px;font-weight:700">Eliminar</button></div>';
+  document.getElementById('overlay').classList.add('show');
+}
 
 function getSorted(g,max){return Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);}).slice(0,max);}
 function getRank(uid,g){var sorted=Object.entries(wScores[g]).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});var idx=sorted.findIndex(function(e){return e[0]===uid;});return idx>=0?idx+1:'—';}
