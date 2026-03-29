@@ -782,7 +782,7 @@ function updateTorneoHomeCard(){
     '<div class="torneo-badge">⚡ TORNEO RELÁMPAGO EN VIVO</div>'+
     '<div class="torneo-title">TORNEO DEL DÍA</div>'+
     '<div class="torneo-prize">'+torneoData.premio+'</div>'+
-    '<div class="torneo-meta">'+gameLabel+' · 5 intentos por jugador</div>'+
+    '<div class="torneo-meta">🎯 Reto secreto · 5 intentos por jugador</div>'+
     '<div class="torneo-countdown" id="homeCountdown" style="font-size:32px;margin:10px 0">'+fmtCountdown(remaining)+'</div>'+
     (limitePlaces!=null?'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:6px;color:'+(limitePlaces<=3?'var(--dg)':'var(--ct)')+'">'+
       (limitePlaces>0?'🔥 '+limitePlaces+' lugar'+(limitePlaces===1?'':'es')+' disponible'+(limitePlaces===1?'':'s'):'🔴 TORNEO LLENO')+'</div>':'')+
@@ -1789,14 +1789,22 @@ function showResult(fmt,diff,isRec,g){
   }
 
   if(isSeq){
-    // Resultado inline en sSeq
     var irS=document.getElementById('inlineResultS');
     if(irS){
       irS.style.display='block';
       document.getElementById('irTimeS').textContent=fmt+'s';
-      document.getElementById('irPosS').textContent='#'+rank;
-      var recS=document.getElementById('irRecS');
-      if(recS)recS.style.display=isRec?'block':'none';
+      if(lastWasTorneo){
+        // Modo torneo — mostrar info de torneo, no ranking diario
+        var intentosUsados=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
+        var intentosLeft=5-intentosUsados;
+        document.getElementById('irPosS').textContent='🏆';
+        var recS=document.getElementById('irRecS');
+        if(recS){recS.style.display='block';recS.style.background='var(--ctd)';recS.style.borderColor='var(--ctm)';recS.style.color='var(--ct)';recS.textContent='🏆 Torneo · Intento '+intentosUsados+'/5'+(intentosLeft>0?' · '+intentosLeft+' restantes':' · Sin más intentos');}
+      } else {
+        document.getElementById('irPosS').textContent='#'+rank;
+        var recS=document.getElementById('irRecS');
+        if(recS)recS.style.display=isRec?'block':'none';
+      }
     }
     var btn=document.getElementById('seqBtn');
     if(btn){
@@ -1820,12 +1828,22 @@ function showResult(fmt,diff,isRec,g){
     if(irR){
       irR.style.display='block';
       document.getElementById('irTimeR').textContent=fmt+'ms';
-      document.getElementById('irPosR').textContent='#'+rank;
-      var recR=document.getElementById('irRecR');
-      if(recR)recR.style.display=isRec?'block':'none';
+      if(lastWasTorneo){
+        var intentosUsados2=torneoData&&torneoData.participantes&&curUser&&torneoData.participantes[curUser.uid]?torneoData.participantes[curUser.uid].intentos||0:0;
+        var intentosLeft2=5-intentosUsados2;
+        document.getElementById('irPosR').textContent='🏆';
+        var recR=document.getElementById('irRecR');
+        if(recR){recR.style.display='block';recR.style.background='var(--ctd)';recR.style.borderColor='var(--ctm)';recR.style.color='var(--ct)';recR.textContent='🏆 Torneo · Intento '+intentosUsados2+'/5'+(intentosLeft2>0?' · '+intentosLeft2+' restantes':' · Sin más intentos');}
+      } else {
+        document.getElementById('irPosR').textContent='#'+rank;
+        var recR=document.getElementById('irRecR');
+        if(recR)recR.style.display=isRec?'block':'none';
+      }
     }
-    document.getElementById('srBestR').textContent=wScores['r'][uid]&&wScores['r'][uid].bestTime?wScores['r'][uid].bestTime+'ms':'—';
-    document.getElementById('srPosR').textContent='#'+rank+' de '+total;
+    if(!lastWasTorneo){
+      document.getElementById('srBestR').textContent=wScores['r'][uid]&&wScores['r'][uid].bestTime?wScores['r'][uid].bestTime+'ms':'—';
+      document.getElementById('srPosR').textContent='#'+rank+' de '+total;
+    }
     if(curTorneoMode){torneoRegistrarIntento(fmt,diff,g);curTorneoMode=false;}
     return;
   }
