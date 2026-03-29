@@ -2283,7 +2283,7 @@ function admLogin(){
     toast('❌ Credenciales incorrectas');
   }
 }
-function genTargets(){var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;window._genTt=newTt;window._genTb=newTb;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div><div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div></div><p style="font-size:11px;color:var(--dg);margin-bottom:12px">⚠️ Los scores de hoy se borrarán automáticamente.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button><button class="btn btn-g" onclick="saveTargets(window._genTt,window._genTb)" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
+function genTargets(){var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+'<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div></div>'+'<p style="font-size:11px;color:var(--dg);margin-bottom:12px">⚠️ Los scores de hoy se borrarán automáticamente.</p>'+'<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+'<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
 function saveTargets(tt,tb){
   var today=getTodayKey();
   db.ref('scores/'+weekKey+'/'+today).remove().then(function(){
@@ -2291,6 +2291,9 @@ function saveTargets(tt,tb){
   }).then(function(){
     closeModal();
     toast('✅ Tiempos actualizados y scores del día reseteados');
+  }).catch(function(err){
+    toast('❌ Error al guardar: '+err.message);
+    console.error('saveTargets error:',err);
   });
 }
 function updateAdmStats(){
