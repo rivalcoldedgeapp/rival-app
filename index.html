@@ -754,26 +754,9 @@ function backfillLegacyPoints(){
     });
   });
 }
-function checkDailyReset(){
-  var currentDay=getTodayKey();
-  // Lee el valor REAL del servidor antes de decidir si escribir.
-  // Sin este once(), el caché local está vacío en cada refresh y la transaction
-  // recibe cfg=null, proponiendo un write innecesario que genera un target nuevo.
-  db.ref('gameConfig').once('value').then(function(snap){
-    var cfg=snap.val();
-    if(cfg&&cfg.lastDay===currentDay&&cfg.tt&&cfg.tb)return; // Ya está completo para hoy — no hacer nada
-    // Generar valores fuera de la transaction para que sean idempotentes en cada reintento
-    var newTt=Math.round((3+Math.random()*12)*1000)/1000;
-    var newTb=Math.round((5+Math.random()*15)*1000)/1000;
-    var now=Date.now();
-    // Transaction para proteger contra race condition entre múltiples clientes simultáneos
-    db.ref('gameConfig').transaction(function(cfg2){
-      if(cfg2&&cfg2.lastDay===currentDay&&cfg2.tt&&cfg2.tb)return; // Otro cliente ya actualizó con datos completos — abortar
-      return{tt:newTt,tb:newTb,lastDay:currentDay,updatedAt:now};
-    });
-  });
-}
-setInterval(function(){var nd=getTodayKey();if(nd!==todayKey){todayKey=nd;checkDailyReset();['t','b','s','r'].forEach(function(g){listenWeekScore(g);});wScores={t:{},b:{},s:{},r:{}};}},60000);
+// Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
+// No hay reset automático ni setInterval de día para eliminar race conditions.
+
 db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();});
@@ -863,7 +846,7 @@ function forgotPw(){var e=document.getElementById('inE').value.trim();if(!e){set
 function chkVerified(){document.getElementById('vMsg').textContent='Verificando...';curUser.reload().then(function(){if(curUser.emailVerified){document.getElementById('vMsg').textContent='';loadAndEnter(curUser);}else document.getElementById('vMsg').textContent='❌ Aún no verificado';});}
 function resendV(){curUser.sendEmailVerification().then(function(){document.getElementById('vMsg').textContent='✅ Reenviado';}).catch(function(){document.getElementById('vMsg').textContent='❌ Espera antes de reenviar';});}
 function doLogout(){gState='idle';cancelAnimationFrame(raf);cancelAnimationFrame(seqRaf);clearTimeout(reactTO);setMsg('lMsg','','');setMsg('rMsg','','');auth.signOut();}
-function loadAndEnter(fu){checkDailyReset();db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
+function loadAndEnter(fu){db.ref('profiles/'+fu.uid).once('value').then(function(s){var p=s.val();if(!p){var rc=genRef(fu.displayName||'RIVAL');var np={name:fu.displayName||fu.email.split('@')[0],email:fu.email,photoURL:fu.photoURL||null,provider:fu.providerData[0].providerId,referralCode:rc,referredBy:null,createdAt:Date.now()};db.ref('profiles/'+fu.uid).set(np).then(function(){showApp(fu,np);});}else{if(!p.referralCode){var rc2=genRef(p.name);db.ref('profiles/'+fu.uid+'/referralCode').set(rc2);p.referralCode=rc2;}showApp(fu,p);}});}
 function showApp(fu,profile){
   var av=document.getElementById('navAv');
   if(profile.photoURL)av.innerHTML='<img src="'+profile.photoURL+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
@@ -1532,15 +1515,45 @@ function admLogin(){
     toast('❌ Credenciales incorrectas');
   }
 }
-function genTargets(){var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+'<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div></div>'+'<p style="font-size:11px;color:var(--tm);margin-bottom:12px">Los scores actuales se conservan. Si quieres limpiar el día, usa "Resetear día" después.</p>'+'<div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+'<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR</button></div>';document.getElementById('overlay').classList.add('show');}
+function genTargets(){
+  var newTt=Math.round((3+Math.random()*12)*1000)/1000,newTb=Math.round((5+Math.random()*15)*1000)/1000;
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:14px">🎲 NUEVOS TIEMPOS</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+
+      '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--ac);border-radius:9px"><span style="color:var(--ac)">🟢 Reto Tiempo</span><span style="font-family:DM Mono,monospace;color:var(--ac)">'+newTt.toFixed(3)+'s</span></div>'+
+      '<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sf2);border:1px solid var(--c4b);border-radius:9px"><span style="color:var(--c4b)">🟡 Reto Ciego</span><span style="font-family:DM Mono,monospace;color:var(--c4b)">'+newTb.toFixed(3)+'s</span></div>'+
+    '</div>'+
+    '<div style="background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.3);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--wn);line-height:1.6">'+
+      '⚠️ Al aplicar se <strong>resetean los scores del día actual</strong>.<br>'+
+      'Los puntos acumulados y el ranking global no se tocan.'+
+    '</div>'+
+    '<div class="mbtns">'+
+      '<button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+
+      '<button class="btn btn-g" onclick="saveTargets('+newTt+','+newTb+')" style="height:40px;border-radius:9px;font-weight:700">✅ APLICAR Y RESETEAR DÍA</button>'+
+    '</div>';
+  document.getElementById('overlay').classList.add('show');
+}
 function saveTargets(tt,tb){
+  resetInProgress=true;
   var today=getTodayKey();
-  // gameConfig no requiere auth — scores sí, por eso se resetean por separado si es necesario
-  db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:Date.now()}).then(function(){
+  var scoresKey='scores/'+weekKey+'/'+today;
+  // 1. Actualizar targets  2. Resetear scores del día en paralelo
+  Promise.all([
+    db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:Date.now()}),
+    db.ref(scoresKey).remove()
+  ]).then(function(){
+    wScores={t:{},b:{},s:{},r:{}};
     closeModal();
-    toast('✅ Tiempos actualizados — usa Resetear día si quieres limpiar scores');
+    toast('✅ Nuevos tiempos aplicados — día reseteado');
+    updateHomecards();
+    updateAdmStats();
+    buildWinners();
+    renderAdmTable();
+    renderAdmGlobalTable();
+    setTimeout(function(){resetInProgress=false;},3000);
   }).catch(function(err){
-    toast('❌ Error al guardar: '+err.message);
+    resetInProgress=false;
+    toast('❌ Error: '+err.message);
     console.error('saveTargets error:',err);
   });
 }
