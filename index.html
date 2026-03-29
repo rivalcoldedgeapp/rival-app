@@ -755,7 +755,7 @@ function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g)
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
 // ══ VERSIÓN / FORCE RELOAD ══
-var APP_VERSION='v6.3';
+var APP_VERSION='v6.4';
 db.ref('appVersion').on('value',function(s){
   var serverVersion=s.val();
   if(!serverVersion)return;
@@ -1343,8 +1343,6 @@ function admLogout(){
   document.getElementById('admLC').style.display='block';
   document.getElementById('admP').innerHTML='';
   document.getElementById('admP').style.display='';
-  // Si la sesión activa es anónima (creada por admLogin), cerrarla al salir.
-  if(auth.currentUser&&auth.currentUser.isAnonymous){auth.signOut();}
   showScreen('sAuth');
 }
 
@@ -1595,14 +1593,11 @@ function admLogin(){
       updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
       toast('✅ Bienvenido '+u);
     };
-    if(auth.currentUser){
+    if(auth.currentUser && !auth.currentUser.isAnonymous){
       initPanel();
     } else {
-      auth.signInAnonymously().then(initPanel).catch(function(e){
-        console.error('signInAnonymously error:',e.message);
-        toast('❌ Error de autenticación: '+e.message);
-        admLoggedIn=false;
-      });
+      toast('❌ Debes iniciar sesión con tu cuenta de Google primero');
+      admLoggedIn=false;
     }
   } else {
     toast('❌ Credenciales incorrectas');
