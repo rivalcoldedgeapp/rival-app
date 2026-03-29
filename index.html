@@ -758,6 +758,20 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
+// ══ DAILY RESET — solo admin lo dispara, nunca usuarios regulares ══
+// Transaction garantiza que solo UN cliente genera los targets (sin race condition)
+function checkDailyReset(){
+  var currentDay=getTodayKey();
+  db.ref('gameConfig').transaction(function(cfg){
+    if(cfg&&cfg.lastDay===currentDay)return; // ya actualizado hoy — abortar
+    return{
+      tt:Math.round((3+Math.random()*12)*1000)/1000,
+      tb:Math.round((5+Math.random()*15)*1000)/1000,
+      lastDay:currentDay,
+      updatedAt:Date.now()
+    };
+  },{applyLocally:false});
+}
 db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
@@ -2001,6 +2015,7 @@ function admLogout(){
   document.getElementById('admLC').style.display='block';
   document.getElementById('admP').innerHTML='';
   document.getElementById('admP').style.display='';
+  if(auth.currentUser&&auth.currentUser.isAnonymous){auth.signOut();}
   showScreen('sAuth');
 }
 
@@ -2257,14 +2272,17 @@ function admLogin(){
         '<div id="secTargetHistory" style="display:none;padding:0 14px 14px"></div>'+
       '</div>';
       panel.style.display='block';
+      checkDailyReset();
       updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
       toast('✅ Bienvenido '+u);
     };
-    if(auth.currentUser && !auth.currentUser.isAnonymous){
+    if(auth.currentUser){
       initPanel();
     } else {
-      toast('❌ Debes iniciar sesión con tu cuenta de Google primero');
-      admLoggedIn=false;
+      auth.signInAnonymously().then(initPanel).catch(function(e){
+        toast('❌ Error de autenticación: '+e.message);
+        admLoggedIn=false;
+      });
     }
   } else {
     toast('❌ Credenciales incorrectas');
