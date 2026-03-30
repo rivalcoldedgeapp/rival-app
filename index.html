@@ -2264,17 +2264,26 @@ function doResetGame(g){
   var d=getCDMX();
   var newKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+Date.now();
   var rkField=g==='s'?'rankKey_s':'rankKey_r';
+  var histField=g==='s'?'rankKey_s_history':'rankKey_r_history';
   var oldKey=g==='s'?rankKeyS:rankKeyR;
-  Promise.all([
-    db.ref('scores/'+oldKey).remove(),
-    db.ref('gameConfig/'+rkField).set(newKey)
-  ]).then(function(){
+  // Leer historial existente, agregar oldKey y conservar últimos 5 periodos
+  db.ref('gameConfig/'+histField).once('value').then(function(snap){
+    var hist=snap.val()||[];
+    if(!Array.isArray(hist))hist=Object.values(hist);
+    hist.push(oldKey);
+    if(hist.length>5)hist=hist.slice(-5);
+    // Scores del periodo anterior se conservan en scores/{oldKey} para historial
+    return Promise.all([
+      db.ref('gameConfig/'+rkField).set(newKey),
+      db.ref('gameConfig/'+histField).set(hist)
+    ]);
+  }).then(function(){
     if(g==='s'){rankKeyS=newKey;wScores.s={};}else{rankKeyR=newKey;wScores.r={};}
     mergeScoresForKey(newKey,g==='s'?['gs']:['gr'],function(){
       updateHomecards();updateRankCards();
       if(document.getElementById('sRanking').classList.contains('on'))renderTop10(g);
     });
-    toast('✅ '+( g==='s'?'Secuencia':'Reacción')+' reseteada — nuevo periodo');
+    toast('✅ '+(g==='s'?'Secuencia':'Reacción')+' reseteada — nuevo periodo');
     setTimeout(function(){resetInProgress=false;},3000);
   });
 }
