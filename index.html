@@ -1948,6 +1948,7 @@ function admLogin(){
           '<button class="btn" style="background:#0088cc;color:#fff" onclick="confResetGame(\'s\')">🔄 Reset Secuencia</button>'+
           '<button class="btn" style="background:#e67e00;color:#fff" onclick="confResetGame(\'r\')">🔄 Reset Reacción</button>'+
           '<button class="btn" style="background:#6b3fa0;color:#fff" onclick="confCleanLegacy()">🧹 Limpiar legacy</button>'+
+          '<button class="btn" style="background:#0a7a4f;color:#fff" onclick="admRecalcAttempts(this)">🔄 Recalcular partidas</button>'+
         '</div>'+
       '</div>'+
       // TIEMPOS OBJETIVO — arriba, sin botón generar, siempre visible
@@ -2240,6 +2241,48 @@ function setAdmTab(g){
 function renderAdmWeek(g){var wrap=document.getElementById('admWeekWrap');if(!wrap)return;wrap.innerHTML='<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Cargando...</div>';var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g);var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});}var today=getTodayKey();Promise.all([Promise.all(days.map(function(dayObj){return db.ref('scores/'+getRankKey(g)+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){return{day:dayObj,scores:s.val()||{}};})})),db.ref('weekScores/'+weekKey+'/'+gkey).once('value')]).then(function(res){var results=res[0],legacyDataAdm=res[1].val()||{},earliestAdm=null;Object.values(legacyDataAdm).forEach(function(w){if(w&&w.lastPlayed&&(!earliestAdm||w.lastPlayed<earliestAdm))earliestAdm=w.lastPlayed;});if(earliestAdm){var legDayK=dayKeyFromTimestamp(earliestAdm),legTarget=legDayK?results.find(function(r){return r.day.key===legDayK;}):null;if(legTarget&&Object.keys(legTarget.scores).length===0){Object.entries(legacyDataAdm).forEach(function(e){var uid2=e[0],w=e[1];if(w&&w.bestDiff!=null)legTarget.scores[uid2]=w;});}}var html='';results.forEach(function(r){var isToday=r.day.key===today,isFuture=r.day.key>today;if(isFuture)return;var sorted=Object.entries(r.scores||{}).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});if(sorted.length===0&&!isToday)return;html+='<div style="background:var(--sf);border:1px solid '+(isToday?cfg.stroke:'var(--bo)')+';border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:700">'+r.day.label+(isToday?' · Hoy':'')+'</div><div style="font-size:11px;color:var(--tm)">'+sorted.length+' jugadores</div></div>';if(sorted.length===0){html+='<div style="font-size:11px;color:var(--td)">Sin partidas aún</div>';}else{html+='<table style="width:100%;border-collapse:collapse"><tr style="font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:1px"><th style="text-align:left;padding:3px 6px">#</th><th style="text-align:left;padding:3px 6px">Jugador</th><th style="text-align:left;padding:3px 6px">Email</th><th style="padding:3px 6px">Tiempo</th><th style="padding:3px 6px">Diff</th><th style="padding:3px 6px">Partidas</th></tr>';sorted.forEach(function(e,i){var uid2=e[0],w=e[1],p=profiles[uid2]||{},medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';html+='<tr style="border-top:1px solid var(--bo);font-size:11px"><td style="padding:5px 6px">'+medal+'</td><td style="padding:5px 6px;font-weight:600">'+(w.name||'—')+'</td><td style="padding:5px 6px;color:var(--tm);font-size:10px">'+(p.email||'—')+'</td><td style="padding:5px 6px;font-family:DM Mono,monospace;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td><td style="padding:5px 6px;font-family:DM Mono,monospace;color:var(--tm);text-align:center">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td><td style="padding:5px 6px;text-align:center;color:var(--tm)">'+(w.attempts||0)+'</td></tr>';});html+='</table>';}html+='</div>';});wrap.innerHTML=html||'<div style="font-size:12px;color:var(--tm);padding:12px;text-align:center">Sin datos esta semana</div>';});}
 function renderAdmTable(){var tbody=document.getElementById('admTbl');if(!tbody)return;var g=admGame,isR=g==='r',isS=g==='s',sorted=getSorted(g,100),cfg=GCOLORS[g];if(sorted.length===0){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--tm);padding:24px">Sin partidas hoy</td></tr>';return;}tbody.innerHTML=sorted.map(function(e,i){var uid=e[0],w=e[1],p=profiles[uid]||{};var invCount=Object.values(profiles).filter(function(pr){return pr.referredBy===uid;}).length;return'<tr><td class="mono" style="color:var(--tm)">'+(i+1)+'</td><td><strong>'+(w.name||'—')+'</strong></td><td style="font-size:11px;color:var(--tm)">'+(p.email||'—')+'</td><td class="mono" style="color:'+cfg.color+'">'+(w.bestTime||'—')+(isR?'ms':'s')+'</td><td class="mono">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td><td class="mono">'+(w.attempts||0)+'</td><td class="mono" style="color:var(--wn)">'+(weekPoints[uid]&&weekPoints[uid].total?weekPoints[uid].total:'0')+'</td><td class="mono" style="color:var(--ac)">'+invCount+'</td><td><button class="btn btn-gh" onclick="admUserHist(this)" data-uid="'+uid+'" style="padding:4px 8px;font-size:10px">📅</button></td></tr>';}).join('');}
 function admUserHist(btn){var uid=btn.getAttribute('data-uid'),p=profiles[uid]||{},name=p.name||uid;var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);monday.setDate(d.getDate()+diff);var days=[];for(var i=0;i<7;i++){var dd=new Date(monday);dd.setDate(monday.getDate()+i);var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()});}document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:4px">📅 '+name+'</div><div style="font-size:10px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Historial de la semana</div><div id="admHistRows">Cargando...</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px;margin-top:12px">Cerrar</button>';document.getElementById('overlay').classList.add('show');var games=[{g:'t',label:'TIEMPO',cfg:GCOLORS['t']},{g:'b',label:'CIEGO',cfg:GCOLORS['b']},{g:'s',label:'SECUENCIA',cfg:GCOLORS['s']},{g:'r',label:'REACCIÓN',cfg:GCOLORS['r']}];var fetches=[],today=getTodayKey();days.forEach(function(dayObj){games.forEach(function(gObj){var key=getGameKey(gObj.g);fetches.push(db.ref('scores/'+getRankKey(gObj.g)+'/'+dayObj.key+'/'+key+'/'+uid).once('value').then(function(s){return{day:dayObj,game:gObj,data:s.val()};}));});});Promise.all(fetches).then(function(results){var rowsHtml='',byDay={};results.forEach(function(r){if(!byDay[r.day.key])byDay[r.day.key]={dayObj:r.day,games:{}};byDay[r.day.key].games[r.game.g]={data:r.data,game:r.game};});days.forEach(function(dayObj){var dayData=byDay[dayObj.key],isToday=dayObj.key===today,isFuture=dayObj.key>today,anyPlayed=false,gameRows='';games.forEach(function(gObj){var info=dayData&&dayData.games[gObj.g],d2=info?info.data:null,isR=gObj.g==='r',isS=gObj.g==='s';if(d2&&d2.bestTime){anyPlayed=true;gameRows+='<div style="display:flex;justify-content:space-between;padding:4px 10px;background:var(--sf2);border-radius:6px;margin-top:4px;font-size:11px"><span style="color:'+gObj.cfg.stroke+'">'+gObj.label+'</span><span class="mono" style="color:'+gObj.cfg.stroke+'">'+d2.bestTime+(isR?'ms':'s')+'</span><span style="color:var(--tm)">'+(isS?(d2.bestDiff/1000).toFixed(3)+'s':'±'+(d2.bestDiff*1000).toFixed(0)+'ms')+'</span><span style="color:var(--tm)">'+d2.attempts+'x</span></div>';}});if(!isFuture){rowsHtml+='<div style="padding:10px 12px;background:var(--sf);border:1px solid '+(isToday?'var(--ac)':'var(--bo)')+';border-radius:10px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:'+(isToday?'var(--tx)':'var(--tm)')+'">'+dayObj.label+(isToday?' · Hoy':'')+'</div>'+(anyPlayed?gameRows:'<div style="font-size:11px;color:var(--td);margin-top:4px">Sin partidas</div>')+'</div>';}});var el=document.getElementById('admHistRows');if(el)el.innerHTML=rowsHtml||'<div style="color:var(--tm);font-size:12px;text-align:center;padding:20px">Sin datos esta semana</div>';});}
+function admRecalcAttempts(btn){
+  if(btn){btn.disabled=true;btn.textContent='Calculando...';}
+  db.ref('gameConfig').once('value').then(function(s){
+    var cfg=s.val()||{};
+    var allRKs=new Set();
+    // Agregar keys actuales e históricos
+    [cfg.rankKey_tc,cfg.rankKey_s,cfg.rankKey_r,'2026-03-23'].forEach(function(k){if(k)allRKs.add(k);});
+    var toArr=function(v){if(!v)return[];return Array.isArray(v)?v:Object.values(v);};
+    toArr(cfg.rankKey_tc_history).forEach(function(e){var k=typeof e==='string'?e:e&&e.key;if(k)allRKs.add(k);});
+    toArr(cfg.rankKey_s_history).forEach(function(k){if(k)allRKs.add(k);});
+    toArr(cfg.rankKey_r_history).forEach(function(k){if(k)allRKs.add(k);});
+    // Fetchear todos los nodos de scores
+    return Promise.all(Array.from(allRKs).map(function(rk){
+      return db.ref('scores/'+rk).once('value').then(function(sn){return{rk:rk,data:sn.val()||{}};});
+    }));
+  }).then(function(results){
+    // Sumar attempts por uid en todos los periodos y juegos
+    var totals={};
+    results.forEach(function(result){
+      Object.values(result.data).forEach(function(dayData){
+        ['gt','gb','gs','gr'].forEach(function(gk){
+          Object.entries(dayData[gk]||{}).forEach(function(e){
+            var uid2=e[0],w=e[1];
+            totals[uid2]=(totals[uid2]||0)+(w.attempts||0);
+          });
+        });
+      });
+    });
+    // Escribir en profiles en un solo update
+    var updates={};
+    Object.entries(totals).forEach(function(e){updates['profiles/'+e[0]+'/totalAttempts']=e[1];});
+    toast('Escribiendo '+Object.keys(updates).length+' perfiles...');
+    return db.ref().update(updates);
+  }).then(function(){
+    toast('✅ Partidas totales actualizadas');
+    if(btn){btn.textContent='✅ Listo';setTimeout(function(){btn.disabled=false;btn.textContent='🔄 Recalcular partidas';},3000);}
+    renderAdmGlobalTable();
+  }).catch(function(err){
+    toast('❌ Error: '+err.message);
+    if(btn){btn.disabled=false;btn.textContent='🔄 Recalcular partidas';}
+  });
+}
 function confCleanLegacy(){
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px">🧹 LIMPIAR CLAVES LEGACY</div>'+
