@@ -701,7 +701,7 @@ var gState='idle',t0=null,raf=null,elapsed=0;
 var reactState='idle',reactTO=null;
 var seqState='idle',seqCurrent=1,seqRaf=null,seqT0=null;
 var rankKeyTC='2026-03-23',rankKeyS='2026-03-23',rankKeyR='2026-03-23';
-var weekKey=rankKeyTC; // alias para weekPoints — siempre sigue a rankKeyTC
+var weekKey=rankKeyTC; // puntos globales — sigue a gameConfig/weekKey, independiente de rankKeyTC
 var todayKey=getTodayKey();
 // ══ TORNEO STATE — aislado de scores/ weekPoints/ recalcPoints() ══
 var torneoData=null,torneoPartic={},torneoMyData=null,inTorneoGame=false;
@@ -765,7 +765,7 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;weekKey=rankKeyTC;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;weekKey=rankKeyTC;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();});
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;_changed=true;}if(cfg.weekKey&&cfg.weekKey!==weekKey){weekKey=cfg.weekKey;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
@@ -2105,7 +2105,7 @@ function _saveTargetsConfirmed(){
 
   function doWrite(tcHist){
     var ops=[
-      db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now,lastResetAt:doReset?now:cfgLastResetAt}),
+      db.ref('gameConfig').update({tt:tt,tb:tb,lastDay:today,updatedAt:now,lastResetAt:doReset?now:cfgLastResetAt}),
       db.ref('targetHistory/'+now).set(histEntry)
     ];
     if(doReset){
@@ -2114,7 +2114,7 @@ function _saveTargetsConfirmed(){
       ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
       ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
       if(tcHist!==null)ops.push(db.ref('gameConfig/rankKey_tc_history').set(tcHist));
-      rankKeyTC=newRankKey;weekKey=rankKeyTC;
+      rankKeyTC=newRankKey;
     }
     Promise.all(ops).then(function(){
       if(doReset){wScores={t:{},b:{},s:{},r:{}};}
@@ -2349,9 +2349,10 @@ function doResetSemana(){
     db.ref('weekPoints/'+weekKey).remove(),
     db.ref('gameConfig/rankKey_tc').set(newKey),
     db.ref('gameConfig/rankKey_s').set(newKey),
-    db.ref('gameConfig/rankKey_r').set(newKey)
+    db.ref('gameConfig/rankKey_r').set(newKey),
+    db.ref('gameConfig/weekKey').set(newKey)
   ]).then(function(){
-    rankKeyTC=newKey;rankKeyS=newKey;rankKeyR=newKey;weekKey=rankKeyTC;
+    rankKeyTC=newKey;rankKeyS=newKey;rankKeyR=newKey;weekKey=newKey;
     wScores={t:{},b:{},s:{},r:{}};
     weekPoints={};
     closeModal();
