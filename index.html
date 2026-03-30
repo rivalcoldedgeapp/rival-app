@@ -1030,7 +1030,7 @@ function resetClock(){
   document.getElementById('cRing').style.borderColor='';document.getElementById('rfg').style.strokeDashoffset='597';
   var ir=document.getElementById('inlineResult');if(ir)ir.style.display='none';
   var btn=document.getElementById('gBtn');
-  if(btn){btn.className='gbtn gbs';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.borderColor='';btn.style.border='none';btn.onclick=handleBtn;}
+  if(btn){btn.className='gbtn gbs';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.borderColor='';btn.style.border='none';btn.disabled=false;btn.onclick=handleBtn;}
 }
 
 // ══ SECUENCIA ══
