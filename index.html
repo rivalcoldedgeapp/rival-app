@@ -311,8 +311,8 @@ tr:hover td{background:var(--sf2)}
   .nav-av{width:28px;height:28px;font-size:12px}
   #navPts{padding:2px 8px}
   #navPts span:last-child{display:none}
-  .screen{min-height:0;height:calc(100dvh - 53px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;justify-content:flex-start;padding-top:12px}
-  .rank-inner{flex-shrink:0}
+  .screen{min-height:0;height:calc(100dvh - 53px);overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;justify-content:flex-start;padding-top:12px}
+  .rank-inner{flex-shrink:0;touch-action:pan-y}
   #sGame{justify-content:center;padding-top:8px}#sSeq{justify-content:center;padding-top:8px}
   #sReaction{justify-content:center;padding-top:8px}
   #sResult{height:auto;min-height:calc(100dvh - 53px)}
@@ -1229,6 +1229,9 @@ function updateRankCards(){
 }
 function setRankGame(g){
   rankGame=g;
+  // Resetear scroll al inicio al cambiar de reto
+  var rkScreen=document.getElementById('sRanking');
+  if(rkScreen)rkScreen.scrollTop=0;
   var idMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};
   Object.keys(idMap).forEach(function(k){
     var el=document.getElementById('rgc'+idMap[k]);
