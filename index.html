@@ -834,9 +834,16 @@ function listenAllScores(){
     }
     if(admLoggedIn){updateAdmStats();buildWinners();}
   };
-  mergeScoresForKey(rankKeyTC,['gt','gb'],refresh);
-  mergeScoresForKey(rankKeyS,['gs'],refresh);
-  mergeScoresForKey(rankKeyR,['gr'],refresh);
+  // Agrupar juegos por rankKey para evitar múltiples listeners en el mismo nodo
+  var groups={};
+  [[rankKeyTC,['gt','gb']],[rankKeyS,['gs']],[rankKeyR,['gr']]].forEach(function(pair){
+    var rk=pair[0],gks=pair[1];
+    if(!groups[rk])groups[rk]=[];
+    groups[rk]=groups[rk].concat(gks);
+  });
+  Object.keys(groups).forEach(function(rk){
+    mergeScoresForKey(rk,groups[rk],refresh);
+  });
 }
 listenAllScores();
 
