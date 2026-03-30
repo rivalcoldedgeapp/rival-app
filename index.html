@@ -682,6 +682,7 @@ var auth=firebase.auth(),db=firebase.database();
 var DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 var MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 var GCFG={t:5.0,b:10.0}; // t=Tiempo(verde) b=Ciego(ambar) — sobrescritos por Firebase
+var cfgLastResetAt=0,newTargetsToastShown=false; // timestamp del último reset de targets
 var GMAXTIME={t:25,b:60};
 var GCOLORS={
   t:{color:'var(--ac)',stroke:'#00e87a',glow:'#00e87a40'},
@@ -763,7 +764,7 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;weekKey=rankKeyTC;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;weekKey=rankKeyTC;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}updateConfigUI();});
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;weekKey=rankKeyTC;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;weekKey=rankKeyTC;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000){newTargetsToastShown=true;setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
@@ -1792,11 +1793,16 @@ function renderAdmRetoSection(g){
     return db.ref('gameConfig/'+histField).once('value').then(function(snap){
       var hist=snap.val()||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
-      var periods=[{rankKey:currentKey,label:'Periodo actual · desde '+rkLabel(currentKey),isCurrent:true}];
+      // Periodo actual — target vive en GCFG
+      var periods=[{rankKey:currentKey,label:'Periodo actual · desde '+rkLabel(currentKey),isCurrent:true,tt:GCFG.t,tb:GCFG.b}];
       // hist: oldest→newest, tomar los últimos 2 y mostrarlos más reciente primero
+      // Entradas pueden ser string (legacy S/R) u objeto {key,tt,tb} (TC y S/R nuevos)
       var prev=hist.slice(-2).reverse();
-      prev.forEach(function(rk,i){
-        if(rk)periods.push({rankKey:rk,label:(i===0?'2°':'3°')+' periodo · desde '+rkLabel(rk),isCurrent:false});
+      prev.forEach(function(entry,i){
+        var rk=typeof entry==='string'?entry:entry.key;
+        var eTt=typeof entry==='object'&&entry.tt!=null?entry.tt:null;
+        var eTb=typeof entry==='object'&&entry.tb!=null?entry.tb:null;
+        if(rk)periods.push({rankKey:rk,label:(i===0?'2°':'3°')+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});
       });
       return periods;
     });
@@ -1845,11 +1851,15 @@ function renderAdmRetoSection(g){
     var html='';
     periodsData.forEach(function(p,pi){
       var sorted=Object.entries(p.scores).filter(function(e){return e[1]&&e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      // Badge de target para Tiempo y Ciego
+      var tgtBadge='';
+      if(g==='t'&&p.tt!=null)tgtBadge='<span style="font-family:DM Mono,monospace;font-size:10px;color:'+cfg.stroke+';opacity:0.75;margin-left:2px"> · 🎯 '+parseFloat(p.tt).toFixed(3)+'s</span>';
+      if(g==='b'&&p.tb!=null)tgtBadge='<span style="font-family:DM Mono,monospace;font-size:10px;color:'+cfg.stroke+';opacity:0.75;margin-left:2px"> · 🎯 '+parseFloat(p.tb).toFixed(3)+'s</span>';
       html+=
         '<div style="margin-bottom:'+(pi<periodsData.length-1?'20':'8')+'px">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bo)">'+
           '<div style="width:7px;height:7px;border-radius:50%;background:'+(p.isCurrent?cfg.stroke:'var(--bo)')+';flex-shrink:0"></div>'+
-          '<div style="font-size:11px;font-weight:700;color:'+(p.isCurrent?cfg.stroke:'var(--tm)')+'">'+p.label+'</div>'+
+          '<div style="font-size:11px;font-weight:700;color:'+(p.isCurrent?cfg.stroke:'var(--tm)')+'">'+p.label+tgtBadge+'</div>'+
           '<div style="font-size:10px;color:var(--td);margin-left:auto">'+sorted.length+' jugadores</div>'+
         '</div>';
       if(sorted.length===0){
@@ -2104,7 +2114,7 @@ function _saveTargetsConfirmed(){
 
   function doWrite(tcHist){
     var ops=[
-      db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now}),
+      db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now,lastResetAt:doReset?now:cfgLastResetAt}),
       db.ref('targetHistory/'+now).set(histEntry)
     ];
     if(doReset){
@@ -2139,7 +2149,7 @@ function _saveTargetsConfirmed(){
     db.ref('gameConfig/rankKey_tc_history').once('value').then(function(snap){
       var hist=snap.val()||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
-      hist.push(rankKeyTC);
+      hist.push({key:rankKeyTC,tt:GCFG.t,tb:GCFG.b});
       if(hist.length>5)hist=hist.slice(-5);
       doWrite(hist);
     }).catch(function(){doWrite(null);});
