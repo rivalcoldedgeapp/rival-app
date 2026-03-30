@@ -760,7 +760,7 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.rankKey&&cfg.rankKey!==weekKey){weekKey=cfg.rankKey;db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});}updateConfigUI();});
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.rankKey&&cfg.rankKey!==weekKey){weekKey=cfg.rankKey;db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
@@ -772,10 +772,8 @@ function startListeners(){
   db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn){updateAdmStats();renderAdmGlobalTable();}});
   db.ref('weekPoints/'+weekKey).off();
   db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});
-  ['t','b','s','r'].forEach(function(g){
-    db.ref(getScorePath(g)).off();
-    listenWeekScore(g);
-  });
+  db.ref('scores/'+weekKey).off();
+  listenAllScores();
   // ── Torneo listeners — paths independientes de scores/ y weekPoints/ ──
   db.ref('torneo/active').off();
   db.ref('torneo/active').on('value',function(s){
@@ -800,19 +798,36 @@ function startListeners(){
     checkAllExhausted();
   });
 }
-function listenWeekScore(g){
-  db.ref(getScorePath(g)).on('value',function(s){
-    wScores[g]=s.val()||{};
-    updateHomecards();
-    updateRankCards();
+// Carga todos los días del periodo activo y guarda el mejor score por usuario
+function listenAllScores(){
+  db.ref('scores/'+weekKey).off();
+  db.ref('scores/'+weekKey).on('value',function(s){
+    var allDays=s.val()||{};
+    var merged={t:{},b:{},s:{},r:{}};
+    var gkMap={gt:'t',gb:'b',gs:'s',gr:'r'};
+    Object.values(allDays).forEach(function(day){
+      Object.keys(gkMap).forEach(function(gk){
+        var g=gkMap[gk];
+        var entries=day[gk]||{};
+        Object.entries(entries).forEach(function(kv){
+          var uid2=kv[0],entry=kv[1];
+          var ex=merged[g][uid2];
+          // Conservar mejor score (menor bestDiff)
+          if(!ex||(entry.bestDiff!=null&&(ex.bestDiff==null||entry.bestDiff<ex.bestDiff))){
+            merged[g][uid2]=entry;
+          }
+        });
+      });
+    });
+    wScores=merged;
+    updateHomecards();updateRankCards();
     if(document.getElementById('sRanking').classList.contains('on')){
-      if(rankGame===g)renderTop10(g);
-      else if(rankGame==='global')renderGlobalRank();
+      if(rankGame==='global')renderGlobalRank();else renderTop10(rankGame);
     }
     if(admLoggedIn){updateAdmStats();buildWinners();}
   });
 }
-['t','b','s','r'].forEach(function(g){listenWeekScore(g);});
+listenAllScores();
 
 // ══ INVITE ══
 function updateInviteCard(){
