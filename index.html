@@ -698,7 +698,7 @@ var resetInProgress=false; // bloquea recalcPoints durante un reset para evitar 
 var gState='idle',t0=null,raf=null,elapsed=0;
 var reactState='idle',reactTO=null;
 var seqState='idle',seqCurrent=1,seqRaf=null,seqT0=null;
-var weekKey=getWeekKey(),todayKey=getTodayKey();
+var weekKey='2026-03-23',todayKey=getTodayKey(); // rankKey controlado por admin via gameConfig.rankKey
 // ══ TORNEO STATE — aislado de scores/ weekPoints/ recalcPoints() ══
 var torneoData=null,torneoPartic={},torneoMyData=null,inTorneoGame=false;
 var torneoCountdownTO=null,torneoCancelTO=null,torneoAutoCloseTO=null;
@@ -760,7 +760,7 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);updateConfigUI();});
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.rankKey&&cfg.rankKey!==weekKey){weekKey=cfg.rankKey;db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});}updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
@@ -2053,9 +2053,14 @@ function _saveTargetsConfirmed(){
     db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now}),
     db.ref('targetHistory/'+now).set(histEntry)
   ];
-  if(doReset)ops.push(db.ref('scores/'+weekKey+'/'+today).remove());
+  if(doReset){
+    var d2=getCDMX();
+    var newRankKey=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0')+'_'+Date.now();
+    ops.push(db.ref('scores/'+weekKey+'/'+today).remove());
+    ops.push(db.ref('gameConfig/rankKey').set(newRankKey));
+  }
   Promise.all(ops).then(function(){
-    if(doReset)wScores={t:{},b:{},s:{},r:{}};
+    if(doReset){wScores={t:{},b:{},s:{},r:{}};}
     closeModal();
     toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
     updateHomecards();
@@ -2222,20 +2227,23 @@ function confResetSemana(){
 }
 function doResetSemana(){
   resetInProgress=true;
+  // Generar nueva clave de periodo para que el historial anterior quede preservado
+  var d=getCDMX();
+  var newKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+Date.now();
   Promise.all([
     db.ref('scores/'+weekKey).remove(),
-    db.ref('weekPoints/'+weekKey).remove()
+    db.ref('weekPoints/'+weekKey).remove(),
+    db.ref('gameConfig/rankKey').set(newKey)
   ]).then(function(){
+    weekKey=newKey;
     wScores={t:{},b:{},s:{},r:{}};
     weekPoints={};
     closeModal();
-    toast('✅ Semana reseteada — todos empiezan de 0');
+    toast('✅ Periodo reseteado — todos empiezan de 0');
     updateHomecards();
     updateAdmStats();
     buildWinners();
     renderAdmGlobalTable();
-    // Re-habilitar recalcPoints después de un momento para asegurarse
-    // de que Firebase procesó todos los deletes antes de permitir nuevas escrituras
     setTimeout(function(){resetInProgress=false;},3000);
   });
 }
