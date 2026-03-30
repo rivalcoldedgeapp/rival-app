@@ -786,7 +786,7 @@ function startListeners(){
   db.ref('torneo/active').off();
   db.ref('torneo/active').on('value',function(s){
     var nd=s.val();
-    if(!nd&&torneoData&&torneoData.status==='cancelled'){
+    if(!nd&&torneoData&&torneoData.status==='cancelled'&&!torneoCancelledDisplay){
       torneoCancelledDisplay={at:Date.now()};
       clearTimeout(window._tornCancelTO);
       window._tornCancelTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
@@ -1030,7 +1030,7 @@ function resetClock(){
   document.getElementById('cRing').style.borderColor='';document.getElementById('rfg').style.strokeDashoffset='597';
   var ir=document.getElementById('inlineResult');if(ir)ir.style.display='none';
   var btn=document.getElementById('gBtn');
-  if(btn){btn.className='gbtn gbs';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.borderColor='';btn.style.border='none';btn.onclick=handleBtn;}
+  if(btn){btn.className='gbtn gbs';btn.textContent='INICIAR';btn.style.background='var(--ac)';btn.style.color='#000';btn.style.borderColor='';btn.style.border='none';btn.disabled=false;btn.onclick=handleBtn;}
 }
 
 // ══ SECUENCIA ══
@@ -1387,7 +1387,14 @@ function cancelTorneo(){
   if(!torneoData||torneoData.status!=='waiting')return;
   db.ref('torneo/active').transaction(function(c){if(!c||c.status!=='waiting')return;c.status='cancelled';c.finishedAt=Date.now();return c;},null,false).then(function(res){
     if(!res.committed)return;
-    setTimeout(function(){db.ref('torneo/active').once('value').then(function(s){var d=s.val();if(d&&d.status==='cancelled')db.ref('torneo/active').remove();});},5*60*1000);
+    // Borrar inmediatamente — no depender de setTimeout efimero en el browser del admin
+    // Limpia participants para que no contaminen el proximo torneo
+    db.ref().update({'torneo/active':null,'torneo/participants':null});
+    if(!torneoCancelledDisplay){
+      torneoCancelledDisplay={at:Date.now()};
+      clearTimeout(window._tornCancelTO);
+      window._tornCancelTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
+    }
   });
 }
 function activateTorneo(){if(!torneoData||torneoData.status!=='countdown')return;db.ref('torneo/active').transaction(function(c){if(!c||c.status!=='countdown')return;c.status='active';c.startedAt=Date.now();return c;},null,false);}
@@ -1696,7 +1703,7 @@ function admCreateTorneo(){
   var tornId=Date.now();
   var btn=document.getElementById('tornCreateBtn');if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
   var tornId=Date.now();var btn=document.getElementById('tornCreateBtn');if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
-  db.ref('torneo/active').set({id:tornId,prize:prize,minPlayers:minP,durationMs:durMin*60*1000,gameMode:gameMode,targetTime:targetTime,status:'waiting',createdAt:tornId,waitingStartedAt:null,startedAt:null,finishedAt:null,countdownEndsAt:null}).then(function(){toast('✅ Torneo creado — '+getTorneoGameLabel(gameMode)+' · '+minP+' jug · '+durMin+'min');renderAdmTorneos();}).catch(function(err){if(btn){btn.textContent='⚡ CREAR TORNEO';btn.disabled=false;btn.style.opacity='1';}if(err.message.indexOf('PERMISSION_DENIED')>=0){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div><p style="font-size:12px;color:var(--tm);margin-bottom:10px">Agrega en Firebase Console → Realtime Database → Rules:</p><div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:12px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;user-select:all;cursor:text;margin-bottom:10px">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';document.getElementById('overlay').classList.add('show');}else{toast('❌ Error: '+err.message);}});
+  db.ref().update({'torneo/participants':null,'torneo/active':{id:tornId,prize:prize,minPlayers:minP,durationMs:durMin*60*1000,gameMode:gameMode,targetTime:targetTime,status:'waiting',createdAt:tornId,waitingStartedAt:null,startedAt:null,finishedAt:null,countdownEndsAt:null}}).then(function(){toast('✅ Torneo creado — '+getTorneoGameLabel(gameMode)+' · '+minP+' jug · '+durMin+'min');renderAdmTorneos();}).catch(function(err){if(btn){btn.textContent='⚡ CREAR TORNEO';btn.disabled=false;btn.style.opacity='1';}if(err.message.indexOf('PERMISSION_DENIED')>=0){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div><p style="font-size:12px;color:var(--tm);margin-bottom:10px">Agrega en Firebase Console → Realtime Database → Rules:</p><div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:12px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;user-select:all;cursor:text;margin-bottom:10px">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';document.getElementById('overlay').classList.add('show');}else{toast('❌ Error: '+err.message);}});
 }
 function admDoCloseTorneo(){closeModal();closeTorneo('manual');}
 function admCloseTorneo(){if(!torneoData){toast('Sin torneo activo');return;}document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ CERRAR TORNEO</div><p style="font-size:12px;color:var(--tm);margin-bottom:14px">Se determinará el ganador con los resultados actuales y el torneo quedará archivado en el historial.</p><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button><button class="btn btn-r" onclick="admDoCloseTorneo()" style="height:42px;font-weight:700">Cerrar torneo</button></div>';document.getElementById('overlay').classList.add('show');}
