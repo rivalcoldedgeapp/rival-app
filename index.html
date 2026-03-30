@@ -574,7 +574,7 @@ body.playing{overflow:hidden}
 <div class="screen" id="sReaction">
   <div class="ri">
     <div class="gh">
-      <button class="gh-back" onclick="clearTimeout(reactTO);reactState='idle';goTab('home')">← Volver</button>
+      <button class="gh-back" onclick="reactBack()">← Volver</button>
       <div class="gh-title" style="color:var(--cr)">REACCIÓN PURA</div>
       <div class="gh-sub" style="color:var(--cr)">Toca en cuanto veas el flash verde</div>
     </div>
@@ -998,6 +998,7 @@ document.getElementById('srPosS').textContent=ws&&ws.bestTime?'#'+getRank(uid,'s
 document.getElementById('seqNextHint').style.display='none';document.getElementById('seqTimerLbl').textContent='—';document.getElementById('seqArea').innerHTML='';var btn=document.getElementById('seqBtn');btn.textContent='INICIAR';btn.disabled=false;btn.style.opacity='1';showScreen('sSeq');}
 function handleSeqBtn(){if(seqState==='idle'){seqState='countdown';var btn=document.getElementById('seqBtn');btn.disabled=true;btn.style.opacity='.5';var num=document.getElementById('cdN');num.style.color='#00c2e0';document.getElementById('cdWrap').classList.add('show');var n=3;function tick(){n--;if(n>0){num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';num.textContent=n;setTimeout(tick,800);}else{num.textContent='¡YA!';setTimeout(function(){document.getElementById('cdWrap').classList.remove('show');seqStartRun();},600);}}setTimeout(tick,800);}}
 function seqAbort(){cancelAnimationFrame(seqRaf);seqState='idle';seqCurrent=1;document.getElementById('cdWrap').classList.remove('show');if(inTorneoGame){inTorneoGame=false;removeTorneoBanner();removeTorneoLBInject();}goTab('home');}
+function reactBack(){clearTimeout(reactTO);reactState='idle';window._torneoReactLock=false;if(inTorneoGame){inTorneoGame=false;removeTorneoBanner();removeTorneoLBInject();}var pr=document.getElementById('torneoReactRetry');if(pr)pr.remove();var irR=document.getElementById('inlineResultR');if(irR)irR.style.display='none';goTab('home');}
 function seqBuildBoard(){var area=document.getElementById('seqArea');area.innerHTML='';var W=area.offsetWidth||300,H=area.offsetHeight||340;var r=31,nums=[1,2,3,4,5,6,7,8,9];for(var i=nums.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=nums[i];nums[i]=nums[j];nums[j]=tmp;}// Grid 3x3 garantiza que los números NUNCA se encimen
 var cols=3,rows=3,cellW=W/cols,cellH=H/rows,pad=r+4;nums.forEach(function(n,idx){var col=idx%cols,row=Math.floor(idx/cols);var x=col*cellW+pad+Math.random()*Math.max(0,cellW-2*pad);var y=row*cellH+pad+Math.random()*Math.max(0,cellH-2*pad);var el=document.createElement('div');el.className='seq-circle';el.textContent=n;el.style.left=x+'px';el.style.top=y+'px';el.onclick=(function(num){return function(){seqTap(num);};})(n);area.appendChild(el);});}
 function seqStartRun(){
@@ -1027,7 +1028,7 @@ function saveSeqScore(ms){
 }
 
 // ══ REACTION ══
-function startReaction(){curGame='r';var uid=curUser?curUser.uid:null,ws=uid?wScores['r'][uid]:null;
+function startReaction(){curGame='r';if(!inTorneoGame){window._torneoReactLock=false;removeTorneoBanner();removeTorneoLBInject();var _prR=document.getElementById('torneoReactRetry');if(_prR)_prR.remove();var _irR=document.getElementById('inlineResultR');if(_irR)_irR.style.display='none';}var uid=curUser?curUser.uid:null,ws=uid?wScores['r'][uid]:null;
 document.getElementById('srBestR').textContent=ws&&ws.bestTime?ws.bestTime+'ms':'—';
 document.getElementById('srPosR').textContent=ws&&ws.bestTime?'#'+getRank(uid,'r'):'—';
 reactState='idle';showReactIdle();showScreen('sReaction');}
