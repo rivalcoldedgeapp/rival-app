@@ -1063,6 +1063,7 @@ function saveSeqScore(ms){
   if(isRec){upd.bestTime=bestTime;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
   // Actualizar local inmediatamente
   wScores['s'][uid]=Object.assign({},ws,upd);
+  db.ref('profiles/'+uid+'/totalAttempts').transaction(function(v){return(v||0)+1;});
   db.ref(getScorePath('s')+'/'+uid).update(upd).then(function(){
     showResult(bestTime,diff,isRec,'s');
     recalcPoints('s');
@@ -1086,6 +1087,7 @@ function saveScore(fmt,diff,g){
   var upd={attempts:(ws.attempts||0)+1,lastPlayed:Date.now()};
   if(isRec){upd.bestTime=fmt;upd.bestDiff=diff;upd.name=pname;upd.photoURL=pphoto;}
   wScores[g][uid]=Object.assign({},ws,upd);
+  db.ref('profiles/'+uid+'/totalAttempts').transaction(function(v){return(v||0)+1;});
   db.ref(getScorePath(g)+'/'+uid).update(upd).then(function(){
     showResult(fmt,diff,isRec,g);
     recalcPoints(g);
@@ -1903,7 +1905,7 @@ function renderAdmGlobalTable(){
   ['t','b','s','r'].forEach(function(g){Object.keys(wScores[g]).forEach(function(u){allUids.add(u);});});
   var rows=Array.from(allUids).map(function(uid2){
     var wp=weekPoints[uid2]||{},p=profiles[uid2]||{};
-    var totalPartidas=0;['t','b','s','r'].forEach(function(g){if(wScores[g][uid2])totalPartidas+=(wScores[g][uid2].attempts||0);});
+    var totalPartidas=(profiles[uid2]&&profiles[uid2].totalAttempts)||0;
     var lastPlayed=0;['t','b','s','r'].forEach(function(g){if(wScores[g][uid2]&&wScores[g][uid2].lastPlayed&&wScores[g][uid2].lastPlayed>lastPlayed)lastPlayed=wScores[g][uid2].lastPlayed;});
     var isOnline=lastPlayed&&(ahora-lastPlayed)<cincoMin;
     var invCount=Object.values(profiles).filter(function(pr){return pr.referredBy===uid2;}).length;
