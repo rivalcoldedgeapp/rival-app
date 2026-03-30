@@ -682,6 +682,8 @@ var auth=firebase.auth(),db=firebase.database();
 var DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 var MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 var GCFG={t:5.0,b:10.0}; // t=Tiempo(verde) b=Ciego(ambar) — sobrescritos por Firebase
+var cfgLastResetAt=0,newTargetsToastShown=false;
+var _pendingTt=null,_pendingTb=null,_pendingReset=true;
 var GMAXTIME={t:25,b:60};
 var GCOLORS={
   t:{color:'var(--ac)',stroke:'#00e87a',glow:'#00e87a40'},
@@ -763,14 +765,14 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;weekKey=rankKeyTC;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;weekKey=rankKeyTC;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}updateConfigUI();});
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;weekKey=rankKeyTC;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;weekKey=rankKeyTC;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
 function startListeners(){
   // Cancelar listeners anteriores y re-registrar con auth activo
   db.ref('gameConfig').off();
-  db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);updateConfigUI();if(admLoggedIn)updateAdmStats();});
+  db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();if(admLoggedIn)updateAdmStats();});
   db.ref('profiles').off();
   db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn){updateAdmStats();renderAdmGlobalTable();}});
   db.ref('weekPoints/'+weekKey).off();
@@ -1775,97 +1777,118 @@ function buildRetosAccordion(){
 function renderAdmRetoSection(g){
   var sid='secReto_'+g;
   var el=document.getElementById(sid);if(!el)return;
-  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',gkey=getGameKey(g);
-  var today=getTodayKey();
+  var cfg=GCOLORS[g],isR=g==='r',isS=g==='s',isTorb=(g==='t'||g==='b'),gkey=getGameKey(g);
+  el.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:12px">Cargando...</div>';
 
-  // Construir días de esta semana
-  var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day,monday=new Date(d);
-  monday.setDate(d.getDate()+diff);
-  var days=[];
-  for(var i=0;i<7;i++){
-    var dd=new Date(monday);dd.setDate(monday.getDate()+i);
-    var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
-    days.push({key:dk,label:DAYS[dd.getDay()]+' '+dd.getDate()+' '+MONTHS[dd.getMonth()]});
+  // Parsear fecha de inicio legible desde un rankKey ("YYYY-MM-DD" o "YYYY-MM-DD_ts")
+  function rkLabel(rk){
+    var p=rk.split('_')[0].split('-');
+    var d2=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    return d2.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d2.getMonth()];
   }
 
-  // Días pasados (sin hoy, sin futuros)
-  var pastDays=days.filter(function(d){return d.key<today;});
-  // Tomar los 2 más recientes para historia + hoy = 3 días max
-  var recentPast=pastDays.slice(-2);
-
-  function renderDias(dayDataMap){
-    // Agregar hoy desde wScores (ya cargado en memoria)
-    var todayScores=wScores[g]||{};
-    var allDays=[];
-    // Hoy primero
-    if(Object.keys(todayScores).length>0){
-      allDays.push({day:{key:today,label:DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]},scores:todayScores,isToday:true});
-    }
-    // Días anteriores
-    recentPast.forEach(function(dayObj){
-      var scores=dayDataMap[dayObj.key]||{};
-      if(Object.values(scores).some(function(w){return w.bestDiff!=null;})){
-        allDays.push({day:dayObj,scores:scores,isToday:false});
-      }
+  // Obtener lista de hasta 3 periodos [{rankKey, label, isCurrent}]
+  function getPeriods(){
+    var currentKey=getRankKey(g);
+    var histField=isTorb?'rankKey_tc_history':(g==='s'?'rankKey_s_history':'rankKey_r_history');
+    return db.ref('gameConfig/'+histField).once('value').then(function(snap){
+      var hist=snap.val()||[];
+      if(!Array.isArray(hist))hist=Object.values(hist);
+      var periods=[{rankKey:currentKey,label:'Periodo actual · desde '+rkLabel(currentKey),isCurrent:true,tt:GCFG.t,tb:GCFG.b}];
+      var prev=hist.slice(-2).reverse();
+      prev.forEach(function(entry,i){
+        var rk=typeof entry==='string'?entry:entry.key;
+        var eTt=typeof entry==='object'&&entry.tt!=null?entry.tt:null;
+        var eTb=typeof entry==='object'&&entry.tb!=null?entry.tb:null;
+        if(rk)periods.push({rankKey:rk,label:(i===0?'2°':'3°')+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});
+      });
+      return periods;
     });
+  }
 
-    if(allDays.length===0){
-      el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';
-      return;
-    }
+  function fetchPeriod(rankKey){
+    return db.ref('scores/'+rankKey).once('value').then(function(snap){
+      var byDay=snap.val()||{},agg={};
+      Object.values(byDay).forEach(function(dayData){
+        var gameData=(dayData&&dayData[gkey])||{};
+        Object.entries(gameData).forEach(function(e){
+          var uid2=e[0],w=e[1];
+          if(!w||w.bestDiff==null)return;
+          if(!agg[uid2]){
+            agg[uid2]=Object.assign({},w,{attempts:w.attempts||0});
+          } else {
+            var totalAtt=(agg[uid2].attempts||0)+(w.attempts||0);
+            if(w.bestDiff<agg[uid2].bestDiff){agg[uid2]=Object.assign({},w,{attempts:totalAtt});}
+            else{agg[uid2].attempts=totalAtt;}
+          }
+        });
+      });
+      return agg;
+    });
+  }
 
-    var html=allDays.map(function(item){
-      var r=item.day,scores=item.scores,isToday=item.isToday;
-      var sorted=Object.entries(scores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
-      if(sorted.length===0)return '';
-      return '<div style="margin-bottom:14px">'+
-        '<div style="font-size:11px;font-weight:700;color:'+(isToday?cfg.stroke:'var(--tm)')+';margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bo)">'+
-          r.label+(isToday?' · Hoy':'')+' <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span>'+
-        '</div>'+
-        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px">'+
+  getPeriods().then(function(periods){
+    return Promise.all(periods.map(function(p){
+      return fetchPeriod(p.rankKey).then(function(scores){
+        if(p.isCurrent){
+          Object.entries(wScores[g]||{}).forEach(function(e){
+            var uid2=e[0],w=e[1];
+            if(!w||w.bestDiff==null)return;
+            var prev2=scores[uid2];
+            if(!prev2||w.bestDiff<prev2.bestDiff){
+              scores[uid2]=Object.assign({},w,{attempts:Math.max(w.attempts||0,prev2?prev2.attempts||0:0)});
+            }
+          });
+        }
+        return Object.assign({},p,{scores:scores});
+      });
+    }));
+  }).then(function(periodsData){
+    var html='';
+    periodsData.forEach(function(p,pi){
+      var sorted=Object.entries(p.scores).filter(function(e){return e[1]&&e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff-b[1].bestDiff;});
+      var tgtBadge='';
+      if(g==='t'&&p.tt!=null)tgtBadge='<span style="font-family:DM Mono,monospace;font-size:10px;color:'+cfg.stroke+';opacity:0.75;margin-left:2px"> · 🎯 '+parseFloat(p.tt).toFixed(3)+'s</span>';
+      if(g==='b'&&p.tb!=null)tgtBadge='<span style="font-family:DM Mono,monospace;font-size:10px;color:'+cfg.stroke+';opacity:0.75;margin-left:2px"> · 🎯 '+parseFloat(p.tb).toFixed(3)+'s</span>';
+      html+=
+        '<div style="margin-bottom:'+(pi<periodsData.length-1?'20':'8')+'px">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bo)">'+
+          '<div style="width:7px;height:7px;border-radius:50%;background:'+(p.isCurrent?cfg.stroke:'var(--bo)')+';flex-shrink:0"></div>'+
+          '<div style="font-size:11px;font-weight:700;color:'+(p.isCurrent?cfg.stroke:'var(--tm)')+'">'+p.label+tgtBadge+'</div>'+
+          '<div style="font-size:10px;color:var(--td);margin-left:auto">'+sorted.length+' jugadores</div>'+
+        '</div>';
+      if(sorted.length===0){
+        html+='<div style="font-size:11px;color:var(--td);padding:4px 0 8px">Sin partidas en este periodo</div>';
+      } else {
+        html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:460px">'+
           '<thead><tr>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">#</th>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Jugador</th>'+
             '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Email</th>'+
-            '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Tiempo</th>'+
+            '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Mejor tiempo</th>'+
             '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Diff</th>'+
             '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Partidas</th>'+
           '</tr></thead><tbody>'+
           sorted.map(function(e,i){
-            var uid2=e[0],w=e[1],p=profiles[uid2]||{};
+            var uid2=e[0],w=e[1],p2=profiles[uid2]||{};
             var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
             return '<tr style="border-top:1px solid var(--bo)">'+
               '<td style="padding:6px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
-              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+( w.name||'—')+'</td>'+
-              '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
+              '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+(w.name||'—')+'</td>'+
+              '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+(p2.email||'—')+'</td>'+
               '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:'+cfg.stroke+';text-align:center">'+w.bestTime+(isR?'ms':'s')+'</td>'+
               '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;color:var(--tm);text-align:center">'+(isS?(w.bestDiff/1000).toFixed(3)+'s':'±'+(w.bestDiff*1000).toFixed(0)+'ms')+'</td>'+
               '<td style="padding:6px 8px;font-size:12px;color:var(--tm);text-align:center">'+(w.attempts||0)+'</td>'+
             '</tr>';
           }).join('')+
-          '</tbody></table></div>'+
-      '</div>';
-    }).join('');
-    el.innerHTML=html||'<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin jugadas esta semana</div>';
-  }
-
-  // Si no hay días pasados, solo usamos wScores (sin Firebase)
-  if(recentPast.length===0){
-    renderDias({});
-    return;
-  }
-  // Fetch solo días anteriores (no hoy)
-  Promise.all(recentPast.map(function(dayObj){
-    return db.ref('scores/'+getRankKey(g)+'/'+dayObj.key+'/'+gkey).once('value').then(function(s){
-      return{key:dayObj.key,scores:s.val()||{}};
+          '</tbody></table></div>';
+      }
+      html+='</div>';
     });
-  })).then(function(results){
-    var map={};
-    results.forEach(function(r){map[r.key]=r.scores;});
-    renderDias(map);
-  }).catch(function(){
-    // Si Firebase falla, mostrar al menos los datos de hoy
-    renderDias({});
+    el.innerHTML=html||'<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin partidas aún</div>';
+  }).catch(function(err){
+    console.error('renderAdmRetoSection error:',err);
+    el.innerHTML='<div style="font-size:12px;color:var(--dg);text-align:center;padding:12px">Error al cargar datos</div>';
   });
 }
 
@@ -1982,7 +2005,7 @@ function admLogin(){
       '</div>';
       panel.style.display='block';
       updateConfigUI();updateAdmStats();buildWinners();buildRetosAccordion();
-      toast('✅ Bienvenido '+u);
+      toast('✅ Panel cargado');
     };
     if(auth.currentUser){
       initPanel();
@@ -2051,12 +2074,13 @@ function genTargetsRandom(){
   if(inTb)inTb.value=rndTb.toFixed(3);
 }
 function saveTargets(){
-  // Confirmación explícita para no sobrescribir targets en prod por accidente
   var inTt2=document.getElementById('inputTt'),inTb2=document.getElementById('inputTb');
   if(!inTt2||!inTb2){toast('❌ Error: campos no encontrados');return;}
   var tt2=parseFloat(inTt2.value),tb2=parseFloat(inTb2.value);
   if(isNaN(tt2)||tt2<3||tt2>15){toast('❌ Reto Tiempo debe estar entre 3.000 y 15.000s');return;}
   if(isNaN(tb2)||tb2<5||tb2>20){toast('❌ Reto Ciego debe estar entre 5.000 y 20.000s');return;}
+  var chk2=document.getElementById('chkReset');
+  _pendingTt=tt2;_pendingTb=tb2;_pendingReset=chk2?chk2.checked:true;
   document.getElementById('modalBody').innerHTML=
     '<div style="text-align:center;padding:8px 0">'+
     '<div style="font-size:28px;margin-bottom:8px">⚠️</div>'+
@@ -2070,49 +2094,59 @@ function saveTargets(){
   return;
 }
 function _saveTargetsConfirmed(){
-  var inTt=document.getElementById('inputTt');
-  var inTb=document.getElementById('inputTb');
-  var chk=document.getElementById('chkReset');
-  if(!inTt||!inTb){toast('❌ Error: campos no encontrados');return;}
-  var tt=parseFloat(inTt.value);
-  var tb=parseFloat(inTb.value);
+  var tt=_pendingTt,tb=_pendingTb,doReset=_pendingReset;
+  if(tt==null||tb==null){toast('❌ Error: valores pendientes no encontrados');return;}
   if(isNaN(tt)||tt<3||tt>15){toast('❌ Reto Tiempo debe estar entre 3.000 y 15.000s');return;}
   if(isNaN(tb)||tb<5||tb>20){toast('❌ Reto Ciego debe estar entre 5.000 y 20.000s');return;}
-  var doReset=chk?chk.checked:true;
   var today=getTodayKey();
   var now=Date.now();
   resetInProgress=true;
-  // Guardar en historial antes de aplicar
   var histEntry={tt:tt,tb:tb,date:today,resetDay:doReset,appliedAt:now};
-  var ops=[
-    db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now}),
-    db.ref('targetHistory/'+now).set(histEntry)
-  ];
-  if(doReset){
-    var d2=getCDMX();
-    var newRankKey=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0')+'_'+Date.now();
-    ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
-    ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
-    rankKeyTC=newRankKey;weekKey=rankKeyTC;
+
+  function doWrite(tcHist){
+    var ops=[
+      db.ref('gameConfig').set({tt:tt,tb:tb,lastDay:today,updatedAt:now,lastResetAt:doReset?now:cfgLastResetAt}),
+      db.ref('targetHistory/'+now).set(histEntry)
+    ];
+    if(doReset){
+      var d2=getCDMX();
+      var newRankKey=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0')+'_'+Date.now();
+      ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
+      ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
+      if(tcHist!==null)ops.push(db.ref('gameConfig/rankKey_tc_history').set(tcHist));
+      rankKeyTC=newRankKey;weekKey=rankKeyTC;
+    }
+    Promise.all(ops).then(function(){
+      if(doReset){wScores={t:{},b:{},s:{},r:{}};}
+      closeModal();
+      toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
+      updateHomecards();
+      updateAdmStats();
+      buildWinners();
+      renderAdmTable();
+      renderAdmGlobalTable();
+      var histEl=document.getElementById('secTargetHistory');
+      if(histEl&&histEl.style.display!=='none')loadTargetHistory();
+      setTimeout(function(){resetInProgress=false;},3000);
+    }).catch(function(err){
+      resetInProgress=false;
+      toast('❌ Error: '+err.message);
+      console.error('saveTargets error:',err);
+    });
   }
-  Promise.all(ops).then(function(){
-    if(doReset){wScores={t:{},b:{},s:{},r:{}};}
-    closeModal();
-    toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
-    updateHomecards();
-    updateAdmStats();
-    buildWinners();
-    renderAdmTable();
-    renderAdmGlobalTable();
-    // Refrescar historial si está abierto
-    var histEl=document.getElementById('secTargetHistory');
-    if(histEl&&histEl.style.display!=='none')loadTargetHistory();
-    setTimeout(function(){resetInProgress=false;},3000);
-  }).catch(function(err){
-    resetInProgress=false;
-    toast('❌ Error: '+err.message);
-    console.error('saveTargets error:',err);
-  });
+
+  if(doReset){
+    // Leer historial existente, agregar rankKeyTC actual y conservar últimos 5 periodos
+    db.ref('gameConfig/rankKey_tc_history').once('value').then(function(snap){
+      var hist=snap.val()||[];
+      if(!Array.isArray(hist))hist=Object.values(hist);
+      hist.push({key:rankKeyTC,tt:GCFG.t,tb:GCFG.b});
+      if(hist.length>5)hist=hist.slice(-5);
+      doWrite(hist);
+    }).catch(function(){doWrite(null);});
+  } else {
+    doWrite(null);
+  }
 }
 function renderTargetHistory(){loadTargetHistory();}
 function loadTargetHistory(){
