@@ -698,7 +698,9 @@ var resetInProgress=false; // bloquea recalcPoints durante un reset para evitar 
 var gState='idle',t0=null,raf=null,elapsed=0;
 var reactState='idle',reactTO=null;
 var seqState='idle',seqCurrent=1,seqRaf=null,seqT0=null;
-var weekKey='2026-03-23',todayKey=getTodayKey(); // rankKey controlado por admin via gameConfig.rankKey
+var rankKeyTC='2026-03-23',rankKeyS='2026-03-23',rankKeyR='2026-03-23';
+var weekKey=rankKeyTC; // alias para weekPoints — siempre sigue a rankKeyTC
+var todayKey=getTodayKey();
 // ══ TORNEO STATE — aislado de scores/ weekPoints/ recalcPoints() ══
 var torneoData=null,torneoPartic={},torneoMyData=null,inTorneoGame=false;
 var torneoCountdownTO=null,torneoCancelTO=null,torneoAutoCloseTO=null;
@@ -712,7 +714,8 @@ function getTodayDate(){var d=getCDMX();return d.getDate()+' '+MONTHS[d.getMonth
 function getWeekLabel(){var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day;var m=new Date(d);m.setDate(d.getDate()+diff);var s=new Date(m);s.setDate(m.getDate()+6);return m.getDate()+' '+MONTHS[m.getMonth()]+' – '+s.getDate()+' '+MONTHS[s.getMonth()];}
 function dayKeyFromTimestamp(ts){if(!ts)return null;var d=new Date(ts);var cdmx=new Date(d.toLocaleString('en-US',{timeZone:'America/Mexico_City'}));return cdmx.getFullYear()+'-'+String(cdmx.getMonth()+1).padStart(2,'0')+'-'+String(cdmx.getDate()).padStart(2,'0');}
 function getGameKey(g){if(g==='r')return 'gr';if(g==='b')return 'gb';if(g==='s')return 'gs';return 'gt';}
-function getScorePath(g){return 'scores/'+weekKey+'/'+todayKey+'/'+getGameKey(g);}
+function getRankKey(g){return (g==='s')?rankKeyS:(g==='r')?rankKeyR:rankKeyTC;}
+function getScorePath(g){return 'scores/'+getRankKey(g)+'/'+todayKey+'/'+getGameKey(g);}
 function fmtCountdown(ms){if(ms<=0)return '00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
 // ══ VERSIÓN / FORCE RELOAD ══
@@ -760,7 +763,7 @@ function backfillLegacyPoints(){
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.rankKey&&cfg.rankKey!==weekKey){weekKey=cfg.rankKey;db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}updateConfigUI();});
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;weekKey=rankKeyTC;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;weekKey=rankKeyTC;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}updateConfigUI();});
 db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
 db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
@@ -772,7 +775,9 @@ function startListeners(){
   db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn){updateAdmStats();renderAdmGlobalTable();}});
   db.ref('weekPoints/'+weekKey).off();
   db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});
-  db.ref('scores/'+weekKey).off();
+  db.ref('scores/'+rankKeyTC).off();
+  db.ref('scores/'+rankKeyS).off();
+  db.ref('scores/'+rankKeyR).off();
   listenAllScores();
   // ── Torneo listeners — paths independientes de scores/ y weekPoints/ ──
   db.ref('torneo/active').off();
@@ -798,34 +803,40 @@ function startListeners(){
     checkAllExhausted();
   });
 }
-// Carga todos los días del periodo activo y guarda el mejor score por usuario
-function listenAllScores(){
-  db.ref('scores/'+weekKey).off();
-  db.ref('scores/'+weekKey).on('value',function(s){
+// Merge todos los días de un rankKey en wScores para los juegos indicados
+function mergeScoresForKey(rk,games,cb){
+  db.ref('scores/'+rk).off();
+  db.ref('scores/'+rk).on('value',function(s){
     var allDays=s.val()||{};
-    var merged={t:{},b:{},s:{},r:{}};
     var gkMap={gt:'t',gb:'b',gs:'s',gr:'r'};
     Object.values(allDays).forEach(function(day){
-      Object.keys(gkMap).forEach(function(gk){
+      games.forEach(function(gk){
         var g=gkMap[gk];
         var entries=day[gk]||{};
         Object.entries(entries).forEach(function(kv){
           var uid2=kv[0],entry=kv[1];
-          var ex=merged[g][uid2];
-          // Conservar mejor score (menor bestDiff)
+          var ex=wScores[g][uid2];
           if(!ex||(entry.bestDiff!=null&&(ex.bestDiff==null||entry.bestDiff<ex.bestDiff))){
-            merged[g][uid2]=entry;
+            wScores[g][uid2]=entry;
           }
         });
       });
     });
-    wScores=merged;
+    if(cb)cb();
+  });
+}
+function listenAllScores(){
+  wScores={t:{},b:{},s:{},r:{}};
+  var refresh=function(){
     updateHomecards();updateRankCards();
     if(document.getElementById('sRanking').classList.contains('on')){
       if(rankGame==='global')renderGlobalRank();else renderTop10(rankGame);
     }
     if(admLoggedIn){updateAdmStats();buildWinners();}
-  });
+  };
+  mergeScoresForKey(rankKeyTC,['gt','gb'],refresh);
+  mergeScoresForKey(rankKeyS,['gs'],refresh);
+  mergeScoresForKey(rankKeyR,['gr'],refresh);
 }
 listenAllScores();
 
@@ -1071,7 +1082,7 @@ function saveScore(fmt,diff,g){
 function recalcPoints(g){
   if(resetInProgress)return;
   var key=getGameKey(g);
-  db.ref('scores/'+weekKey+'/'+todayKey+'/'+key).once('value').then(function(s){
+  db.ref('scores/'+getRankKey(g)+'/'+todayKey+'/'+key).once('value').then(function(s){
     if(resetInProgress)return;
     var dayScores=s.val()||{};
     var sorted=Object.entries(dayScores).filter(function(e){return e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});
@@ -1232,11 +1243,11 @@ function setRankGame(g){
   var labels={'t':'Reto Tiempo','b':'Reto Ciego','s':'Secuencia','r':'Reacción'};
   if(howBtn)howBtn.style.display='none';
   document.getElementById('rankTitle').textContent=labels[g]||'—';
-  document.getElementById('rankSub').textContent='Hoy · '+getTodayDate();
-  renderTop10(g);
+  var _rk=(g==='s')?rankKeyS:(g==='r')?rankKeyR:rankKeyTC;var _rkPts=_rk.split('_')[0].split('-');var _rkDate=new Date(parseInt(_rkPts[0]),parseInt(_rkPts[1])-1,parseInt(_rkPts[2]));var _rkLbl=_rkDate.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][_rkDate.getMonth()];var _tdLbl=getTodayDate();var _tgt=(g==='t')?'🎯 '+GCFG.t.toFixed(3)+'s · ':(g==='b')?'🎯 '+GCFG.b.toFixed(3)+'s · ':'';var _pLbl=(_rkLbl===_tdLbl)?'Hoy · '+_tdLbl:'Desde '+_rkLbl+' · '+_tdLbl;document.getElementById('rankSub').textContent=_tgt+_pLbl;  renderTop10(g);
 }
 function renderTop10(g){
   var uid=curUser?curUser.uid:null,cfg=GCOLORS[g],isR=g==='r',isS=g==='s';
+  var _rk2=(g==='s')?rankKeyS:(g==='r')?rankKeyR:rankKeyTC;var _rp2=_rk2.split('_')[0].split('-');var _rd2=new Date(parseInt(_rp2[0]),parseInt(_rp2[1])-1,parseInt(_rp2[2]));var _rl2=_rd2.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][_rd2.getMonth()];var _tl2=getTodayDate();var _tg2=(g==='t')?'🎯 '+GCFG.t.toFixed(3)+'s · ':(g==='b')?'🎯 '+GCFG.b.toFixed(3)+'s · ':'';var _pl2=(_rl2===_tl2)?'Hoy · '+_tl2:'Desde '+_rl2+' · '+_tl2;document.getElementById('rankSub').textContent=_tg2+_pl2;
   var sorted=getSorted(g,50);var top10=sorted.slice(0,10),myIdx=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
   var html='';
   if(top10.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}
@@ -1897,7 +1908,9 @@ function admLogin(){
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:4px;color:var(--ac)">ADMIN RIVAL</div>'+
         '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
           '<button class="btn btn-r" onclick="confReset()">🗑️ Resetear día</button>'+
-          '<button class="btn" style="background:#ff6b00;color:#fff" onclick="confResetSemana()">⚠️ Resetear semana</button>'+
+          '<button class="btn" style="background:#ff6b00;color:#fff" onclick="confResetSemana()">⚠️ Resetear todo</button>'+
+          '<button class="btn" style="background:#0088cc;color:#fff" onclick="confResetGame(\'s\')">🔄 Reset Secuencia</button>'+
+          '<button class="btn" style="background:#e67e00;color:#fff" onclick="confResetGame(\'r\')">🔄 Reset Reacción</button>'+
           '<button class="btn" style="background:#6b3fa0;color:#fff" onclick="confCleanLegacy()">🧹 Limpiar legacy</button>'+
         '</div>'+
       '</div>'+
@@ -2071,8 +2084,9 @@ function _saveTargetsConfirmed(){
   if(doReset){
     var d2=getCDMX();
     var newRankKey=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0')+'_'+Date.now();
-    ops.push(db.ref('scores/'+weekKey+'/'+today).remove());
-    ops.push(db.ref('gameConfig/rankKey').set(newRankKey));
+    ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
+    ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
+    rankKeyTC=newRankKey;weekKey=rankKeyTC;
   }
   Promise.all(ops).then(function(){
     if(doReset){wScores={t:{},b:{},s:{},r:{}};}
@@ -2224,6 +2238,39 @@ function cleanLegacyKeys(){
     });
   });
 }
+function confResetGame(g){
+  var labels={s:'Secuencia',r:'Reacción'};
+  var colors={s:'var(--cs)',r:'var(--cr)'};
+  document.getElementById('modalBody').innerHTML=
+    '<div style="text-align:center;padding:8px 0">'+
+    '<div style="font-size:28px;margin-bottom:8px">🔄</div>'+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;color:'+colors[g]+';margin-bottom:8px">RESETEAR '+labels[g].toUpperCase()+'</div>'+
+    '<div style="font-size:12px;color:var(--tm);margin-bottom:16px">Esto borrará todos los scores de <strong style="color:var(--tx)">'+labels[g]+'</strong> y empezará un nuevo periodo. El ranking global no se toca.</div>'+
+    '<div style="display:flex;gap:8px">'+
+    '<button class="btn" onclick="closeModal()" style="flex:1;height:40px;border-radius:9px">Cancelar</button>'+
+    '<button class="btn" onclick="closeModal();doResetGame(\''+g+'\')" style="flex:1;height:40px;border-radius:9px;background:'+colors[g]+';color:#fff;font-weight:700">🔄 Resetear</button>'+
+    '</div></div>';
+  document.getElementById('overlay').classList.add('show');
+}
+function doResetGame(g){
+  resetInProgress=true;
+  var d=getCDMX();
+  var newKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+Date.now();
+  var rkField=g==='s'?'rankKey_s':'rankKey_r';
+  var oldKey=g==='s'?rankKeyS:rankKeyR;
+  Promise.all([
+    db.ref('scores/'+oldKey).remove(),
+    db.ref('gameConfig/'+rkField).set(newKey)
+  ]).then(function(){
+    if(g==='s'){rankKeyS=newKey;wScores.s={};}else{rankKeyR=newKey;wScores.r={};}
+    mergeScoresForKey(newKey,g==='s'?['gs']:['gr'],function(){
+      updateHomecards();updateRankCards();
+      if(document.getElementById('sRanking').classList.contains('on'))renderTop10(g);
+    });
+    toast('✅ '+( g==='s'?'Secuencia':'Reacción')+' reseteada — nuevo periodo');
+    setTimeout(function(){resetInProgress=false;},3000);
+  });
+}
 function confResetSemana(){
   document.getElementById('modalBody').innerHTML=
     '<div style="font-family:Bebas Neue,sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:12px;color:#ff6b00">⚠️ RESETEAR SEMANA COMPLETA</div>'+
@@ -2246,11 +2293,15 @@ function doResetSemana(){
   var d=getCDMX();
   var newKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+Date.now();
   Promise.all([
-    db.ref('scores/'+weekKey).remove(),
+    db.ref('scores/'+rankKeyTC).remove(),
+    db.ref('scores/'+rankKeyS).remove(),
+    db.ref('scores/'+rankKeyR).remove(),
     db.ref('weekPoints/'+weekKey).remove(),
-    db.ref('gameConfig/rankKey').set(newKey)
+    db.ref('gameConfig/rankKey_tc').set(newKey),
+    db.ref('gameConfig/rankKey_s').set(newKey),
+    db.ref('gameConfig/rankKey_r').set(newKey)
   ]).then(function(){
-    weekKey=newKey;
+    rankKeyTC=newKey;rankKeyS=newKey;rankKeyR=newKey;weekKey=rankKeyTC;
     wScores={t:{},b:{},s:{},r:{}};
     weekPoints={};
     closeModal();
