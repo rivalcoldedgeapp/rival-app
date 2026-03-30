@@ -311,10 +311,11 @@ tr:hover td{background:var(--sf2)}
   .nav-av{width:28px;height:28px;font-size:12px}
   #navPts{padding:2px 8px}
   #navPts span:last-child{display:none}
-  .screen{min-height:0;height:calc(100dvh - 53px);overflow-y:auto;justify-content:flex-start;padding-top:12px}
+  .screen{min-height:0;height:calc(100dvh - 53px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;justify-content:flex-start;padding-top:12px}
+  .rank-inner{flex-shrink:0}
   #sGame{justify-content:center;padding-top:8px}#sSeq{justify-content:center;padding-top:8px}
   #sReaction{justify-content:center;padding-top:8px}
-  #sResult{height:auto;min-height:calc(100dvh - 53px)}#sRanking{height:auto;min-height:calc(100dvh - 53px)}
+  #sResult{height:auto;min-height:calc(100dvh - 53px)}
   #sAdmin{height:auto;min-height:calc(100dvh - 53px)}#sWeek{height:auto;min-height:calc(100dvh - 53px)}
   .gi{gap:10px;padding:0 12px 16px}.si{gap:10px;padding:0 12px 16px}
   .cring{width:160px;height:160px}.cs{font-size:34px}.cm{font-size:26px}
@@ -772,7 +773,7 @@ function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var
 function startListeners(){
   // Cancelar listeners anteriores y re-registrar con auth activo
   db.ref('gameConfig').off();
-  db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){rankKeyTC=cfg.rankKey_tc;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(cfg.weekKey&&cfg.weekKey!==weekKey){weekKey=cfg.weekKey;db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});}if(_changed){listenAllScores();}if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();if(admLoggedIn)updateAdmStats();});
+  db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(cfg.weekKey&&cfg.weekKey!==weekKey){weekKey=cfg.weekKey;db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});}if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();if(admLoggedIn)updateAdmStats();});
   db.ref('profiles').off();
   db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn){updateAdmStats();renderAdmGlobalTable();}});
   db.ref('weekPoints/'+weekKey).off();
