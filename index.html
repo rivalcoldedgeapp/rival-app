@@ -2093,13 +2093,13 @@ function genTargets(){
     '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.25);border-radius:9px;cursor:pointer;margin-bottom:8px">'+
       '<input type="checkbox" id="chkReset" checked onchange="toggleResetWarning()" style="width:16px;height:16px;margin-top:1px;accent-color:var(--wn);flex-shrink:0;cursor:pointer">'+
       '<div>'+
-        '<div style="font-size:12px;font-weight:600;color:var(--wn)">Resetear scores del día</div>'+
-        '<div style="font-size:10px;color:var(--tm);margin-top:2px;line-height:1.5">Los rankings del día empiezan en 0. Los puntos acumulados de la semana no se tocan.</div>'+
+        '<div style="font-size:12px;font-weight:600;color:var(--wn)">Nuevo periodo (aislar scores del ranking)</div>'+
+        '<div style="font-size:10px;color:var(--tm);margin-top:2px;line-height:1.5">El ranking activo empieza en 0. Los scores anteriores quedan archivados y visibles en el panel histórico.</div>'+
       '</div>'+
     '</label>'+
     // Advertencia dinámica — solo visible cuando checkbox está desmarcado
     '<div id="noResetWarning" style="display:none;background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.3);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--dg);line-height:1.6">'+
-      '⚠️ Los scores actuales se conservan. Los jugadores que ya jugaron hoy competirán con el <strong>nuevo target</strong> — su diferencia será recalculada automáticamente.'+
+      '⚠️ El ranking activo conserva los scores existentes y el nuevo target coexiste con ellos. Las diferencias de los jugadores actuales no serán comparables con el nuevo target.'+
     '</div>'+
     '<div class="mbtns">'+
       '<button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+
@@ -2159,7 +2159,9 @@ function _saveTargetsConfirmed(){
       var d2=getCDMX();
       var newRankKey=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0')+'_'+Date.now();
       var oldTCKey=rankKeyTC;
-      ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
+      // NO se borran los scores del periodo anterior: al cambiar rankKeyTC el ranking activo
+      // ya deja de mostrarlos (listenAllScores escucha solo el nuevo key), pero quedan
+      // archivados y visibles en el panel de histórico de admin.
       ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
       // Nota: el historial ya fue actualizado atomicamente via transaction antes de llamar doWrite
       rankKeyTC=newRankKey;
@@ -2167,7 +2169,7 @@ function _saveTargetsConfirmed(){
     Promise.all(ops).then(function(){
       if(doReset){db.ref('scores/'+oldTCKey).off();wScores={t:{},b:{},s:{},r:{}};listenAllScores();}
       closeModal();
-      toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
+      toast(doReset?'✅ Tiempos aplicados — nuevo periodo iniciado':'✅ Tiempos actualizados — scores conservados');
       updateHomecards();
       updateAdmStats();
       buildWinners();
