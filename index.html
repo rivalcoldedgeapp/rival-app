@@ -2404,28 +2404,41 @@ function confResetSemana(){
 }
 function doResetSemana(){
   resetInProgress=true;
-  // Generar nueva clave de periodo para que el historial anterior quede preservado
   var d=getCDMX();
   var newKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+Date.now();
+  var oldTCKey=rankKeyTC,oldSKey=rankKeyS,oldRKey=rankKeyR;
   Promise.all([
-    db.ref('scores/'+rankKeyTC).remove(),
-    db.ref('scores/'+rankKeyS).remove(),
-    db.ref('scores/'+rankKeyR).remove(),
-    db.ref('weekPoints/'+weekKey).remove(),
-    db.ref('gameConfig/rankKey_tc').set(newKey),
-    db.ref('gameConfig/rankKey_s').set(newKey),
-    db.ref('gameConfig/rankKey_r').set(newKey),
-    db.ref('gameConfig/weekKey').set(newKey)
-  ]).then(function(){
+    db.ref('gameConfig/rankKey_tc_history').once('value'),
+    db.ref('gameConfig/rankKey_s_history').once('value'),
+    db.ref('gameConfig/rankKey_r_history').once('value')
+  ]).then(function(snaps){
+    var tcHist=snaps[0].val()||[];var sHist=snaps[1].val()||[];var rHist=snaps[2].val()||[];
+    if(!Array.isArray(tcHist))tcHist=Object.values(tcHist);
+    if(!Array.isArray(sHist))sHist=Object.values(sHist);
+    if(!Array.isArray(rHist))rHist=Object.values(rHist);
+    tcHist.push({key:oldTCKey,tt:GCFG.t,tb:GCFG.b});if(tcHist.length>5)tcHist=tcHist.slice(-5);
+    sHist.push(oldSKey);if(sHist.length>5)sHist=sHist.slice(-5);
+    rHist.push(oldRKey);if(rHist.length>5)rHist=rHist.slice(-5);
+    return Promise.all([
+      db.ref('scores/'+oldTCKey).remove(),
+      db.ref('scores/'+oldSKey).remove(),
+      db.ref('scores/'+oldRKey).remove(),
+      db.ref('weekPoints/'+weekKey).remove(),
+      db.ref('gameConfig/rankKey_tc').set(newKey),
+      db.ref('gameConfig/rankKey_s').set(newKey),
+      db.ref('gameConfig/rankKey_r').set(newKey),
+      db.ref('gameConfig/weekKey').set(newKey),
+      db.ref('gameConfig/rankKey_tc_history').set(tcHist),
+      db.ref('gameConfig/rankKey_s_history').set(sHist),
+      db.ref('gameConfig/rankKey_r_history').set(rHist)
+    ]);
+  }).then(function(){
     rankKeyTC=newKey;rankKeyS=newKey;rankKeyR=newKey;weekKey=newKey;
-    wScores={t:{},b:{},s:{},r:{}};
-    weekPoints={};
+    wScores={t:{},b:{},s:{},r:{}};weekPoints={};
+    listenAllScores();
     closeModal();
     toast('✅ Periodo reseteado — todos empiezan de 0');
-    updateHomecards();
-    updateAdmStats();
-    buildWinners();
-    renderAdmGlobalTable();
+    updateHomecards();updateAdmStats();buildWinners();renderAdmGlobalTable();
     setTimeout(function(){resetInProgress=false;},3000);
   });
 }
@@ -2439,6 +2452,7 @@ function doReset(){
     db.ref('scores/'+rankKeyR+'/'+todayKey).remove()
   ]).then(function(){
     wScores={t:{},b:{},s:{},r:{}};
+    listenAllScores();
     closeModal();
     toast('✅ Día reseteado');
     updateHomecards();
