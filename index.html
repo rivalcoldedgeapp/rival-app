@@ -1816,22 +1816,46 @@ function renderAdmRetoSection(g){
     return d2.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d2.getMonth()];
   }
 
-  // Obtener lista de hasta 3 periodos [{rankKey, label, isCurrent}]
+  // Obtener lista de periodos [{rankKey, label, isCurrent}].
+  // Ademas del historial oficial, detecta claves huerfanas: presentes en scores/ con
+  // datos del juego actual pero sin registro en historial. Causa: race condition en
+  // saveTargets() al cambiar targets en rapida sucesion.
   function getPeriods(){
     var currentKey=getRankKey(g);
     var histField=isTorb?'rankKey_tc_history':(g==='s'?'rankKey_s_history':'rankKey_r_history');
-    return db.ref('gameConfig/'+histField).once('value').then(function(snap){
-      var hist=snap.val()||[];
+    return Promise.all([
+      db.ref('gameConfig/'+histField).once('value'),
+      db.ref('scores').once('value')
+    ]).then(function(results){
+      var hist=results[0].val()||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
+      var scoresSnap=results[1];
+
       var periods=[{rankKey:currentKey,label:'Periodo actual · desde '+rkLabel(currentKey),isCurrent:true,tt:GCFG.t,tb:GCFG.b}];
+      var knownKeys=new Set([currentKey]);
+
       var prev=hist.slice().reverse();
       prev.forEach(function(entry,i){
         var rk=typeof entry==='string'?entry:entry.key;
         var eTt=typeof entry==='object'&&entry.tt!=null?entry.tt:null;
         var eTb=typeof entry==='object'&&entry.tb!=null?entry.tb:null;
         var ordinal=['2°','3°','4°','5°','6°'];
-        if(rk)periods.push({rankKey:rk,label:(ordinal[i]||((i+2)+'°'))+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});
+        if(rk){knownKeys.add(rk);periods.push({rankKey:rk,label:(ordinal[i]||((i+2)+'°'))+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});}
       });
+
+      // Detectar claves huerfanas: existen en scores/ con data del juego actual pero no estan en historial
+      scoresSnap.forEach(function(rkSnap){
+        var rk=rkSnap.key;
+        if(knownKeys.has(rk))return;
+        var hasData=false;
+        rkSnap.forEach(function(daySnap){
+          if(daySnap.child(gkey).numChildren()>0)hasData=true;
+        });
+        if(hasData){
+          periods.push({rankKey:rk,label:rkLabel(rk)+' (periodo recuperado †)',isCurrent:false,tt:null,tb:null,orphaned:true});
+        }
+      });
+
       return periods;
     });
   }
@@ -2137,7 +2161,7 @@ function _saveTargetsConfirmed(){
       var oldTCKey=rankKeyTC;
       ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
       ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
-      if(tcHist!==null)ops.push(db.ref('gameConfig/rankKey_tc_history').set(tcHist));
+      // Nota: el historial ya fue actualizado atomicamente via transaction antes de llamar doWrite
       rankKeyTC=newRankKey;
     }
     Promise.all(ops).then(function(){
@@ -2160,13 +2184,22 @@ function _saveTargetsConfirmed(){
   }
 
   if(doReset){
-    // Leer historial existente, agregar rankKeyTC actual y conservar últimos 5 periodos
-    db.ref('gameConfig/rankKey_tc_history').once('value').then(function(snap){
-      var hist=snap.val()||[];
+    // Usar transaction para evitar race condition: si el admin guarda targets en rapida
+    // sucesion, dos lecturas concurrentes pueden sobrescribirse mutuamente y perder claves.
+    // La transaction garantiza que cada escritura lee el estado mas reciente antes de modificar.
+    var keyToArchive=rankKeyTC;
+    var ttToArchive=GCFG.t;
+    var tbToArchive=GCFG.b;
+    db.ref('gameConfig/rankKey_tc_history').transaction(function(currentHist){
+      var hist=currentHist||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
-      hist.push({key:rankKeyTC,tt:GCFG.t,tb:GCFG.b});
+      // Solo agregar si no esta ya en el historial (evita duplicados por reintentos)
+      var alreadyIn=hist.some(function(e){return (typeof e==='string'?e:e.key)===keyToArchive;});
+      if(!alreadyIn)hist.push({key:keyToArchive,tt:ttToArchive,tb:tbToArchive});
       if(hist.length>5)hist=hist.slice(-5);
-      doWrite(hist);
+      return hist;
+    },{applyLocally:false}).then(function(){
+      doWrite(null); // historial ya actualizado atomicamente por la transaction
     }).catch(function(){doWrite(null);});
   } else {
     doWrite(null);
