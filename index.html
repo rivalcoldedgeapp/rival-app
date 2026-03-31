@@ -1815,12 +1815,13 @@ function renderAdmRetoSection(g){
       var hist=snap.val()||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
       var periods=[{rankKey:currentKey,label:'Periodo actual · desde '+rkLabel(currentKey),isCurrent:true,tt:GCFG.t,tb:GCFG.b}];
-      var prev=hist.slice(-2).reverse();
+      var prev=hist.slice().reverse();
       prev.forEach(function(entry,i){
         var rk=typeof entry==='string'?entry:entry.key;
         var eTt=typeof entry==='object'&&entry.tt!=null?entry.tt:null;
         var eTb=typeof entry==='object'&&entry.tb!=null?entry.tb:null;
-        if(rk)periods.push({rankKey:rk,label:(i===0?'2°':'3°')+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});
+        var ordinal=['2°','3°','4°','5°','6°'];
+        if(rk)periods.push({rankKey:rk,label:(ordinal[i]||((i+2)+'°'))+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});
       });
       return periods;
     });
