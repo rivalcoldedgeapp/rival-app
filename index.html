@@ -712,7 +712,6 @@ var torneoCancelledDisplay=null;
 function getCDMX(){return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Mexico_City'}));}
 function getWeekKey(){var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day;var m=new Date(d);m.setDate(d.getDate()+diff);return m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');}
 function getTodayKey(){var d=getCDMX();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function getTodayLabel(){return '¿Puedes ser el mejor?';}
 function getTodayDate(){var d=getCDMX();return d.getDate()+' '+MONTHS[d.getMonth()];}
 function getWeekLabel(){var d=getCDMX(),day=d.getDay(),diff=day===0?-6:1-day;var m=new Date(d);m.setDate(d.getDate()+diff);var s=new Date(m);s.setDate(m.getDate()+6);return m.getDate()+' '+MONTHS[m.getMonth()]+' – '+s.getDate()+' '+MONTHS[s.getMonth()];}
 function dayKeyFromTimestamp(ts){if(!ts)return null;var d=new Date(ts);var cdmx=new Date(d.toLocaleString('en-US',{timeZone:'America/Mexico_City'}));return cdmx.getFullYear()+'-'+String(cdmx.getMonth()+1).padStart(2,'0')+'-'+String(cdmx.getDate()).padStart(2,'0');}
@@ -743,32 +742,12 @@ db.ref('appVersion').on('value',function(s){
 
 // Migración única: transfiere puntos del esquema antiguo (g5/g10/g15/g4b) al nuevo.
 // Protegida por flag en system/legacyPointsDone_<weekKey> — solo corre una vez por semana.
-function backfillLegacyPoints(){
-  var flag='legacyPointsDone_'+weekKey;
-  db.ref('system/'+flag).once('value').then(function(s){
-    if(s.val())return;
-    var games=[{g:5,key:'g5'},{g:10,key:'g10'},{g:15,key:'g15'},{g:4,key:'g4b'},{g:'r',key:'gr'}];
-    Promise.all(games.map(function(gObj){return db.ref('weekScores/'+weekKey+'/'+gObj.key).once('value').then(function(s){return{game:gObj,scores:s.val()||{}};});})).then(function(results){
-      var earliest=null;
-      results.forEach(function(r){Object.values(r.scores).forEach(function(w){if(w&&w.lastPlayed&&(!earliest||w.lastPlayed<earliest))earliest=w.lastPlayed;});});
-      if(!earliest)return;
-      var launchDay=dayKeyFromTimestamp(earliest);if(!launchDay)return;
-      var updates={},userTotals={};
-      results.forEach(function(r){
-        var sorted=Object.entries(r.scores).filter(function(e){return e[1]&&e[1].bestDiff!=null;}).sort(function(a,b){return a[1].bestDiff!==b[1].bestDiff?a[1].bestDiff-b[1].bestDiff:(a[1].lastPlayed||0)-(b[1].lastPlayed||0);});
-        sorted.forEach(function(e,i){var uid2=e[0],w=e[1],pts=i<POINTS.length?POINTS[i]:0;if(pts===0)return;updates['weekPoints/'+weekKey+'/'+uid2+'/days/'+launchDay+'/'+r.game.key]=pts;updates['weekPoints/'+weekKey+'/'+uid2+'/name']=w.name||'?';updates['weekPoints/'+weekKey+'/'+uid2+'/photoURL']=w.photoURL||null;userTotals[uid2]=(userTotals[uid2]||0)+pts;});
-      });
-      if(Object.keys(updates).length>0){db.ref().update(updates).then(function(){Promise.all(Object.keys(userTotals).map(function(uid2){return db.ref('weekPoints/'+weekKey+'/'+uid2+'/days').once('value').then(function(ds){var days=ds.val()||{},total=0;Object.values(days).forEach(function(dg){Object.values(dg).forEach(function(p){total+=(p||0);});});return db.ref('weekPoints/'+weekKey+'/'+uid2+'/total').set(total);});})).then(function(){db.ref('system/'+flag).set(true);});});}
-      else db.ref('system/'+flag).set(true);
-    });
-  });
-}
 // Los targets son 100% manuales — el admin los cambia desde "Generar nuevos tiempos".
 // No hay reset automático ni setInterval de día para eliminar race conditions.
 
-db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){db.ref('scores/'+ rankKeyTC).off();rankKeyTC=cfg.rankKey_tc;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;_changed=true;}if(cfg.weekKey&&cfg.weekKey!==weekKey){weekKey=cfg.weekKey;_changed=true;}if(_changed){db.ref('weekPoints/'+weekKey).off();db.ref('weekPoints/'+weekKey).on('value',function(s2){weekPoints=s2.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();if(admLoggedIn){buildWinners();renderAdmGlobalTable();}});listenAllScores();}if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;if(!newTargetsToastShown&&!admLoggedIn&&cfgLastResetAt>0&&(Date.now()-cfgLastResetAt)<3*60*60*1000&&localStorage.getItem('lastSeenResetAt')!==String(cfgLastResetAt)){newTargetsToastShown=true;localStorage.setItem('lastSeenResetAt',String(cfgLastResetAt));setTimeout(function(){toast('⚡ Nuevos tiempos — ¡Tiempo y Ciego actualizados!');},1500);}updateConfigUI();});
-db.ref('profiles').on('value',function(s){profiles=s.val()||{};updateHomecards();updateInviteCard();if(admLoggedIn)updateAdmStats();});
-db.ref('weekPoints/'+weekKey).on('value',function(s){weekPoints=s.val()||{};if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='global')renderGlobalRank();updateNavPoints();updateRankCards();});
+// Listener pre-auth para gameConfig: sincroniza rankKeys y GCFG antes de que el usuario
+// inicie sesión. startListeners() lo cancela y re-registra con lógica post-auth completa.
+db.ref('gameConfig').on('value',function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);var _changed=false;if(cfg.rankKey_tc&&cfg.rankKey_tc!==rankKeyTC){db.ref('scores/'+rankKeyTC).off();rankKeyTC=cfg.rankKey_tc;_changed=true;}if(cfg.rankKey_s&&cfg.rankKey_s!==rankKeyS){rankKeyS=cfg.rankKey_s;_changed=true;}if(cfg.rankKey_r&&cfg.rankKey_r!==rankKeyR){rankKeyR=cfg.rankKey_r;_changed=true;}if(!cfg.rankKey_tc&&cfg.rankKey&&cfg.rankKey!==rankKeyTC){rankKeyTC=cfg.rankKey;_changed=true;}if(cfg.weekKey&&cfg.weekKey!==weekKey){weekKey=cfg.weekKey;_changed=true;}if(cfg.lastResetAt)cfgLastResetAt=cfg.lastResetAt;updateConfigUI();});
 function updateNavPoints(){if(!curUser)return;var wp=weekPoints[curUser.uid];var total=wp?(wp.total||0):0;var el=document.getElementById('navPts'),en=document.getElementById('navPtsNum');if(el&&en){en.textContent=total;el.style.display=total>0?'flex':'none';}}
 function startListeners(){
   // Cancelar listeners anteriores y re-registrar con auth activo
@@ -850,7 +829,7 @@ function listenAllScores(){
     mergeScoresForKey(rk,groups[rk],refresh);
   });
 }
-listenAllScores();
+// listenAllScores() es invocado por startListeners() una vez autenticado el usuario.
 
 // ══ INVITE ══
 function updateInviteCard(){
@@ -900,9 +879,6 @@ function doCreateAccount(name,email,pass,refCode,refOwnerUid){
     return r.user.updateProfile({displayName:name}).then(function(){return r.user.sendEmailVerification();}).then(function(){
       var uid=r.user.uid,rc=genRef(name);
       var np={name:name,email:email,photoURL:null,provider:'password',referralCode:rc,referredBy:refOwnerUid||null,createdAt:Date.now()};
-      if(refOwnerUid&&refCode){
-        // referral ilimitado — solo guardamos referredBy en el perfil
-      }
       return db.ref('profiles/'+uid).set(np);
     });
   }).catch(function(err){setMsg('rMsg',eMsg(err.code),'err');});
@@ -925,7 +901,7 @@ function showApp(fu,profile){
 }
 function updateConfigUI(){
   var tEl=document.getElementById('homeTitle'),dEl=document.getElementById('homeDate');
-  if(tEl)tEl.textContent=getTodayLabel();
+  if(tEl)tEl.textContent='¿Puedes ser el mejor?';
   if(dEl)dEl.textContent=getTodayDate();
   var tT=document.getElementById('tgtt');
   if(tT)tT.textContent=GCFG.t.toFixed(3);
@@ -1231,6 +1207,18 @@ function updateRankCards(){
     }
   }
 }
+// ── Helper: calcula y actualiza el subtítulo del ranking para un juego dado ──
+function updateRankSub(g){
+  var rk=(g==='s')?rankKeyS:(g==='r')?rankKeyR:rankKeyTC;
+  var parts=rk.split('_')[0].split('-');
+  var dt=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  var MABR=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var fromLbl=dt.getDate()+' '+MABR[dt.getMonth()];
+  var todayLbl=getTodayDate();
+  var tgt=(g==='t')?'🎯 '+GCFG.t.toFixed(3)+'s · ':(g==='b')?'🎯 '+GCFG.b.toFixed(3)+'s · ':'';
+  var period=(fromLbl===todayLbl)?'Hoy · '+todayLbl:'Desde '+fromLbl+' · '+todayLbl;
+  document.getElementById('rankSub').textContent=tgt+period;
+}
 function setRankGame(g){
   rankGame=g;
   var rkScreen=document.getElementById('sRanking');if(rkScreen)rkScreen.scrollTop=0;
@@ -1258,11 +1246,11 @@ function setRankGame(g){
   var labels={'t':'Reto Tiempo','b':'Reto Ciego','s':'Secuencia','r':'Reacción'};
   if(howBtn)howBtn.style.display='none';
   document.getElementById('rankTitle').textContent=labels[g]||'—';
-  var _rk=(g==='s')?rankKeyS:(g==='r')?rankKeyR:rankKeyTC;var _rkPts=_rk.split('_')[0].split('-');var _rkDate=new Date(parseInt(_rkPts[0]),parseInt(_rkPts[1])-1,parseInt(_rkPts[2]));var _rkLbl=_rkDate.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][_rkDate.getMonth()];var _tdLbl=getTodayDate();var _tgt=(g==='t')?'🎯 '+GCFG.t.toFixed(3)+'s · ':(g==='b')?'🎯 '+GCFG.b.toFixed(3)+'s · ':'';var _pLbl=(_rkLbl===_tdLbl)?'Hoy · '+_tdLbl:'Desde '+_rkLbl+' · '+_tdLbl;document.getElementById('rankSub').textContent=_tgt+_pLbl;  renderTop10(g);
+  updateRankSub(g);  renderTop10(g);
 }
 function renderTop10(g){
   var uid=curUser?curUser.uid:null,cfg=GCOLORS[g],isR=g==='r',isS=g==='s';
-  var _rk2=(g==='s')?rankKeyS:(g==='r')?rankKeyR:rankKeyTC;var _rp2=_rk2.split('_')[0].split('-');var _rd2=new Date(parseInt(_rp2[0]),parseInt(_rp2[1])-1,parseInt(_rp2[2]));var _rl2=_rd2.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][_rd2.getMonth()];var _tl2=getTodayDate();var _tg2=(g==='t')?'🎯 '+GCFG.t.toFixed(3)+'s · ':(g==='b')?'🎯 '+GCFG.b.toFixed(3)+'s · ':'';var _pl2=(_rl2===_tl2)?'Hoy · '+_tl2:'Desde '+_rl2+' · '+_tl2;document.getElementById('rankSub').textContent=_tg2+_pl2;
+  updateRankSub(g);
   var sorted=getSorted(g,50);var top10=sorted.slice(0,10),myIdx=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
   var html='';
   if(top10.length===0){html='<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';}
@@ -1578,7 +1566,7 @@ function updateTorneoCard(){
   if(td.status==='waiting'){
     var wRem=td.waitingStartedAt?(20*60*1000-(now-td.waitingStartedAt)):null;var tStr=wRem&&wRem>0?'<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--ct)">'+fmtMs(wRem)+'</span>':'';
     var pLine='<div style="font-size:12px;color:var(--tm);margin-bottom:12px"><strong style="color:var(--tx)">'+partCount+'</strong> / '+td.minPlayers+' jugadores'+(tStr?' · '+tStr:'')+'</div>';
-    var aBtn=!uid?'<button class="btn btn-gh" style="width:100%;height:38px;border-radius:9px" onclick="toast(\'Inicia sesión para unirte\')">Iniciar sesión</button>':isJoined?'<div style="font-size:12px;color:var(--ct);text-align:center;padding:8px 0">✅ Ya te uniste — esperando jugadores...</div>':'<button class="btn" style="background:var(--ct);color:#fff;width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px" onclick="window._tornShowJoin()">UNIRSE AL TORNEO</button>';
+    var aBtn=!uid?'<button class="btn btn-gh" style="width:100%;height:38px;border-radius:9px" onclick="toast(\'Inicia sesión para unirte\')">Iniciar sesión</button>':isJoined?'<div style="font-size:12px;color:var(--ct);text-align:center;padding:8px 0">✅ Ya te uniste — esperando jugadores...</div>':'<button class="btn" style="background:var(--ct);color:#fff;width:100%;height:40px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:3px" onclick="tornShowJoin()">UNIRSE AL TORNEO</button>';
     var wGameInfo=isJoined?('<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px"><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px">'+gameLabel+'</div><button onclick="showTorneoHowPlay()" style="background:transparent;border:1px solid var(--ct);border-radius:50%;width:20px;height:20px;color:var(--ct);font-size:10px;font-weight:700;cursor:pointer;padding:0">?</button></div>'+(targetLabel?'<div style="font-size:11px;color:var(--tm);margin-bottom:8px">'+targetLabel+'</div>':'')):'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:11px;color:var(--ctm)">🔒 Tipo de reto y meta ocultos — únete para revelar</div><button onclick="showTorneoHowPlay()" style="background:transparent;border:1px solid var(--ct);border-radius:50%;width:20px;height:20px;color:var(--ct);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0;margin-left:8px">?</button></div>';
     el.innerHTML='<div class="torneo-card"><span class="torneo-badge waiting">⚡ TORNEO RELÁMPAGO</span>'+wGameInfo+'<div style="font-size:12px;color:var(--wn);margin-bottom:6px">🏆 Premio: <strong>'+td.prize+'</strong></div>'+pLine+aBtn+'</div>';
     clearTimeout(window._tornCardTO);window._tornCardTO=setTimeout(updateTorneoCard,1000);return;
@@ -1599,7 +1587,7 @@ function updateTorneoCard(){
   }
   el.innerHTML='';
 }
-window._tornShowJoin=function(){
+function tornShowJoin(){
   if(!torneoData)return;var td=torneoData;var pc=Object.keys(torneoPartic).length;
   document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:4px;color:var(--ct)">⚡ UNIRSE AL TORNEO</div><div style="font-size:12px;color:var(--tm);margin-bottom:12px">'+'🔒 El tipo de reto y la meta se revelan al iniciar'+'</div><div style="background:var(--sf2);border:1px solid var(--bo);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Premio</span><strong>'+td.prize+'</strong></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Jugadores</span><span>'+pc+' / '+td.minPlayers+'</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Duración (al iniciar)</span><span>'+Math.round(td.durationMs/60000)+' min</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--tm)">Intentos</span><span>5 exclusivos del torneo</span></div></div><div style="font-size:11px;color:var(--tm);line-height:1.7;margin-bottom:14px">Tus intentos en el torneo no afectan los retos diarios ni el ranking semanal.</div><div class="mbtns"><button class="btn btn-gh" onclick="closeModal()" style="height:42px">Cancelar</button><button class="btn" onclick="joinTorneo()" style="height:42px;background:var(--ct);color:#fff;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">⚡ CONFIRMAR</button></div>';
   document.getElementById('overlay').classList.add('show');
@@ -1708,8 +1696,8 @@ function admCreateTorneo(){
     targetTime=Math.round(tVal*1000)/1000;
   }
   var tornId=Date.now();
-  var btn=document.getElementById('tornCreateBtn');if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
-  var tornId=Date.now();var btn=document.getElementById('tornCreateBtn');if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
+  var btn=document.getElementById('tornCreateBtn');
+  if(btn){btn.textContent='Creando...';btn.disabled=true;btn.style.opacity='.6';}
   db.ref().update({'torneo/participants':null,'torneo/active':{id:tornId,prize:prize,minPlayers:minP,durationMs:durMin*60*1000,gameMode:gameMode,targetTime:targetTime,status:'waiting',createdAt:tornId,waitingStartedAt:null,startedAt:null,finishedAt:null,countdownEndsAt:null}}).then(function(){toast('✅ Torneo creado — '+getTorneoGameLabel(gameMode)+' · '+minP+' jug · '+durMin+'min');renderAdmTorneos();}).catch(function(err){if(btn){btn.textContent='⚡ CREAR TORNEO';btn.disabled=false;btn.style.opacity='1';}if(err.message.indexOf('PERMISSION_DENIED')>=0){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:var(--dg)">⚠️ PERMISSION DENIED</div><p style="font-size:12px;color:var(--tm);margin-bottom:10px">Agrega en Firebase Console → Realtime Database → Rules:</p><div style="background:var(--sf2);border:1px solid var(--bo);border-radius:8px;padding:12px;font-family:DM Mono,monospace;font-size:11px;color:var(--ac);white-space:pre-wrap;user-select:all;cursor:text;margin-bottom:10px">"torneo": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n},\n"torneoHistorial": {\n  ".read": "auth != null",\n  ".write": "auth != null"\n}</div><button class="btn btn-gh" onclick="closeModal()" style="width:100%;height:40px;border-radius:9px">Cerrar</button>';document.getElementById('overlay').classList.add('show');}else{toast('❌ Error: '+err.message);}});
 }
 function tornHistToggle(el){var sk=el.getAttribute('data-sk');var b=document.getElementById('thb_'+sk);var ch=document.getElementById('thc_'+sk);if(!b)return;var isOpen=b.style.display!=='none';b.style.display=isOpen?'none':'block';if(ch)ch.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';}function admDoCloseTorneo(){closeModal();closeTorneo('manual');}
@@ -1768,7 +1756,7 @@ function toggleAdmSection(id){
       }
       renderAdmRetoSection(g2);
     }
-    if(id==='secTargetHistory')renderTargetHistory();
+    if(id==='secTargetHistory')loadTargetHistory();
   }
 }
 
@@ -1807,22 +1795,46 @@ function renderAdmRetoSection(g){
     return d2.getDate()+' '+['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d2.getMonth()];
   }
 
-  // Obtener lista de hasta 3 periodos [{rankKey, label, isCurrent}]
+  // Obtener lista de periodos [{rankKey, label, isCurrent}].
+  // Ademas del historial oficial, detecta claves huerfanas: presentes en scores/ con
+  // datos del juego actual pero sin registro en historial. Causa: race condition en
+  // saveTargets() al cambiar targets en rapida sucesion.
   function getPeriods(){
     var currentKey=getRankKey(g);
     var histField=isTorb?'rankKey_tc_history':(g==='s'?'rankKey_s_history':'rankKey_r_history');
-    return db.ref('gameConfig/'+histField).once('value').then(function(snap){
-      var hist=snap.val()||[];
+    return Promise.all([
+      db.ref('gameConfig/'+histField).once('value'),
+      db.ref('scores').once('value')
+    ]).then(function(results){
+      var hist=results[0].val()||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
+      var scoresSnap=results[1];
+
       var periods=[{rankKey:currentKey,label:'Periodo actual · desde '+rkLabel(currentKey),isCurrent:true,tt:GCFG.t,tb:GCFG.b}];
+      var knownKeys=new Set([currentKey]);
+
       var prev=hist.slice().reverse();
       prev.forEach(function(entry,i){
         var rk=typeof entry==='string'?entry:entry.key;
         var eTt=typeof entry==='object'&&entry.tt!=null?entry.tt:null;
         var eTb=typeof entry==='object'&&entry.tb!=null?entry.tb:null;
         var ordinal=['2°','3°','4°','5°','6°'];
-        if(rk)periods.push({rankKey:rk,label:(ordinal[i]||((i+2)+'°'))+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});
+        if(rk){knownKeys.add(rk);periods.push({rankKey:rk,label:(ordinal[i]||((i+2)+'°'))+' periodo · desde '+rkLabel(rk),isCurrent:false,tt:eTt,tb:eTb});}
       });
+
+      // Detectar claves huerfanas: existen en scores/ con data del juego actual pero no estan en historial
+      scoresSnap.forEach(function(rkSnap){
+        var rk=rkSnap.key;
+        if(knownKeys.has(rk))return;
+        var hasData=false;
+        rkSnap.forEach(function(daySnap){
+          if(daySnap.child(gkey).numChildren()>0)hasData=true;
+        });
+        if(hasData){
+          periods.push({rankKey:rk,label:rkLabel(rk)+' (periodo recuperado †)',isCurrent:false,tt:null,tb:null,orphaned:true});
+        }
+      });
+
       return periods;
     });
   }
@@ -1944,12 +1956,8 @@ function renderAdmGlobalTable(){
 }
 function admLogin(){
   if(!curUser||curUser.uid!==ADMIN_UID){toast('⛔ No autorizado');admLogout();return;}
-  if(true){
-    admLoggedIn=true;
-    // Si no hay sesión Firebase activa (admin entró desde la pantalla de login sin
-    // autenticarse), firmar anónimamente para que auth!=null y las reglas de DB
-    // permitan operaciones de escritura (reset de scores, etc.).
-    var initPanel=function(){
+  admLoggedIn=true;
+  var initPanel=function(){
       startListeners();
       document.getElementById('admLC').style.display='none';
       setTimeout(updateAdmStats,1500);
@@ -1964,6 +1972,7 @@ function admLogin(){
           '<button class="btn" style="background:#e67e00;color:#fff" onclick="confResetGame(\'r\')">🔄 Reset Reacción</button>'+
           '<button class="btn" style="background:#6b3fa0;color:#fff" onclick="confCleanLegacy()">🧹 Limpiar legacy</button>'+
           '<button class="btn" style="background:#0a7a4f;color:#fff" onclick="admRecalcAttempts(this)">🔄 Recalcular partidas</button>'+
+
         '</div>'+
       '</div>'+
       // TIEMPOS OBJETIVO — arriba, sin botón generar, siempre visible
@@ -2032,13 +2041,9 @@ function admLogin(){
     if(auth.currentUser){
       initPanel();
     } else {
-      auth.signInAnonymously().then(initPanel).catch(function(e){
-        toast('❌ Error de auth: '+e.message);admLoggedIn=false;
-      });
+      toast('❌ Sin sesión activa — recarga la página');
+      admLoggedIn=false;
     }
-  } else {
-    toast('❌ Credenciales incorrectas');
-  }
 }
 function genTargets(){
   var rndTt=Math.round((3+Math.random()*12)*1000)/1000;
@@ -2068,13 +2073,13 @@ function genTargets(){
     '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.25);border-radius:9px;cursor:pointer;margin-bottom:8px">'+
       '<input type="checkbox" id="chkReset" checked onchange="toggleResetWarning()" style="width:16px;height:16px;margin-top:1px;accent-color:var(--wn);flex-shrink:0;cursor:pointer">'+
       '<div>'+
-        '<div style="font-size:12px;font-weight:600;color:var(--wn)">Resetear scores del día</div>'+
-        '<div style="font-size:10px;color:var(--tm);margin-top:2px;line-height:1.5">Los rankings del día empiezan en 0. Los puntos acumulados de la semana no se tocan.</div>'+
+        '<div style="font-size:12px;font-weight:600;color:var(--wn)">Nuevo periodo (aislar scores del ranking)</div>'+
+        '<div style="font-size:10px;color:var(--tm);margin-top:2px;line-height:1.5">El ranking activo empieza en 0. Los scores anteriores quedan archivados y visibles en el panel histórico.</div>'+
       '</div>'+
     '</label>'+
     // Advertencia dinámica — solo visible cuando checkbox está desmarcado
     '<div id="noResetWarning" style="display:none;background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.3);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--dg);line-height:1.6">'+
-      '⚠️ Los scores actuales se conservan. Los jugadores que ya jugaron hoy competirán con el <strong>nuevo target</strong> — su diferencia será recalculada automáticamente.'+
+      '⚠️ El ranking activo conserva los scores existentes y el nuevo target coexiste con ellos. Las diferencias de los jugadores actuales no serán comparables con el nuevo target.'+
     '</div>'+
     '<div class="mbtns">'+
       '<button class="btn btn-gh" onclick="closeModal()" style="height:40px;border-radius:9px">Cancelar</button>'+
@@ -2134,15 +2139,17 @@ function _saveTargetsConfirmed(){
       var d2=getCDMX();
       var newRankKey=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0')+'_'+Date.now();
       var oldTCKey=rankKeyTC;
-      ops.push(db.ref('scores/'+rankKeyTC+'/'+today).remove());
+      // NO se borran los scores del periodo anterior: al cambiar rankKeyTC el ranking activo
+      // ya deja de mostrarlos (listenAllScores escucha solo el nuevo key), pero quedan
+      // archivados y visibles en el panel de histórico de admin.
       ops.push(db.ref('gameConfig/rankKey_tc').set(newRankKey));
-      if(tcHist!==null)ops.push(db.ref('gameConfig/rankKey_tc_history').set(tcHist));
+      // Nota: el historial ya fue actualizado atomicamente via transaction antes de llamar doWrite
       rankKeyTC=newRankKey;
     }
     Promise.all(ops).then(function(){
       if(doReset){db.ref('scores/'+oldTCKey).off();wScores={t:{},b:{},s:{},r:{}};listenAllScores();}
       closeModal();
-      toast(doReset?'✅ Tiempos aplicados — día reseteado':'✅ Tiempos actualizados — scores conservados');
+      toast(doReset?'✅ Tiempos aplicados — nuevo periodo iniciado':'✅ Tiempos actualizados — scores conservados');
       updateHomecards();
       updateAdmStats();
       buildWinners();
@@ -2159,19 +2166,27 @@ function _saveTargetsConfirmed(){
   }
 
   if(doReset){
-    // Leer historial existente, agregar rankKeyTC actual y conservar últimos 5 periodos
-    db.ref('gameConfig/rankKey_tc_history').once('value').then(function(snap){
-      var hist=snap.val()||[];
+    // Usar transaction para evitar race condition: si el admin guarda targets en rapida
+    // sucesion, dos lecturas concurrentes pueden sobrescribirse mutuamente y perder claves.
+    // La transaction garantiza que cada escritura lee el estado mas reciente antes de modificar.
+    var keyToArchive=rankKeyTC;
+    var ttToArchive=GCFG.t;
+    var tbToArchive=GCFG.b;
+    db.ref('gameConfig/rankKey_tc_history').transaction(function(currentHist){
+      var hist=currentHist||[];
       if(!Array.isArray(hist))hist=Object.values(hist);
-      hist.push({key:rankKeyTC,tt:GCFG.t,tb:GCFG.b});
+      // Solo agregar si no esta ya en el historial (evita duplicados por reintentos)
+      var alreadyIn=hist.some(function(e){return (typeof e==='string'?e:e.key)===keyToArchive;});
+      if(!alreadyIn)hist.push({key:keyToArchive,tt:ttToArchive,tb:tbToArchive});
       if(hist.length>5)hist=hist.slice(-5);
-      doWrite(hist);
+      return hist;
+    },{applyLocally:false}).then(function(){
+      doWrite(null); // historial ya actualizado atomicamente por la transaction
     }).catch(function(){doWrite(null);});
   } else {
     doWrite(null);
   }
 }
-function renderTargetHistory(){loadTargetHistory();}
 function loadTargetHistory(){
   var el=document.getElementById('secTargetHistory');
   if(!el)return;
@@ -2475,8 +2490,8 @@ function showHowPlay(g){var isR=g==='r',isB=g==='b',isS=g==='s',cfg=GCOLORS[g]||
 function showHowPoints(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px">🏅 CÓMO SE GANAN PUNTOS</div><div style="font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.7">Cada día, los mejores resultados de <strong style="color:var(--tx)">cada reto</strong> suman puntos:</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥇</span><span>1er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">15 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥈</span><span>2do lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥉</span><span>3er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>4to</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">5 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>5to–10mo</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">2 pts</span></div></div><div style="font-size:11px;color:var(--td);background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">💡 Hay <strong style="color:var(--tm)">4 retos por día</strong> — Tiempo, Ciego, Secuencia y Reacción.<br>El ranking global muestra quién acumuló más puntos en la semana.</div><button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
-var tt;
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},3500);}
+var _toastTO;
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(_toastTO);_toastTO=setTimeout(function(){t.classList.remove('show');},3500);}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();if(e.code==='Space'&&document.getElementById('sGame').classList.contains('on')&&gState!=='countdown'){e.preventDefault();handleBtn();}});
 </script>
 </body>
