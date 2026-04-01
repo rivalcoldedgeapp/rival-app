@@ -2192,7 +2192,7 @@ function _saveTargetsConfirmed(){
       if(!alreadyIn)hist.push({key:keyToArchive,tt:ttToArchive,tb:tbToArchive});
       if(hist.length>5)hist=hist.slice(-5);
       return hist;
-    },{applyLocally:false}).then(function(){
+    },null,false).then(function(){
       doWrite(null); // historial ya actualizado atomicamente por la transaction
     }).catch(function(){doWrite(null);});
   } else {
