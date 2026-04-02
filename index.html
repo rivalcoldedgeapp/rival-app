@@ -864,7 +864,7 @@ db.ref('appVersion').on('value',function(s){
     banner.id='updateBanner';
     banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--ac);color:#000;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;box-shadow:0 2px 20px rgba(0,230,122,.3)';
     banner.innerHTML='<span>⚡ Hay una nueva versión de RIVAL disponible</span>'+
-      '<button onclick="window.location.reload(true)" style="background:#000;color:var(--ac);border:none;border-radius:7px;padding:6px 14px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;white-space:nowrap">ACTUALIZAR</button>';
+      '<button onclick="window.location.href=window.location.pathname+\'?v=\'+Date.now()" style="background:#000;color:var(--ac);border:none;border-radius:7px;padding:6px 14px;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;white-space:nowrap">ACTUALIZAR</button>';
     document.body.prepend(banner);
   }
 });
@@ -1944,53 +1944,52 @@ function scheduleAutoClose(){
 }
 function cancelTorneo(){
   if(!torneoData||torneoData.status!=='waiting')return;
-  // Guard local: no cancelar si ya hay suficientes jugadores
-  var currentCount=Object.keys(torneoPartic||{}).length;
-  if(torneoData.minPlayers&&currentCount>=torneoData.minPlayers)return;
   var expectedId=torneoData.id;
-  // Leer estado fresco de Firebase antes de cancelar — evita drift de reloj entre clientes
-  db.ref('torneo/active').once('value').then(function(snap){
-    var fresh=snap.val();
-    if(!fresh||fresh.status!=='waiting')return; // ya cambió
-    if(fresh.id!==expectedId)return; // es otro torneo
-    // Verificar que realmente venció el tiempo usando datos del servidor
-    if(fresh.waitingStartedAt){
-      var elapsed=Date.now()-fresh.waitingStartedAt;
-      var waitMs=fresh.waitMs||20*60*1000;
-      if(elapsed<waitMs){
-        // Aún hay tiempo — reprogramar con el tiempo correcto
-        var remaining=waitMs-elapsed;
-        clearTimeout(torneoCancelTO);
-        torneoCancelTO=setTimeout(cancelTorneo,remaining);
+  var expectedWaitMs=torneoData.waitMs||60*60*1000; // fallback 60min, NO 20min
+
+  // Leer participants frescos de Firebase
+  db.ref('torneo/participants').once('value').then(function(pSnap){
+    var freshParts=pSnap.val()||{};
+    var freshCount=Object.keys(freshParts).length;
+
+    db.ref('torneo/active').transaction(function(c){
+      if(!c||c.status!=='waiting')return; // ya no está waiting
+      if(c.id!==expectedId)return;        // es otro torneo
+
+      // ══ VERIFICACIÓN DE TIEMPO DENTRO DE LA TRANSACTION ══
+      // Si aún hay tiempo, abortar — esto es la defensa final
+      if(c.waitingStartedAt){
+        var wMs=c.waitMs||expectedWaitMs;
+        var elapsed=Date.now()-c.waitingStartedAt;
+        if(elapsed<wMs)return; // abortar — aún hay tiempo
+        // También verificar cancelAt si existe (timestamp absoluto más confiable)
+        if(c.cancelAt&&Date.now()<c.cancelAt)return;
+      } else {
+        // Nadie se ha unido aún — no hay waitingStartedAt, no cancelar
         return;
       }
-    }
-    // Verificar minPlayers con datos frescos de participants
-    db.ref('torneo/participants').once('value').then(function(pSnap){
-      var freshParts=pSnap.val()||{};
-      var freshCount=Object.keys(freshParts).length;
-      if(fresh.minPlayers&&freshCount>=fresh.minPlayers)return; // se llenó
-      // Proceder con la cancelación via transaction
-      db.ref('torneo/active').transaction(function(c){
-        if(!c||c.status!=='waiting')return;
-        if(c.id!==expectedId)return;
-        c.status='cancelled';c.finishedAt=Date.now();return c;
-      },null,false).then(function(res){
-        if(!res.committed)return;
-        var fd=res.snapshot.val();
-        var histId=fd.id||fd.createdAt||Date.now();
-        var partSnap=Object.entries(freshParts).map(function(e){return{uid:e[0],name:e[1].name||'?',joinedAt:e[1].joinedAt||0};});
-        var updates={};
-        updates['torneoHistorial/'+histId]={id:histId,prize:fd.prize||'',gameMode:fd.gameMode,targetTime:fd.targetTime||null,status:'cancelled',closeReason:'no_fill',createdAt:fd.createdAt||0,startedAt:null,finishedAt:fd.finishedAt||Date.now(),minPlayers:fd.minPlayers||0,durationMs:fd.durationMs||0,waitingStartedAt:fd.waitingStartedAt||null,participantsCount:partSnap.length,winner:null,top3:[],participants:(function(){var cp={};Object.entries(freshParts).forEach(function(e){cp[e[0]]=e[1];});return cp;}())};
-        updates['torneo/active']=null;
-        updates['torneo/participants']=null;
-        db.ref().update(updates);
-        if(!torneoCancelledDisplay){
-          torneoCancelledDisplay={at:Date.now()};
-          clearTimeout(window._tornCancelTO);
-          window._tornCancelTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
-        }
-      });
+
+      // Verificar minPlayers con datos frescos
+      if(c.minPlayers&&freshCount>=c.minPlayers)return; // se llenó
+
+      c.status='cancelled';
+      c.finishedAt=Date.now();
+      return c;
+    },null,false).then(function(res){
+      if(!res.committed)return;
+      var fd=res.snapshot.val();
+      var histId=fd.id||fd.createdAt||Date.now();
+      var partSnap=Object.entries(freshParts).map(function(e){return{uid:e[0],name:e[1].name||'?',joinedAt:e[1].joinedAt||0};});
+      var updates={};
+      updates['torneoHistorial/'+histId]={id:histId,prize:fd.prize||'',gameMode:fd.gameMode,targetTime:fd.targetTime||null,status:'cancelled',closeReason:'no_fill',createdAt:fd.createdAt||0,startedAt:null,finishedAt:fd.finishedAt||Date.now(),minPlayers:fd.minPlayers||0,durationMs:fd.durationMs||0,waitingStartedAt:fd.waitingStartedAt||null,participantsCount:partSnap.length,winner:null,top3:[],participants:(function(){var cp={};Object.entries(freshParts).forEach(function(e){cp[e[0]]=e[1];});return cp;}())};
+      updates['torneo/active']=null;
+      updates['torneo/participants']=null;
+      db.ref().update(updates);
+      if(!torneoCancelledDisplay){
+        torneoCancelledDisplay={at:Date.now()};
+        clearTimeout(window._tornCancelTO);
+        window._tornCancelTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
+      }
     });
   });
 }
@@ -2027,7 +2026,7 @@ function joinTorneo(){
   db.ref('torneo/participants/'+uid).set({name:p.name||'?',email:p.email||'',joinedAt:Date.now(),attempts:0,attemptsExhausted:false}).then(function(){
     db.ref('torneo/participants').once('value').then(function(s){
       var count=Object.keys(s.val()||{}).length;
-      db.ref('torneo/active').transaction(function(c){if(!c||c.status!=='waiting')return;if(!c.waitingStartedAt)c.waitingStartedAt=Date.now();if(count>=c.minPlayers){c.status='countdown';c.countdownEndsAt=Date.now()+5000;}return c;},null,false);
+      db.ref('torneo/active').transaction(function(c){if(!c||c.status!=='waiting')return;if(!c.waitingStartedAt){c.waitingStartedAt=Date.now();c.cancelAt=c.waitingStartedAt+(c.waitMs||60*60*1000);}if(count>=c.minPlayers){c.status='countdown';c.countdownEndsAt=Date.now()+5000;}return c;},null,false);
     });
     toast('✅ ¡Te uniste al torneo!');closeModal();
   }).catch(function(err){toast('❌ '+err.message);});
