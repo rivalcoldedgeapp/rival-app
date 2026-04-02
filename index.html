@@ -981,6 +981,12 @@ function _showPerfilModalWith(p){
 function gameBack(){if(inTorneoGame&&gState==='running'){toast('⚡ Para el reloj antes de salir');return;}if(inTorneoGame){inTorneoGame=false;removeTorneoBanner();removeTorneoLBInject();db.ref('gameConfig').once('value').then(function(s){var cfg=s.val()||{};if(cfg.tt)GCFG.t=parseFloat(cfg.tt);if(cfg.tb)GCFG.b=parseFloat(cfg.tb);});}goTab('home');}
 function startGame(g){
   curGame=g;var cfg=GCOLORS[g];
+  // Si no es un intento de torneo, limpiar cualquier residuo del torneo anterior
+  if(!inTorneoGame){
+    removeTorneoBanner();
+    removeTorneoLBInject();
+    var _ir=document.getElementById('inlineResult');if(_ir)_ir.style.display='none';
+  }
   var labels={t:'RETO TIEMPO',b:'RETO CIEGO'};
   document.getElementById('ghTitle').textContent=labels[g]||'RETO';document.getElementById('ghTitle').style.color=cfg.color;
   if(g==='b'){document.getElementById('ghSub').textContent='Para sin ver el reloj';document.getElementById('tNum').textContent='???';document.getElementById('tUnit').textContent='SEGUNDOS (OCULTO)';}
@@ -1010,7 +1016,15 @@ function resetClock(){
 }
 
 // ══ SECUENCIA ══
-function startSeq(){seqState='idle';seqCurrent=1;var uid=curUser?curUser.uid:null,ws=uid?wScores['s'][uid]:null;
+function startSeq(){
+  seqState='idle';seqCurrent=1;
+  // Si no es un intento de torneo, limpiar cualquier residuo del torneo anterior
+  if(!inTorneoGame){
+    removeTorneoBanner();
+    removeTorneoLBInject();
+    var _irS=document.getElementById('inlineResultS');if(_irS)_irS.style.display='none';
+  }
+  var uid=curUser?curUser.uid:null,ws=uid?wScores['s'][uid]:null;
 document.getElementById('srBestS').textContent=ws&&ws.bestTime?ws.bestTime+'s':'—';
 document.getElementById('srPosS').textContent=ws&&ws.bestTime?'#'+getRank(uid,'s'):'—';
 document.getElementById('seqNextHint').style.display='none';document.getElementById('seqTimerLbl').textContent='—';document.getElementById('seqArea').innerHTML='';var btn=document.getElementById('seqBtn');btn.textContent='INICIAR';btn.disabled=false;btn.style.opacity='1';btn.onclick=handleSeqBtn;showScreen('sSeq');}
