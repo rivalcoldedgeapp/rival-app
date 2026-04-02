@@ -21,6 +21,7 @@
   --cs:#00c2e0;--csd:#00c2e015;--csm:#00c2e040;
   --cr:#ff6b00;--crd:#ff6b0015;--crm:#ff6b0040;
   --ct:#ff2d78;--ctd:#ff2d7815;--ctm:#ff2d7840;
+  --cp:#a855f7;--cpd:#a855f715;--cpm:#a855f740;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
@@ -315,7 +316,7 @@ tr:hover td{background:var(--sf2)}
   .rank-inner{flex-shrink:0;touch-action:pan-y}
   .adm-inner{flex-shrink:0}
   #sGame{justify-content:center;padding-top:8px}#sSeq{justify-content:center;padding-top:8px}
-  #sReaction{justify-content:center;padding-top:8px}
+  #sReaction{justify-content:center;padding-top:8px}#sPulso{justify-content:center;padding-top:8px}
   #sResult{height:auto;min-height:calc(100dvh - 53px)}
   .gi{gap:10px;padding:0 12px 16px}.si{gap:10px;padding:0 12px 16px}
   .cring{width:160px;height:160px}.cs{font-size:34px}.cm{font-size:26px}
@@ -339,8 +340,8 @@ tr:hover td{background:var(--sf2)}
   .home-hdr{flex-shrink:0;margin-bottom:10px}
   .game-grid{
     flex:1;min-height:0;gap:8px;
-    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
-    max-height:calc(2 * 200px + 8px);
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr);
+    max-height:calc(2 * 200px + 8px + 120px);
   }
   .gc2{min-height:0;padding:10px 10px 8px}
   .gc2-name{font-size:13px}
@@ -349,7 +350,37 @@ tr:hover td{background:var(--sf2)}
   .gc2-leader{font-size:10px;padding-top:4px}
   .gc2-pos{font-size:9px}
 }
-/* ══ TORNEO RELÁMPAGO ══ */
+.gc2.gp{border-color:var(--cp)}.gc2.gp::before{background:var(--cp)}
+/* ══ PULSO ══ */
+#sPulso{padding:18px;position:relative}
+#sPulso::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--bo) 1px,transparent 1px),linear-gradient(90deg,var(--bo) 1px,transparent 1px);background-size:40px 40px;opacity:.2;pointer-events:none}
+.pi{width:100%;max-width:360px;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pulso-arena{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pulso-ring-outer{position:absolute;inset:0;border-radius:50%;border:2px solid var(--cp);opacity:.25}
+.pulso-ring-track{position:absolute;inset:8px;border-radius:50%;border:1px solid var(--cp);opacity:.15}
+.pulso-circle{width:120px;height:120px;border-radius:50%;background:var(--cpd);border:3px solid var(--cp);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;transition:box-shadow .1s;user-select:none;-webkit-user-select:none;position:relative;z-index:2}
+.pulso-circle.active{box-shadow:0 0 40px var(--cpm)}
+.pulso-circle.hit-good{border-color:#00e87a;box-shadow:0 0 30px #00e87a40;animation:pulsoHitGood .25s ease-out}
+.pulso-circle.hit-ok{border-color:var(--wn);box-shadow:0 0 30px rgba(255,184,0,.3);animation:pulsoHitOk .25s ease-out}
+.pulso-circle.hit-bad{border-color:var(--dg);box-shadow:0 0 30px rgba(255,61,90,.3);animation:pulsoHitBad .3s ease-out}
+@keyframes pulsoHitGood{0%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes pulsoHitOk{0%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pulsoHitBad{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pulso-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--cp);line-height:1;text-align:center}
+.pulso-lbl{font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-top:2px;text-align:center;white-space:nowrap}
+.pulso-expand{position:absolute;inset:0;border-radius:50%;border:2px solid var(--cp);opacity:0;pointer-events:none}
+.pulso-expand.pulse-anim{animation:pulsoExpand 1s ease-out forwards}
+@keyframes pulsoExpand{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.8);opacity:0}}
+.pulso-tap-row{display:flex;gap:6px;justify-content:center}
+.pulso-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--cp);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .2s}
+.pulso-dot.pending{background:transparent;color:var(--tm)}
+.pulso-dot.good{background:#00e87a;border-color:#00e87a;color:#000}
+.pulso-dot.ok{background:var(--wn);border-color:var(--wn);color:#000}
+.pulso-dot.bad{background:var(--dg);border-color:var(--dg);color:#fff}
+.pulso-score-big{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--cp);line-height:1;text-shadow:0 0 30px var(--cpm)}
+.pulso-score-lbl{font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-top:2px}
+.rks-p{border-color:var(--bo)}.rks-p::before{background:var(--cp)}
+.rk-sel-card.active.rks-p{border-color:var(--cp);box-shadow:0 0 14px var(--cpd)}.rk-sel-card.active.rks-p::before{opacity:.1}
 .torneo-card{border-radius:14px;padding:16px;border:2px solid var(--ct);background:var(--sf);position:relative;overflow:hidden;margin-top:12px}
 .torneo-card::before{content:'';position:absolute;inset:0;background:var(--ct);opacity:.04;pointer-events:none}
 .torneo-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:8px;font-family:'DM Sans',sans-serif;font-weight:600}
@@ -499,9 +530,97 @@ body.playing{overflow:hidden}
       </div>
     </div>
 
+    <!-- PULSO — sección especial separada del grid diario -->
+    <div onclick="startPulso()" style="margin-top:10px;background:var(--sf);border:1px solid var(--cp);border-radius:14px;padding:14px 16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+      <div style="position:absolute;inset:0;background:var(--cp);opacity:.05;pointer-events:none"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:3px;color:var(--cp);background:var(--cpd);border:1px solid var(--cpm);border-radius:4px;padding:2px 7px">MODO ESPECIAL</div>
+        </div>
+        <button onclick="event.stopPropagation();showHowPlay('p')" style="background:transparent;border:1px solid var(--cp);border-radius:50%;width:20px;height:20px;color:var(--cp);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--cp);line-height:1">♾ PULSO</div>
+          <div style="font-size:10px;color:var(--tm);margin-top:3px">Ritmo interno · Ranking permanente</div>
+        </div>
+        <div style="text-align:right">
+          <div class="gc2-leader" id="hldp" style="font-size:11px">—</div>
+          <div class="gc2-pos" id="hrp" style="font-size:10px;color:var(--tm)">—</div>
+        </div>
+      </div>
+    </div>
+
     <!-- TORNEOS RELÁMPAGO -->
     <div id="torneoCard"></div>
 
+  </div>
+</div>
+
+<!-- PULSO -->
+<div class="screen" id="sPulso">
+  <div class="pi">
+    <div class="gh">
+      <button class="gh-back" onclick="pulsoBack()">← Volver</button>
+      <div class="gh-title" style="color:var(--cp)">PULSO <button onclick="showPulsoTutorial()" style="background:transparent;border:1px solid var(--cp);border-radius:50%;width:22px;height:22px;color:var(--cp);font-size:11px;font-weight:700;cursor:pointer;padding:0;vertical-align:middle;margin-left:6px">?</button></div>
+      <div class="gh-sub" style="color:var(--cp)">Toca exactamente cada 1.000 segundo</div>
+    </div>
+    <div class="score-row">
+      <div><div class="sr-lbl">Tu mejor</div><div class="sr-val" id="srBestP" style="color:var(--cp)">—</div></div>
+      <div style="text-align:right"><div class="sr-lbl">Posición</div><div class="sr-val" id="srPosP" style="color:var(--wn)">—</div></div>
+    </div>
+    <!-- Arena del pulso — arco giratorio -->
+    <div class="pulso-arena">
+      <!-- SVG del arco de progreso -->
+      <svg id="pulsoSVG" viewBox="0 0 200 200" style="position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)">
+        <!-- Track gris -->
+        <circle cx="100" cy="100" r="88" fill="none" stroke="var(--bo)" stroke-width="6"/>
+        <!-- Arco de progreso — se anima con JS -->
+        <circle cx="100" cy="100" r="88" fill="none" stroke="var(--cp)" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"
+          id="pulsoArc" style="transition:stroke .2s"/>
+      </svg>
+      <!-- Círculo central táctil -->
+      <div class="pulso-circle" id="pulsoCircle" onclick="pulsoTap()">
+        <div class="pulso-num" id="pulsoNum">5</div>
+        <div class="pulso-lbl" id="pulsoLbl">TOQUES</div>
+      </div>
+    </div>
+    <!-- Instrucción visual debajo del arco -->
+    <div id="pulsoArcHint" style="text-align:center;font-size:11px;color:var(--tm);letter-spacing:1px">Toca cuando el arco se llene ↑</div>
+    <!-- Indicadores de taps — 7 toques -->
+    <div class="pulso-tap-row" id="pulsoTapRow" style="gap:6px;justify-content:center">
+      <div class="pulso-dot pending" id="pd0">1</div>
+      <div class="pulso-dot pending" id="pd1">2</div>
+      <div class="pulso-dot pending" id="pd2">3</div>
+      <div class="pulso-dot pending" id="pd3">4</div>
+      <div class="pulso-dot pending" id="pd4">5</div>
+      <div class="pulso-dot pending" id="pd5">6</div>
+      <div class="pulso-dot pending" id="pd6">7</div>
+    </div>
+    <!-- Timer de referencia -->
+    <div style="text-align:center">
+      <div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:4px">Objetivo</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cp)">1.000s</div>
+      <div style="font-size:10px;color:var(--td)">entre cada toque</div>
+    </div>
+    <!-- Sin botón INICIAR — toca el círculo directamente -->
+    <!-- Resultado inline -->
+    <div id="inlineResultP" style="display:none;width:100%;text-align:center">
+      <div style="text-align:center;margin-bottom:8px">
+        <div class="pulso-score-big" id="pulsoScoreBig">—</div>
+        <div class="pulso-score-lbl">MS PROMEDIO DE ERROR</div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:16px;padding:10px 14px;background:var(--sf);border:1px solid var(--bo);border-radius:12px;margin-bottom:8px">
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Posición</div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--wn)" id="irPosP">—</div></div>
+        <div style="width:1px;background:var(--bo)"></div>
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Mejor tap</div><div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#00e87a" id="irBestTapP">—</div></div>
+        <div style="width:1px;background:var(--bo)"></div>
+        <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Peor tap</div><div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--dg)" id="irWorstTapP">—</div></div>
+      </div>
+      <div id="irRecP" style="display:none;font-size:12px;padding:6px 12px;background:var(--cpd);border:1px solid var(--cpm);border-radius:8px;color:var(--cp);margin-bottom:8px">🎉 ¡Nuevo récord personal!</div>
+      <button id="pulsoRetryBtn" onclick="pulsoRetry()" style="width:100%;height:50px;background:var(--cp);color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px">▶ INTENTAR DE NUEVO</button>
+    </div>
   </div>
 </div>
 
@@ -649,6 +768,11 @@ body.playing{overflow:hidden}
         <div class="rk-sel-val" id="rksv-tn">—</div>
         <div class="rk-sel-sub" id="rkss-tn">historial</div>
       </div>
+      <div class="rk-sel-card rks-p" id="rgcP" onclick="setRankGame('p')">
+        <div class="rk-sel-name">♾ PULSO</div>
+        <div class="rk-sel-val" id="rksv-p">—</div>
+        <div class="rk-sel-sub" id="rkss-p">mejor global</div>
+      </div>
     </div>
     <!-- Lista -->
     <div id="rankList" style="margin-top:6px"></div>
@@ -690,16 +814,23 @@ var GCOLORS={
   t:{color:'var(--ac)',stroke:'#00e87a',glow:'#00e87a40'},
   b:{color:'var(--c4b)',stroke:'#ff9f00',glow:'#ff9f0040'},
   s:{color:'var(--cs)',stroke:'#00c2e0',glow:'#00c2e040'},
-  r:{color:'var(--cr)',stroke:'#ff6b00',glow:'#ff6b0040'}
+  r:{color:'var(--cr)',stroke:'#ff6b00',glow:'#ff6b0040'},
+  p:{color:'var(--cp)',stroke:'#a855f7',glow:'#a855f740'}
 };
-var GAME_LABELS={t:'🟢 Reto Tiempo',b:'🟡 Reto Ciego',s:'🩵 Secuencia',r:'⚡ Reacción'};
+var GAME_LABELS={t:'🟢 Reto Tiempo',b:'🟡 Reto Ciego',s:'🩵 Secuencia',r:'⚡ Reacción',p:'♾ Pulso'};
 var profiles={},POINTS=[15,10,7,5,2,2,2,2,2,2],weekPoints={};
 var wScores={t:{},b:{},s:{},r:{}};
+var wScoresPulso={}; // ranking permanente de Pulso — no resetea
 var ADMIN_UID='U4X0cDD33Ahh2MxDsKCLgaoZMtR2';
 var curUser=null,curGame='t',admLoggedIn=false,admGame='t',rankGame='global';
 var resetInProgress=false; // bloquea recalcPoints durante un reset para evitar re-escritura
 var gState='idle',t0=null,raf=null,elapsed=0;
 var reactState='idle',reactTO=null;
+// ══ PULSO STATE ══
+var pulsoState='idle'; // idle | countdown | running | done
+var pulsoTaps=[]; // array de {ts, diff} por cada tap
+var pulsoLastTapTs=0;
+var pulsoExpTO=null; // timeout del expand visual
 var seqState='idle',seqCurrent=1,seqRaf=null,seqT0=null;
 var rankKeyTC='2026-03-23',rankKeyS='2026-03-23',rankKeyR='2026-03-23';
 var weekKey=rankKeyTC; // puntos globales — sigue a gameConfig/weekKey, independiente de rankKeyTC
@@ -784,8 +915,16 @@ function startListeners(){
     if(admLoggedIn)renderAdmTorneos();
     checkAllExhausted();
   });
+  // ── Pulso listener — ranking permanente, no resetea ──
+  db.ref('pulsoScores').off();
+  db.ref('pulsoScores').on('value',function(s){
+    wScoresPulso=s.val()||{};
+    updateHomecardPulso();
+    updateRankCards();
+    if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='p')renderPulsoRanking();
+    if(admLoggedIn)renderAdmPulsoSection();
+  });
 }
-// Merge todos los días de un rankKey en wScores para los juegos indicados
 function mergeScoresForKey(rk,games,cb){
   db.ref('scores/'+rk).off();
   db.ref('scores/'+rk).on('value',function(s){
@@ -941,7 +1080,33 @@ function updateHomecards(){
       }
     }
   });
+  updateHomecardPulso();
+}
 
+function updateHomecardPulso(){
+  if(!curUser)return;
+  var uid=curUser.uid;
+  var cfg=GCOLORS.p;
+  var sortedP=getPulsoSorted(1);
+  var ldEl=document.getElementById('hldp');
+  if(ldEl){
+    if(sortedP.length>0){
+      var leader=sortedP[0][1],isMe=sortedP[0][0]===uid;
+      ldEl.innerHTML='🥇 <strong style="color:'+cfg.stroke+'">'+(isMe?'Tú 👈':leader.name)+'</strong> <span style="font-family:DM Mono,monospace;color:'+cfg.stroke+'">±'+leader.bestScore+'ms</span>';
+    } else {
+      ldEl.innerHTML='<span style="color:var(--td)">Sin jugadores aún</span>';
+    }
+  }
+  var posEl=document.getElementById('hrp');
+  if(posEl){
+    var myP=wScoresPulso[uid];
+    if(myP&&myP.bestScore!=null){
+      var rankP=getPulsoRank(uid);
+      posEl.innerHTML='Tu mejor: <strong style="color:'+cfg.stroke+'">±'+myP.bestScore+'ms</strong> · Pos <strong style="color:var(--wn)">#'+rankP+'</strong>';
+    } else {
+      posEl.textContent='Aún no has jugado';
+    }
+  }
 }
 
 function showPerfilModal(){
@@ -1079,6 +1244,370 @@ function reactStart(){if(reactState!=='idle'||window._reactSavePending){return;}
     // Cancelar el reset automático del early antes de resetear manualmente
     clearTimeout(window._reactEarlyTO);
     window._reactResetAt=Date.now();reactState='idle';showReactIdle();}}
+
+// ══ PULSO ══
+var PULSO_INTERVAL=1000; // ms entre pulsos — siempre 1.000s
+var PULSO_TAPS=7;       // taps requeridos por intento
+var PULSO_MAX_DIFF=600;  // ms — si un tap supera esto, intento inválido
+
+function startPulso(){
+  curGame='p';
+  var uid=curUser?curUser.uid:null;
+  var myP=uid?wScoresPulso[uid]:null;
+  document.getElementById('srBestP').textContent=myP&&myP.bestScore!=null?'±'+myP.bestScore+'ms':'—';
+  document.getElementById('srPosP').textContent=myP&&myP.bestScore!=null?'#'+getPulsoRank(uid)+' de '+Object.values(wScoresPulso).filter(function(p){return p.bestScore!=null;}).length:'—';
+  pulsoState='idle';
+  pulsoTaps=[];
+  pulsoLastTapTs=0;
+  _pulsoResetDots();
+  _pulsoResetCircle();
+  var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
+  var hint=document.getElementById('pulsoArcHint');if(hint)hint.style.display='block';
+  showScreen('sPulso');
+  if(!localStorage.getItem('pulsoTutorialSeen')){
+    setTimeout(function(){showPulsoTutorial();},400);
+  }
+}
+
+function showPulsoTutorial(){
+  localStorage.setItem('pulsoTutorialSeen','1');
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:4px;color:var(--cp);margin-bottom:4px">♾ CÓMO JUGAR PULSO</div>'+
+    '<div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">Entrena tu ritmo interno</div>'+
+    // Paso 1
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">1</div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Toca el círculo para iniciar</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">El círculo arranca la cuenta regresiva 3-2-1. Cuando aparezca <strong style="color:var(--cp)">¡YA!</strong>, el punto empieza a girar — toca 10 veces al ritmo.</div></div>'+
+    '</div>'+
+    // Paso 2
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">2</div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Toca cuando el arco se complete</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">El arco morado se llena completamente cada 1 segundo. Toca el círculo <strong>7 veces</strong>, una por cada vez que el arco llegue al tope. Cuando tocas en el momento exacto, el arco destella <strong style="color:#00e87a">verde</strong>.</div></div>'+
+    '</div>'+
+    // Paso 3
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding:12px;background:var(--sf2);border-radius:10px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">3</div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Ve tu error promedio</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Tu score es cuántos <strong style="color:var(--tx)">ms te desviaste</strong> del segundo exacto en promedio.<br>'+
+      '<span style="color:#00e87a">Verde ≤30ms</span> · <span style="color:var(--wn)">Naranja ≤80ms</span> · <span style="color:var(--dg)">Rojo +80ms</span></div></div>'+
+    '</div>'+
+    // Meta
+    '<div style="background:var(--cpd);border:1px solid var(--cpm);border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:center">'+
+      '<div style="font-size:11px;color:var(--cp);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">El objetivo</div>'+
+      '<div style="font-size:13px;color:var(--tx);line-height:1.7">Llegar a <strong>±0ms</strong> es perfecto. El ranking es <strong>permanente</strong> — no resetea semanal. Cada intento puede mejorar tu posición.</div>'+
+    '</div>'+
+    '<button class="btn" onclick="closeModal()" style="width:100%;height:46px;background:var(--cp);color:#fff;border-radius:9px;font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:4px">¡ENTENDIDO, A JUGAR!</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+
+function pulsoRetry(){
+  pulsoState='idle';
+  pulsoTaps=[];
+  _pulsoResetDots();
+  _pulsoResetCircle();
+  var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
+  var hint=document.getElementById('pulsoArcHint');if(hint)hint.style.display='block';
+  pulsoStart();
+}
+
+function pulsoBack(){
+  cancelAnimationFrame(_pulsoArcRAF);
+  clearTimeout(pulsoExpTO);
+  _pulsoArcReset();
+  pulsoState='idle';
+  pulsoTaps=[];
+  goTab('home');
+}
+
+function pulsoStart(){
+  if(pulsoState!=='idle')return;
+  pulsoState='countdown';
+  pulsoTaps=[];
+  pulsoLastTapTs=0;
+  cancelAnimationFrame(_pulsoArcRAF);
+  _pulsoArcReset();
+  _pulsoResetDots();
+  var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
+  // Countdown 3-2-1
+  var num=document.getElementById('cdN');
+  num.style.color=GCOLORS.p.stroke;
+  document.getElementById('cdWrap').classList.add('show');
+  var n=3;
+  function tick(){
+    n--;
+    if(n>0){
+      num.style.animation='none';num.offsetHeight;num.style.animation='cdp .8s ease-out';
+      num.textContent=n;setTimeout(tick,800);
+    } else {
+      num.textContent='¡YA!';
+      setTimeout(function(){
+        document.getElementById('cdWrap').classList.remove('show');
+        _pulsoRun();
+      },600);
+    }
+  }
+  setTimeout(tick,800);
+}
+
+function _pulsoRun(){
+  pulsoState='running';
+  pulsoTaps=[];
+  pulsoLastTapTs=performance.now();
+  var circ=document.getElementById('pulsoCircle');
+  if(circ){
+    circ.classList.add('active');
+    circ.querySelector('.pulso-num').textContent=PULSO_TAPS;
+    circ.querySelector('.pulso-lbl').textContent='TOQUES';
+  }
+  // Ocultar hint una vez que arranca
+  var hint=document.getElementById('pulsoArcHint');
+  if(hint)hint.style.display='none';
+  // Arrancar animación del arco
+  cancelAnimationFrame(_pulsoArcRAF);
+  _pulsoArcAnimate();
+}
+
+var _pulsoArcRAF=null;
+
+function _pulsoArcAnimate(){
+  if(pulsoState!=='running'){
+    _pulsoArcReset();
+    return;
+  }
+  var now=performance.now();
+  var elapsed=now-pulsoLastTapTs;
+  // Progreso 0→1 dentro del intervalo actual, reinicia cada 1000ms
+  var progress=(elapsed%PULSO_INTERVAL)/PULSO_INTERVAL;
+  var circumference=553; // 2π×88
+  var arc=document.getElementById('pulsoArc');
+  if(arc){
+    var offset=circumference*(1-progress);
+    arc.setAttribute('stroke-dashoffset',offset);
+    // Cambiar color al llegar al tope — zona de toque ideal
+    if(progress>0.95||progress<0.05){
+      arc.setAttribute('stroke','#00e87a');
+    } else {
+      arc.setAttribute('stroke','var(--cp)');
+    }
+  }
+
+  _pulsoArcRAF=requestAnimationFrame(_pulsoArcAnimate);
+}
+
+function _pulsoArcReset(){
+  cancelAnimationFrame(_pulsoArcRAF);
+  var arc=document.getElementById('pulsoArc');
+  if(arc){arc.setAttribute('stroke-dashoffset','553');arc.setAttribute('stroke','var(--cp)');}
+}
+
+function pulsoTap(){
+  if(pulsoState==='idle'){
+    pulsoStart();return;
+  }
+  if(pulsoState==='done'){
+    pulsoState='idle';
+    pulsoTaps=[];
+    _pulsoResetDots();
+    _pulsoResetCircle();
+    var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
+    return;
+  }
+  if(pulsoState!=='running')return;
+
+  var now=performance.now();
+  var elapsed=now-pulsoLastTapTs;
+  var diff=Math.abs(elapsed-PULSO_INTERVAL);
+  pulsoLastTapTs=now;
+
+  pulsoTaps.push({diff:Math.round(diff)});
+
+  var tapIdx=pulsoTaps.length-1;
+  var dotEl=document.getElementById('pd'+tapIdx);
+
+  var cls,feedbackCls;
+  if(diff<=30){cls='good';feedbackCls='hit-good';}
+  else if(diff<=80){cls='ok';feedbackCls='hit-ok';}
+  else{cls='bad';feedbackCls='hit-bad';}
+
+  if(dotEl){
+    dotEl.className='pulso-dot '+cls;
+    dotEl.textContent='±'+Math.round(diff);
+  }
+
+  var circ=document.getElementById('pulsoCircle');
+  if(circ){
+    circ.classList.remove('hit-good','hit-ok','hit-bad','active');
+    circ.classList.add(feedbackCls);
+    var remaining=PULSO_TAPS-pulsoTaps.length;
+    circ.querySelector('.pulso-num').textContent=remaining>0?remaining:'✓';
+    circ.querySelector('.pulso-lbl').textContent=remaining>0?'TOQUES':'¡LISTO!';
+    setTimeout(function(){
+      circ.classList.remove('hit-good','hit-ok','hit-bad');
+      if(pulsoState==='running')circ.classList.add('active');
+    },250);
+  }
+
+  if(pulsoTaps.length>=PULSO_TAPS){
+    clearTimeout(pulsoExpTO);
+    cancelAnimationFrame(_pulsoArcRAF);
+    _pulsoArcReset();
+    pulsoState='done';
+    var _tapsSnap=pulsoTaps.slice(); // snapshot — evita que un tap extra vacíe el array
+    setTimeout(function(){_pulsoFinishWith(_tapsSnap);},300);
+  }
+}
+
+function _pulsoFinishWith(taps){
+  if(!taps||taps.length===0){pulsoState='idle';_pulsoResetCircle();_pulsoResetDots();return;}
+  var validDiffs=taps.map(function(t){return t.diff;});
+  var avg=Math.round(validDiffs.reduce(function(a,b){return a+b;},0)/validDiffs.length);
+  var best=Math.min.apply(null,validDiffs);
+  var worst=Math.max.apply(null,validDiffs);
+
+  // Si el peor tap supera el límite — intento inválido
+  if(worst>=PULSO_MAX_DIFF){
+    toast('❌ Intento inválido — un toque fue demasiado lejos (±'+worst+'ms)');
+    pulsoState='idle';
+    _pulsoResetDots();
+    _pulsoResetCircle();
+    return;
+  }
+
+  // Guardar score
+  _pulsoSaveScore(avg,best,worst);
+}
+
+function _pulsoResetDots(){
+  for(var i=0;i<PULSO_TAPS;i++){
+    var d=document.getElementById('pd'+i);
+    if(d){d.className='pulso-dot pending';d.textContent=i+1;}
+  }
+}
+
+function _pulsoResetCircle(){
+  var circ=document.getElementById('pulsoCircle');
+  if(circ){
+    circ.className='pulso-circle';
+    circ.querySelector('.pulso-num').textContent='▶';
+    circ.querySelector('.pulso-lbl').textContent='TOCA AQUÍ';
+  }
+}
+
+function _pulsoSaveScore(avg,best,worst){
+  if(!curUser)return;
+  var uid=curUser.uid;
+  var existing=wScoresPulso[uid]||{};
+  var isRec=existing.bestScore==null||avg<existing.bestScore;
+  var pname=(profiles[uid]||{}).name||'?';
+  var pphoto=(profiles[uid]||{}).photoURL||null;
+  var upd={
+    attempts:(existing.attempts||0)+1,
+    lastPlayed:Date.now(),
+    name:pname,
+    photoURL:pphoto
+  };
+  if(isRec){
+    upd.bestScore=avg;
+    upd.bestTap=best;
+    upd.worstTap=worst;
+  }
+  // Actualizar local inmediatamente
+  wScoresPulso[uid]=Object.assign({},existing,upd);
+  // Mostrar resultado inmediatamente — no esperar Firebase
+  _pulsoShowResult(avg,best,worst,isRec);
+  // Guardar en Firebase en background
+  db.ref('pulsoScores/'+uid).update(upd).catch(function(){
+    toast('⚠️ Error al guardar — revisa tu conexión');
+  });
+}
+
+function _pulsoShowResult(avg,best,worst,isRec){
+  var uid=curUser?curUser.uid:null;
+  var myP=uid?wScoresPulso[uid]:null;
+  var displayBest=myP&&myP.bestScore!=null?myP.bestScore:avg;
+
+  var scoreBig=document.getElementById('pulsoScoreBig');
+  if(scoreBig){
+    scoreBig.textContent='±'+avg+'ms';
+    scoreBig.style.color=avg<=30?'#00e87a':avg<=80?'var(--wn)':'var(--cp)';
+  }
+  var rankP=uid?getPulsoRank(uid):'—';
+  var total=Object.values(wScoresPulso).filter(function(p){return p.bestScore!=null;}).length;
+  var irPosEl=document.getElementById('irPosP');if(irPosEl)irPosEl.textContent='#'+rankP+' de '+total;
+  var irBestEl=document.getElementById('irBestTapP');if(irBestEl)irBestEl.textContent='±'+best+'ms';
+  var irWorstEl=document.getElementById('irWorstTapP');if(irWorstEl)irWorstEl.textContent='±'+worst+'ms';
+  var irRecEl=document.getElementById('irRecP');if(irRecEl)irRecEl.style.display=isRec?'block':'none';
+  var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='block';
+
+  // Actualizar score-row con el MEJOR histórico
+  var srBest=document.getElementById('srBestP');
+  if(srBest)srBest.textContent='±'+displayBest+'ms';
+  var srPos=document.getElementById('srPosP');
+  if(srPos)srPos.textContent='#'+rankP+' de '+total;
+
+
+}
+
+// Helpers de ranking Pulso
+function getPulsoSorted(max){
+  return Object.entries(wScoresPulso)
+    .filter(function(e){return e[1].bestScore!=null;})
+    .sort(function(a,b){
+      return a[1].bestScore!==b[1].bestScore
+        ?a[1].bestScore-b[1].bestScore
+        :(a[1].lastPlayed||0)-(b[1].lastPlayed||0);
+    }).slice(0,max||50);
+}
+function getPulsoRank(uid){
+  var sorted=getPulsoSorted(9999);
+  var idx=sorted.findIndex(function(e){return e[0]===uid;});
+  return idx>=0?idx+1:'—';
+}
+function renderPulsoRanking(){
+  var uid=curUser?curUser.uid:null;
+  document.getElementById('rankTitle').textContent='PULSO';
+  document.getElementById('rankSub').textContent='Ranking global · permanente';
+  var sorted=getPulsoSorted(50);
+  var top10=sorted.slice(0,10);
+  var myIdx=uid?sorted.findIndex(function(e){return e[0]===uid;}):-1;
+  var html='';
+  var cfg=GCOLORS.p;
+  if(top10.length===0){
+    html='<div style="text-align:center;color:var(--tm);padding:40px 20px;font-size:13px;line-height:2">Nadie ha jugado aún.<br>¡Sé el primero!</div>';
+  } else {
+    top10.forEach(function(e,i){
+      var uid2=e[0],w=e[1],isMe=uid&&uid2===uid,isTop3=i<3;
+      var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';var num=i+1;
+      var av=w.photoURL
+        ?'<div style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+w.photoURL+'" style="width:100%;height:100%;object-fit:cover"></div>'
+        :'<div style="width:34px;height:34px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:'+cfg.stroke+'">'+(w.name||'?')[0].toUpperCase()+'</div>';
+      var scoreColor=w.bestScore<=30?'#00e87a':w.bestScore<=80?'var(--wn)':cfg.stroke;
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;background:'+(isMe?'rgba(168,85,247,.08)':isTop3?'var(--sf2)':'var(--sf)')+';border:1px solid '+(isMe?cfg.stroke:isTop3?cfg.stroke+'40':'var(--bo)')+';border-radius:11px;margin-bottom:6px">'+
+        '<div style="width:28px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:'+(isTop3?'20':'15')+'px;color:'+(isTop3?'var(--wn)':'var(--td)')+'">'+(medal||num)+'</div>'+av+
+        '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:'+(isTop3?'700':'500')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(w.name||'?')+(isMe?' 👈':'')+'</div>'+
+        '<div style="font-size:10px;color:var(--tm);margin-top:1px">'+( w.attempts||0)+' intentos</div></div>'+
+        '<div style="font-family:DM Mono,monospace;font-size:'+(isTop3?'15':'13')+'px;color:'+scoreColor+'">±'+w.bestScore+'ms</div></div>';
+    });
+  }
+  document.getElementById('rankList').innerHTML=html;
+  var myDiv=document.getElementById('rankMy');
+  if(myDiv){
+    if(myIdx>=10&&uid&&wScoresPulso[uid]&&wScoresPulso[uid].bestScore!=null){
+      var me=wScoresPulso[uid];
+      myDiv.classList.add('show');myDiv.style.borderColor=cfg.stroke;
+      myDiv.innerHTML='<div style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px">Tu posición</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(168,85,247,.08);border:1px solid '+cfg.stroke+';border-radius:11px">'+
+        '<div style="width:28px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:'+cfg.stroke+'">'+(myIdx+1)+'</div>'+
+        '<div style="flex:1;font-size:13px;font-weight:700">'+(me.name||'?')+' 👈</div>'+
+        '<div style="font-family:DM Mono,monospace;font-size:13px;color:'+cfg.stroke+'">±'+me.bestScore+'ms</div></div>'+
+        '<div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px">de '+sorted.length+' jugadores</div>';
+    } else {
+      myDiv.classList.remove('show');
+    }
+  }
+}
 
 // ══ SAVE SCORE ══
 function saveScore(fmt,diff,g){
@@ -1232,6 +1761,17 @@ function updateRankCards(){
       if(tnSub)tnSub.textContent='torneos';
     }
   }
+  // Card de Pulso — ranking permanente
+  var pValEl=document.getElementById('rksv-p'),pSubEl=document.getElementById('rkss-p');
+  if(pValEl){
+    var topP=getPulsoSorted(1);
+    if(topP.length>0){
+      pValEl.textContent=topP[0][1].name||'?';
+      if(pSubEl)pSubEl.textContent='±'+topP[0][1].bestScore+'ms · líder';
+    } else {
+      pValEl.textContent='Sin partidas';
+    }
+  }
 }
 // ── Helper: calcula y actualiza el subtítulo del ranking para un juego dado ──
 function updateRankSub(g){
@@ -1248,7 +1788,7 @@ function updateRankSub(g){
 function setRankGame(g){
   rankGame=g;
   var rkScreen=document.getElementById('sRanking');if(rkScreen)rkScreen.scrollTop=0;
-  var idMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};
+  var idMap={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN','p':'P'};
   Object.keys(idMap).forEach(function(k){
     var el=document.getElementById('rgc'+idMap[k]);
     if(el)el.classList.remove('active');
@@ -1270,6 +1810,7 @@ function setRankGame(g){
     renderGlobalRank();return;
   }
   var labels={'t':'Reto Tiempo','b':'Reto Ciego','s':'Secuencia','r':'Reacción'};
+  if(g==='p'){if(howBtn)howBtn.style.display='none';renderPulsoRanking();return;}
   if(howBtn)howBtn.style.display='none';
   document.getElementById('rankTitle').textContent=labels[g]||'—';
   updateRankSub(g);  renderTop10(g);
@@ -1406,7 +1947,7 @@ function cancelTorneo(){
   db.ref('torneo/active').transaction(function(c){
     if(!c||c.status!=='waiting')return;
     if(c.id!==expectedId)return;
-    // Double-check: si ya se llenó (countdown/active) no cancelar
+    // Double-check: si ya se llenó no cancelar
     if(c.status!=='waiting')return;
     c.status='cancelled';c.finishedAt=Date.now();return c;
   },null,false).then(function(res){
@@ -1785,10 +2326,14 @@ function goTab(t){
         updateConfigUI();
       });
     }
+    // Limpiar estado Pulso si el usuario sale a mitad de juego
+    if(pulsoState==='running'||pulsoState==='countdown'){
+      clearTimeout(pulsoExpTO);pulsoState='idle';pulsoTaps=[];
+    }
     showScreen('sHome');updateHomecards();updateConfigUI();
   }
   else if(t==='rank'){
-    ['global','t','b','s','r','yo','torneo'].forEach(function(x){var map={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};var el=document.getElementById('rgc'+map[x]);if(el)el.classList.remove('active');});
+    ['global','t','b','s','r','yo','torneo','p'].forEach(function(x){var map={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN','p':'P'};var el=document.getElementById('rgc'+map[x]);if(el)el.classList.remove('active');});
     setRankGame('global');showScreen('sRanking');
   }
   else if(t==='admin'&&curUser){
@@ -1838,7 +2383,8 @@ function buildRetosAccordion(){
     {g:'t',label:'🟢 Reto Tiempo',color:'var(--ac)',stroke:'#00e87a'},
     {g:'b',label:'🟡 Reto Ciego', color:'var(--c4b)',stroke:'#ff9f00'},
     {g:'s',label:'🩵 Secuencia',  color:'var(--cs)',stroke:'#00c2e0'},
-    {g:'r',label:'⚡ Reacción',   color:'var(--cr)',stroke:'#ff6b00'}
+    {g:'r',label:'⚡ Reacción',   color:'var(--cr)',stroke:'#ff6b00'},
+    {g:'p',label:'♾ Pulso',       color:'var(--cp)',stroke:'#a855f7'}
   ];
   wrap.innerHTML=retos.map(function(r){
     var sid='secReto_'+r.g;
@@ -1850,8 +2396,44 @@ function buildRetosAccordion(){
       '<div id="'+sid+'" style="display:none;padding:0 14px 14px"></div>'+
     '</div>';
   }).join('');
-  // Pre-cargar datos de todos los retos en background
-  retos.forEach(function(r){renderAdmRetoSection(r.g);});
+  retos.forEach(function(r){
+    if(r.g==='p')renderAdmPulsoSection();
+    else renderAdmRetoSection(r.g);
+  });
+}
+
+function renderAdmPulsoSection(){
+  var el=document.getElementById('secReto_p');if(!el)return;
+  var sorted=getPulsoSorted(50);
+  if(sorted.length===0){
+    el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin partidas aún</div>';
+    return;
+  }
+  var cfg=GCOLORS.p;
+  var html='<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+';margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bo)">'+
+    'Ranking global permanente <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span></div>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:420px">'+
+    '<thead><tr>'+
+      '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">#</th>'+
+      '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Jugador</th>'+
+      '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Email</th>'+
+      '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Mejor</th>'+
+      '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Intentos</th>'+
+    '</tr></thead><tbody>'+
+    sorted.map(function(e,i){
+      var uid2=e[0],w=e[1],p=profiles[uid2]||{};
+      var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+      var scoreColor=w.bestScore<=30?'#00e87a':w.bestScore<=80?'var(--wn)':cfg.stroke;
+      return '<tr style="border-top:1px solid var(--bo)">'+
+        '<td style="padding:6px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
+        '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+( w.name||'—')+'</td>'+
+        '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
+        '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:'+scoreColor+';text-align:center">±'+w.bestScore+'ms</td>'+
+        '<td style="padding:6px 8px;font-size:12px;color:var(--tm);text-align:center">'+(w.attempts||0)+'</td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div>';
+  el.innerHTML=html;
 }
 
 function renderAdmRetoSection(g){
@@ -2300,9 +2882,11 @@ function updateAdmStats(){
   document.getElementById('stU').textContent=Object.keys(profiles).length;
   var ahora=Date.now(),cincoMin=5*60*1000,onlineUids=new Set();
   ['t','b','s','r'].forEach(function(g){Object.entries(wScores[g]).forEach(function(e){if(e[1].lastPlayed&&(ahora-e[1].lastPlayed)<cincoMin)onlineUids.add(e[0]);});});
+  Object.entries(wScoresPulso).forEach(function(e){if(e[1].lastPlayed&&(ahora-e[1].lastPlayed)<cincoMin)onlineUids.add(e[0]);});
   var onlineEl=document.getElementById('stOnline');
   if(onlineEl){onlineEl.textContent=onlineUids.size;onlineEl.style.color=onlineUids.size>0?'var(--ac)':'var(--tm)';}
   var total=0;['t','b','s','r'].forEach(function(g){total+=Object.values(wScores[g]).reduce(function(a,w){return a+(w.attempts||0);},0);});
+  total+=Object.values(wScoresPulso).reduce(function(a,w){return a+(w.attempts||0);},0);
   document.getElementById('stP').textContent=total;
   clearTimeout(window._onlineTO);
   window._onlineTO=setTimeout(updateAdmStats,30000);
@@ -2322,6 +2906,9 @@ function buildWinners(){
     '</div>':'<div style="font-size:11px;color:var(--tm)">Sin puntos totales</div>')+
   '</div>';
   ['t','b','s','r'].forEach(function(g){var cfg=GCOLORS[g],isR=g==='r',isS=g==='s';var sorted=getSorted(g,1),w=sorted.length>0?sorted[0][1]:null,wUid=sorted.length>0?sorted[0][0]:null;var email=wUid&&profiles[wUid]?profiles[wUid].email:'—';var label=GAME_LABELS[g];html+='<div style="background:var(--sf);border:1px solid '+cfg.stroke+';border-radius:11px;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:'+cfg.color+';text-transform:uppercase;margin-bottom:5px">'+label+'</div>'+(w?'<div style="font-weight:700;font-size:12px">'+w.name+'</div><div style="font-family:\'DM Mono\',monospace;font-size:13px;color:'+cfg.color+';margin-top:2px">'+w.bestTime+(isR?'ms':'s')+'</div><div style="font-size:10px;color:var(--tm);margin-top:3px;word-break:break-all">'+email+'</div>':'<div style="font-size:11px;color:var(--tm)">Sin partidas</div>')+'</div>';});
+  // Pulso — líder del ranking permanente
+  var pCfg=GCOLORS.p;var pSorted=getPulsoSorted(1);var pW=pSorted.length>0?pSorted[0][1]:null;var pUid=pSorted.length>0?pSorted[0][0]:null;var pEmail=pUid&&profiles[pUid]?profiles[pUid].email:'—';
+  html+='<div style="background:var(--sf);border:1px solid '+pCfg.stroke+';border-radius:11px;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:'+pCfg.color+';text-transform:uppercase;margin-bottom:5px">♾ PULSO</div>'+(pW?'<div style="font-weight:700;font-size:12px">'+pW.name+'</div><div style="font-family:\'DM Mono\',monospace;font-size:13px;color:'+pCfg.color+';margin-top:2px">±'+pW.bestScore+'ms</div><div style="font-size:10px;color:var(--tm);margin-top:3px;word-break:break-all">'+pEmail+'</div>':'<div style="font-size:11px;color:var(--tm)">Sin partidas</div>')+'</div>';
   wrap.innerHTML=html;
 }
 function setAdmTab(g){
@@ -2558,7 +3145,7 @@ function findRef(code){return Object.keys(profiles).find(function(uid){return pr
 function genRef(name){var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase();}
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera'};return m[code]||('Error: '+code);}
-function showHowPlay(g){var isR=g==='r',isB=g==='b',isS=g==='s',cfg=GCOLORS[g]||GCOLORS['t'];var labels={t:'RETO TIEMPO',b:'RETO CIEGO',s:'SECUENCIA',r:'REACCIÓN'};var icons={t:'🟢',b:'🟡',s:'🩵',r:'⚡'};var target=(!isR&&!isB&&!isS)?(GCFG[g]||GCFG.t).toFixed(3)+'s':'';var content;if(isS){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔢</span><div><strong style="color:var(--tx)">Aparecen 9 números dispersos</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Los números del 1 al 9 aparecen en posiciones aleatorias en pantalla</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👆</span><div><strong style="color:var(--tx)">Tócalos en orden del 1 al 9</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Si tocas el número equivocado, ¡parpadea en rojo!</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien lo haga más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Velocidad y precisión ganan</div></div></div></div>';}else if(isR){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👁️</span><div><strong style="color:var(--tx)">Observa la pantalla</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando se ponga verde, toca lo más rápido posible</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏳</span><div><strong style="color:var(--tx)">Espera el flash</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Aparece entre 1 y 5 segundos — si tocas antes, penalización</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⚡</span><div><strong style="color:var(--tx)">Gana quien reaccione más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El promedio humano es ~250ms</div></div></div></div>';}else if(isB){content='<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--c4b);text-align:center">⚠️ El objetivo del día está oculto — solo lo ves al parar</div><div style="display:flex;flex-direction:column;gap:10px;margin:0 0 14px"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza pero los dígitos desaparecen</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para cuando lo sientas</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Solo tu intuición</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔓</span><div><strong>Se revela el objetivo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Al parar ves tu tiempo y la meta</div></div></div></div>';}else{content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza a correr</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para exactamente en '+target+'</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Pulsa PARAR cuando creas que llegaste</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong>Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día</div></div></div></div>';}document.getElementById('modalBody').innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:20px">'+icons[g]+'</span><div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:'+cfg.stroke+'">CÓMO JUGAR — '+labels[g]+'</div></div>'+content+'<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:4px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
+function showHowPlay(g){var isR=g==='r',isB=g==='b',isS=g==='s',isP=g==='p',cfg=GCOLORS[g]||GCOLORS['t'];var labels={t:'RETO TIEMPO',b:'RETO CIEGO',s:'SECUENCIA',r:'REACCIÓN',p:'PULSO'};var icons={t:'🟢',b:'🟡',s:'🩵',r:'⚡',p:'♾'};var target=(!isR&&!isB&&!isS&&!isP)?(GCFG[g]||GCFG.t).toFixed(3)+'s':'';var content;if(isP){showPulsoTutorial();return;}else if(isS){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔢</span><div><strong style="color:var(--tx)">Aparecen 9 números dispersos</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Los números del 1 al 9 aparecen en posiciones aleatorias en pantalla</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👆</span><div><strong style="color:var(--tx)">Tócalos en orden del 1 al 9</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Si tocas el número equivocado, ¡parpadea en rojo!</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien lo haga más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Velocidad y precisión ganan</div></div></div></div>';}else if(isR){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👁️</span><div><strong style="color:var(--tx)">Observa la pantalla</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando se ponga verde, toca lo más rápido posible</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏳</span><div><strong style="color:var(--tx)">Espera el flash</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Aparece entre 1 y 5 segundos — si tocas antes, penalización</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⚡</span><div><strong style="color:var(--tx)">Gana quien reaccione más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El promedio humano es ~250ms</div></div></div></div>';}else if(isB){content='<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--c4b);text-align:center">⚠️ El objetivo del día está oculto — solo lo ves al parar</div><div style="display:flex;flex-direction:column;gap:10px;margin:0 0 14px"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza pero los dígitos desaparecen</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para cuando lo sientas</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Solo tu intuición</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔓</span><div><strong>Se revela el objetivo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Al parar ves tu tiempo y la meta</div></div></div></div>';}else{content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza a correr</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para exactamente en '+target+'</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Pulsa PARAR cuando creas que llegaste</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong>Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día</div></div></div></div>';}document.getElementById('modalBody').innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:20px">'+icons[g]+'</span><div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:'+cfg.stroke+'">CÓMO JUGAR — '+labels[g]+'</div></div>'+content+'<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:4px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
 function showHowPoints(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px">🏅 CÓMO SE GANAN PUNTOS</div><div style="font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.7">Cada día, los mejores resultados de <strong style="color:var(--tx)">cada reto</strong> suman puntos:</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥇</span><span>1er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">15 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥈</span><span>2do lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥉</span><span>3er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>4to</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">5 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>5to–10mo</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">2 pts</span></div></div><div style="font-size:11px;color:var(--td);background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">💡 Hay <strong style="color:var(--tm)">4 retos por día</strong> — Tiempo, Ciego, Secuencia y Reacción.<br>El ranking global muestra quién acumuló más puntos en la semana.</div><button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
