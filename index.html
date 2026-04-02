@@ -1474,8 +1474,17 @@ function saveTorneoScore(fmt,diff,g){
   upd['attemptHistory/'+attempts]={time:fmt,diff:diff,at:Date.now()};
   // Actualizar local inmediatamente para rank preciso antes de que llegue el listener
   torneoPartic[uid]=Object.assign({},torneoPartic[uid]||{},upd);
-  db.ref('torneo/participants/'+uid).update(upd).then(function(){showTorneoResult(fmt,diff,isRec,attempts,g);checkAllExhausted();// Restaurar GCFG al valor diario para que torneos no contaminen retos diarios
-    // GCFG se restaura en gameBack(), no tras cada intento
+  db.ref('torneo/participants/'+uid).update(upd).then(function(){
+    showTorneoResult(fmt,diff,isRec,attempts,g);
+    checkAllExhausted();
+    // Restaurar GCFG al valor real del día — el torneo lo sobreescribe temporalmente
+    if(g==='t'||g==='b'){
+      db.ref('gameConfig').once('value').then(function(s){
+        var cfg=s.val()||{};
+        if(cfg.tt)GCFG.t=parseFloat(cfg.tt);
+        if(cfg.tb)GCFG.b=parseFloat(cfg.tb);
+      });
+    }
   });
 }
 function showTorneoResult(fmt,diff,isRec,attempts,g){
