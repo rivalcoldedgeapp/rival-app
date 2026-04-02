@@ -552,23 +552,34 @@ body.playing{overflow:hidden}
   <div class="pi">
     <div class="gh">
       <button class="gh-back" onclick="pulsoBack()">← Volver</button>
-      <div class="gh-title" style="color:var(--cp)">PULSO</div>
+      <div class="gh-title" style="color:var(--cp)">PULSO <button onclick="showPulsoTutorial()" style="background:transparent;border:1px solid var(--cp);border-radius:50%;width:22px;height:22px;color:var(--cp);font-size:11px;font-weight:700;cursor:pointer;padding:0;vertical-align:middle;margin-left:6px">?</button></div>
       <div class="gh-sub" style="color:var(--cp)">Toca exactamente cada 1.000 segundo</div>
     </div>
     <div class="score-row">
       <div><div class="sr-lbl">Tu mejor</div><div class="sr-val" id="srBestP" style="color:var(--cp)">—</div></div>
       <div style="text-align:right"><div class="sr-lbl">Posición</div><div class="sr-val" id="srPosP" style="color:var(--wn)">—</div></div>
     </div>
-    <!-- Arena del pulso -->
+    <!-- Arena del pulso — arco giratorio -->
     <div class="pulso-arena">
-      <div class="pulso-ring-outer"></div>
-      <div class="pulso-ring-track"></div>
+      <!-- SVG del arco de progreso -->
+      <svg id="pulsoSVG" viewBox="0 0 200 200" style="position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)">
+        <!-- Track gris -->
+        <circle cx="100" cy="100" r="88" fill="none" stroke="var(--bo)" stroke-width="6"/>
+        <!-- Arco de progreso — se anima con JS -->
+        <circle cx="100" cy="100" r="88" fill="none" stroke="var(--cp)" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"
+          id="pulsoArc" style="transition:stroke .2s"/>
+        <!-- Punto marcador en posición 0 (top) -->
+        <circle cx="100" cy="12" r="7" fill="var(--cp)" id="pulsoDot"/>
+      </svg>
+      <!-- Círculo central táctil -->
       <div class="pulso-circle" id="pulsoCircle" onclick="pulsoTap()">
         <div class="pulso-num" id="pulsoNum">5</div>
         <div class="pulso-lbl" id="pulsoLbl">TOQUES</div>
       </div>
-      <div class="pulso-expand" id="pulsoExpand"></div>
     </div>
+    <!-- Instrucción visual debajo del arco -->
+    <div id="pulsoArcHint" style="text-align:center;font-size:11px;color:var(--tm);letter-spacing:1px">Toca cuando el punto llegue arriba ↑</div>
     <!-- Indicadores de taps -->
     <div class="pulso-tap-row" id="pulsoTapRow">
       <div class="pulso-dot pending" id="pd0">1</div>
@@ -1231,7 +1242,7 @@ function startPulso(){
   var uid=curUser?curUser.uid:null;
   var myP=uid?wScoresPulso[uid]:null;
   document.getElementById('srBestP').textContent=myP&&myP.bestScore!=null?'±'+myP.bestScore+'ms':'—';
-  document.getElementById('srPosP').textContent=myP&&myP.bestScore!=null?'#'+getPulsoRank(uid):'—';
+  document.getElementById('srPosP').textContent=myP&&myP.bestScore!=null?'#'+getPulsoRank(uid)+' de '+Object.values(wScoresPulso).filter(function(p){return p.bestScore!=null;}).length:'—';
   pulsoState='idle';
   pulsoTaps=[];
   pulsoLastTapTs=0;
@@ -1241,10 +1252,49 @@ function startPulso(){
   var btn=document.getElementById('pulsoBtn');
   if(btn){btn.textContent='INICIAR';btn.style.background='var(--cp)';btn.style.color='#fff';btn.disabled=false;btn.style.opacity='1';btn.onclick=pulsoStart;}
   showScreen('sPulso');
+  // Mostrar tutorial la primera vez
+  if(!localStorage.getItem('pulsoTutorialSeen')){
+    setTimeout(function(){showPulsoTutorial();},400);
+  }
+}
+
+function showPulsoTutorial(){
+  localStorage.setItem('pulsoTutorialSeen','1');
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:4px;color:var(--cp);margin-bottom:4px">♾ CÓMO JUGAR PULSO</div>'+
+    '<div style="font-size:11px;color:var(--tm);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">Entrena tu ritmo interno</div>'+
+    // Paso 1
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">1</div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Dale INICIAR</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Una cuenta regresiva 3-2-1 arranca. Cuando aparezca <strong style="color:var(--cp)">¡YA!</strong>, el juego empieza.</div></div>'+
+    '</div>'+
+    // Paso 2
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">2</div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Toca cuando el punto llegue arriba</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Un punto <strong style="color:var(--cp)">morado</strong> da vueltas alrededor del círculo — tarda exactamente <strong style="color:var(--cp)">1 segundo</strong> por vuelta. Toca cada vez que llega arriba. Se pone <strong style="color:#00e87a">verde</strong> en la zona perfecta.</div></div>'+
+    '</div>'+
+    // Paso 3
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding:12px;background:var(--sf2);border-radius:10px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">3</div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Ve tu error promedio</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Tu score es cuántos <strong style="color:var(--tx)">ms te desviaste</strong> del segundo exacto en promedio.<br>'+
+      '<span style="color:#00e87a">Verde ≤30ms</span> · <span style="color:var(--wn)">Naranja ≤80ms</span> · <span style="color:var(--dg)">Rojo +80ms</span></div></div>'+
+    '</div>'+
+    // Meta
+    '<div style="background:var(--cpd);border:1px solid var(--cpm);border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:center">'+
+      '<div style="font-size:11px;color:var(--cp);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">El objetivo</div>'+
+      '<div style="font-size:13px;color:var(--tx);line-height:1.7">Llegar a <strong>±0ms</strong> es perfecto. El ranking es <strong>permanente</strong> — no resetea semanal. Cada intento puede mejorar tu posición.</div>'+
+    '</div>'+
+    '<button class="btn" onclick="closeModal()" style="width:100%;height:46px;background:var(--cp);color:#fff;border-radius:9px;font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:4px">¡ENTENDIDO, A JUGAR!</button>';
+  document.getElementById('overlay').classList.add('show');
 }
 
 function pulsoBack(){
+  cancelAnimationFrame(_pulsoArcRAF);
   clearTimeout(pulsoExpTO);
+  _pulsoArcReset();
   pulsoState='idle';
   pulsoTaps=[];
   goTab('home');
@@ -1255,6 +1305,8 @@ function pulsoStart(){
   pulsoState='countdown';
   pulsoTaps=[];
   pulsoLastTapTs=0;
+  cancelAnimationFrame(_pulsoArcRAF);
+  _pulsoArcReset();
   _pulsoResetDots();
   var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
   var btn=document.getElementById('pulsoBtn');if(btn){btn.disabled=true;btn.style.opacity='.4';}
@@ -1282,7 +1334,6 @@ function pulsoStart(){
 function _pulsoRun(){
   pulsoState='running';
   pulsoTaps=[];
-  // Timer arranca automáticamente — el primer tap del usuario ya tiene referencia
   pulsoLastTapTs=performance.now();
   var circ=document.getElementById('pulsoCircle');
   if(circ){
@@ -1290,21 +1341,58 @@ function _pulsoRun(){
     circ.querySelector('.pulso-num').textContent=PULSO_TAPS;
     circ.querySelector('.pulso-lbl').textContent='TOQUES';
   }
-  _pulsoVisualBeat();
+  // Ocultar hint una vez que arranca
+  var hint=document.getElementById('pulsoArcHint');
+  if(hint)hint.style.display='none';
+  // Arrancar animación del arco
+  cancelAnimationFrame(_pulsoArcRAF);
+  _pulsoArcAnimate();
 }
 
-function _pulsoVisualBeat(){
-  if(pulsoState!=='running')return;
-  var exp=document.getElementById('pulsoExpand');
-  if(exp){
-    exp.classList.remove('pulse-anim');
-    exp.offsetHeight; // reflow
-    exp.classList.add('pulse-anim');
+var _pulsoArcRAF=null;
+
+function _pulsoArcAnimate(){
+  if(pulsoState!=='running'){
+    _pulsoArcReset();
+    return;
   }
-  // Repetir el beat visual solo si quedan taps
-  if(pulsoTaps.length<PULSO_TAPS){
-    pulsoExpTO=setTimeout(_pulsoVisualBeat,PULSO_INTERVAL);
+  var now=performance.now();
+  var elapsed=now-pulsoLastTapTs;
+  // Progreso 0→1 dentro del intervalo actual, reinicia cada 1000ms
+  var progress=(elapsed%PULSO_INTERVAL)/PULSO_INTERVAL;
+  var circumference=553; // 2π×88
+  var arc=document.getElementById('pulsoArc');
+  var dot=document.getElementById('pulsoDot');
+  if(arc){
+    var offset=circumference*(1-progress);
+    arc.setAttribute('stroke-dashoffset',offset);
+    // Cambiar color al llegar al tope — zona de toque ideal
+    if(progress>0.95||progress<0.05){
+      arc.setAttribute('stroke','#00e87a');
+    } else {
+      arc.setAttribute('stroke','var(--cp)');
+    }
   }
+  if(dot){
+    // El punto viaja por el arco: arriba=0°, derecha=90°, abajo=180°, izquierda=270°
+    var angle=progress*2*Math.PI; // ya está rotado -90deg en SVG
+    var r=88,cx=100,cy=100;
+    var x=cx+r*Math.sin(angle);
+    var y=cy-r*Math.cos(angle);
+    dot.setAttribute('cx',x.toFixed(1));
+    dot.setAttribute('cy',y.toFixed(1));
+    // El punto se pone verde cuando está cerca del tope
+    dot.setAttribute('fill',progress>0.95||progress<0.05?'#00e87a':'var(--cp)');
+  }
+  _pulsoArcRAF=requestAnimationFrame(_pulsoArcAnimate);
+}
+
+function _pulsoArcReset(){
+  cancelAnimationFrame(_pulsoArcRAF);
+  var arc=document.getElementById('pulsoArc');
+  var dot=document.getElementById('pulsoDot');
+  if(arc){arc.setAttribute('stroke-dashoffset','553');arc.setAttribute('stroke','var(--cp)');}
+  if(dot){dot.setAttribute('cx','100');dot.setAttribute('cy','12');dot.setAttribute('fill','var(--cp)');}
 }
 
 function pulsoTap(){
@@ -1358,6 +1446,8 @@ function pulsoTap(){
 
   if(pulsoTaps.length>=PULSO_TAPS){
     clearTimeout(pulsoExpTO);
+    cancelAnimationFrame(_pulsoArcRAF);
+    _pulsoArcReset();
     pulsoState='done';
     setTimeout(function(){_pulsoFinish();},300);
   }
@@ -3011,7 +3101,7 @@ function findRef(code){return Object.keys(profiles).find(function(uid){return pr
 function genRef(name){var c=(name||'RVLX').replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,4);if(c.length<4)c=(c+'RVLX').slice(0,4);return c+Math.random().toString(36).slice(2,4).toUpperCase();}
 function setMsg(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='amsg '+(type||'');}
 function eMsg(code){var m={'auth/user-not-found':'Correo no registrado','auth/wrong-password':'Contraseña incorrecta','auth/email-already-in-use':'Ese correo ya tiene cuenta','auth/invalid-email':'Correo inválido','auth/weak-password':'Contraseña mínimo 6 caracteres','auth/too-many-requests':'Demasiados intentos — espera'};return m[code]||('Error: '+code);}
-function showHowPlay(g){var isR=g==='r',isB=g==='b',isS=g==='s',isP=g==='p',cfg=GCOLORS[g]||GCOLORS['t'];var labels={t:'RETO TIEMPO',b:'RETO CIEGO',s:'SECUENCIA',r:'REACCIÓN',p:'PULSO'};var icons={t:'🟢',b:'🟡',s:'🩵',r:'⚡',p:'♾'};var target=(!isR&&!isB&&!isS&&!isP)?(GCFG[g]||GCFG.t).toFixed(3)+'s':'';var content;if(isP){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">&#9854;</span><div><strong style="color:var(--tx)">Toca el circulo 5 veces seguidas</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo es dejar exactamente 1.000 segundo entre cada toque</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">&#128225;</span><div><strong style="color:var(--tx)">El circulo pulsa de guia</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Una onda visual te muestra el ritmo</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">&#127942;</span><div><strong style="color:var(--tx)">Gana quien tenga menos error promedio</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Tu score es el promedio de ms de desviacion. El ranking es permanente.</div></div></div></div>';}else if(isS){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔢</span><div><strong style="color:var(--tx)">Aparecen 9 números dispersos</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Los números del 1 al 9 aparecen en posiciones aleatorias en pantalla</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👆</span><div><strong style="color:var(--tx)">Tócalos en orden del 1 al 9</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Si tocas el número equivocado, ¡parpadea en rojo!</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien lo haga más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Velocidad y precisión ganan</div></div></div></div>';}else if(isR){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👁️</span><div><strong style="color:var(--tx)">Observa la pantalla</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando se ponga verde, toca lo más rápido posible</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏳</span><div><strong style="color:var(--tx)">Espera el flash</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Aparece entre 1 y 5 segundos — si tocas antes, penalización</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⚡</span><div><strong style="color:var(--tx)">Gana quien reaccione más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El promedio humano es ~250ms</div></div></div></div>';}else if(isB){content='<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--c4b);text-align:center">⚠️ El objetivo del día está oculto — solo lo ves al parar</div><div style="display:flex;flex-direction:column;gap:10px;margin:0 0 14px"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza pero los dígitos desaparecen</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para cuando lo sientas</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Solo tu intuición</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔓</span><div><strong>Se revela el objetivo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Al parar ves tu tiempo y la meta</div></div></div></div>';}else{content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza a correr</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para exactamente en '+target+'</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Pulsa PARAR cuando creas que llegaste</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong>Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día</div></div></div></div>';}document.getElementById('modalBody').innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:20px">'+icons[g]+'</span><div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:'+cfg.stroke+'">CÓMO JUGAR — '+labels[g]+'</div></div>'+content+'<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:4px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
+function showHowPlay(g){var isR=g==='r',isB=g==='b',isS=g==='s',isP=g==='p',cfg=GCOLORS[g]||GCOLORS['t'];var labels={t:'RETO TIEMPO',b:'RETO CIEGO',s:'SECUENCIA',r:'REACCIÓN',p:'PULSO'};var icons={t:'🟢',b:'🟡',s:'🩵',r:'⚡',p:'♾'};var target=(!isR&&!isB&&!isS&&!isP)?(GCFG[g]||GCFG.t).toFixed(3)+'s':'';var content;if(isP){showPulsoTutorial();return;}else if(isS){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔢</span><div><strong style="color:var(--tx)">Aparecen 9 números dispersos</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Los números del 1 al 9 aparecen en posiciones aleatorias en pantalla</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👆</span><div><strong style="color:var(--tx)">Tócalos en orden del 1 al 9</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Si tocas el número equivocado, ¡parpadea en rojo!</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong style="color:var(--tx)">Gana quien lo haga más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Velocidad y precisión ganan</div></div></div></div>';}else if(isR){content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">👁️</span><div><strong style="color:var(--tx)">Observa la pantalla</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Cuando se ponga verde, toca lo más rápido posible</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⏳</span><div><strong style="color:var(--tx)">Espera el flash</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Aparece entre 1 y 5 segundos — si tocas antes, penalización</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">⚡</span><div><strong style="color:var(--tx)">Gana quien reaccione más rápido</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El promedio humano es ~250ms</div></div></div></div>';}else if(isB){content='<div style="background:var(--sf2);border:1px solid var(--c4b);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--c4b);text-align:center">⚠️ El objetivo del día está oculto — solo lo ves al parar</div><div style="display:flex;flex-direction:column;gap:10px;margin:0 0 14px"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza pero los dígitos desaparecen</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para cuando lo sientas</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Solo tu intuición</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🔓</span><div><strong>Se revela el objetivo</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Al parar ves tu tiempo y la meta</div></div></div></div>';}else{content='<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0"><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">▶️</span><div><strong>Pulsa INICIAR</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El reloj empieza a correr</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🎯</span><div><strong>Para exactamente en '+target+'</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">Pulsa PARAR cuando creas que llegaste</div></div></div><div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px">🏆</span><div><strong>Gana quien más se acerque</strong><div style="font-size:12px;color:var(--tm);margin-top:2px">El objetivo cambia cada día</div></div></div></div>';}document.getElementById('modalBody').innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:20px">'+icons[g]+'</span><div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:'+cfg.stroke+'">CÓMO JUGAR — '+labels[g]+'</div></div>'+content+'<button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px;margin-top:4px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
 function showHowPoints(){document.getElementById('modalBody').innerHTML='<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:14px">🏅 CÓMO SE GANAN PUNTOS</div><div style="font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.7">Cada día, los mejores resultados de <strong style="color:var(--tx)">cada reto</strong> suman puntos:</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥇</span><span>1er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">15 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥈</span><span>2do lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">10 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>🥉</span><span>3er lugar</span><span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--wn)">7 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>4to</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">5 pts</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px"><span>5to–10mo</span><span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--tm)">2 pts</span></div></div><div style="font-size:11px;color:var(--td);background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">💡 Hay <strong style="color:var(--tm)">4 retos por día</strong> — Tiempo, Ciego, Secuencia y Reacción.<br>El ranking global muestra quién acumuló más puntos en la semana.</div><button class="btn btn-g" onclick="closeModal()" style="width:100%;height:42px;border-radius:9px;font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:3px">ENTENDIDO</button>';document.getElementById('overlay').classList.add('show');}
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===document.getElementById('overlay'))closeModal();});
