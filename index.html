@@ -922,7 +922,9 @@ function startListeners(){
   db.ref('pulsoScores').on('value',function(s){
     wScoresPulso=s.val()||{};
     updateHomecardPulso();
+    updateRankCards();
     if(document.getElementById('sRanking').classList.contains('on')&&rankGame==='p')renderPulsoRanking();
+    if(admLoggedIn)renderAdmPulsoSection();
   });
 }
 function mergeScoresForKey(rk,games,cb){
@@ -1467,13 +1469,14 @@ function pulsoTap(){
     cancelAnimationFrame(_pulsoArcRAF);
     _pulsoArcReset();
     pulsoState='done';
-    setTimeout(function(){_pulsoFinish();},300);
+    var _tapsSnap=pulsoTaps.slice(); // snapshot — evita que un tap extra vacíe el array
+    setTimeout(function(){_pulsoFinishWith(_tapsSnap);},300);
   }
 }
 
-function _pulsoFinish(){
-  // Todos los taps en pulsoTaps son medidos (el tap de referencia no se guardó)
-  var validDiffs=pulsoTaps.map(function(t){return t.diff;});
+function _pulsoFinishWith(taps){
+  if(!taps||taps.length===0){pulsoState='idle';_pulsoResetCircle();_pulsoResetDots();return;}
+  var validDiffs=taps.map(function(t){return t.diff;});
   var avg=Math.round(validDiffs.reduce(function(a,b){return a+b;},0)/validDiffs.length);
   var best=Math.min.apply(null,validDiffs);
   var worst=Math.max.apply(null,validDiffs);
@@ -2386,7 +2389,8 @@ function buildRetosAccordion(){
     {g:'t',label:'🟢 Reto Tiempo',color:'var(--ac)',stroke:'#00e87a'},
     {g:'b',label:'🟡 Reto Ciego', color:'var(--c4b)',stroke:'#ff9f00'},
     {g:'s',label:'🩵 Secuencia',  color:'var(--cs)',stroke:'#00c2e0'},
-    {g:'r',label:'⚡ Reacción',   color:'var(--cr)',stroke:'#ff6b00'}
+    {g:'r',label:'⚡ Reacción',   color:'var(--cr)',stroke:'#ff6b00'},
+    {g:'p',label:'♾ Pulso',       color:'var(--cp)',stroke:'#a855f7'}
   ];
   wrap.innerHTML=retos.map(function(r){
     var sid='secReto_'+r.g;
@@ -2398,8 +2402,44 @@ function buildRetosAccordion(){
       '<div id="'+sid+'" style="display:none;padding:0 14px 14px"></div>'+
     '</div>';
   }).join('');
-  // Pre-cargar datos de todos los retos en background
-  retos.forEach(function(r){renderAdmRetoSection(r.g);});
+  retos.forEach(function(r){
+    if(r.g==='p')renderAdmPulsoSection();
+    else renderAdmRetoSection(r.g);
+  });
+}
+
+function renderAdmPulsoSection(){
+  var el=document.getElementById('secReto_p');if(!el)return;
+  var sorted=getPulsoSorted(50);
+  if(sorted.length===0){
+    el.innerHTML='<div style="font-size:12px;color:var(--td);text-align:center;padding:12px">Sin partidas aún</div>';
+    return;
+  }
+  var cfg=GCOLORS.p;
+  var html='<div style="font-size:11px;font-weight:700;color:'+cfg.stroke+';margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bo)">'+
+    'Ranking global permanente <span style="font-weight:400;color:var(--td)">'+sorted.length+' jugadores</span></div>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:420px">'+
+    '<thead><tr>'+
+      '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">#</th>'+
+      '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Jugador</th>'+
+      '<th style="text-align:left;font-size:9px;color:var(--tm);padding:4px 8px">Email</th>'+
+      '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Mejor</th>'+
+      '<th style="text-align:center;font-size:9px;color:var(--tm);padding:4px 8px">Intentos</th>'+
+    '</tr></thead><tbody>'+
+    sorted.map(function(e,i){
+      var uid2=e[0],w=e[1],p=profiles[uid2]||{};
+      var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'';
+      var scoreColor=w.bestScore<=30?'#00e87a':w.bestScore<=80?'var(--wn)':cfg.stroke;
+      return '<tr style="border-top:1px solid var(--bo)">'+
+        '<td style="padding:6px 8px;font-size:12px;color:var(--td)">'+medal+'</td>'+
+        '<td style="padding:6px 8px;font-size:12px;font-weight:'+(i<3?'700':'400')+'">'+( w.name||'—')+'</td>'+
+        '<td style="padding:6px 8px;font-size:10px;color:var(--tm)">'+( p.email||'—')+'</td>'+
+        '<td style="padding:6px 8px;font-family:DM Mono,monospace;font-size:12px;color:'+scoreColor+';text-align:center">±'+w.bestScore+'ms</td>'+
+        '<td style="padding:6px 8px;font-size:12px;color:var(--tm);text-align:center">'+(w.attempts||0)+'</td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div>';
+  el.innerHTML=html;
 }
 
 function renderAdmRetoSection(g){
@@ -2848,9 +2888,11 @@ function updateAdmStats(){
   document.getElementById('stU').textContent=Object.keys(profiles).length;
   var ahora=Date.now(),cincoMin=5*60*1000,onlineUids=new Set();
   ['t','b','s','r'].forEach(function(g){Object.entries(wScores[g]).forEach(function(e){if(e[1].lastPlayed&&(ahora-e[1].lastPlayed)<cincoMin)onlineUids.add(e[0]);});});
+  Object.entries(wScoresPulso).forEach(function(e){if(e[1].lastPlayed&&(ahora-e[1].lastPlayed)<cincoMin)onlineUids.add(e[0]);});
   var onlineEl=document.getElementById('stOnline');
   if(onlineEl){onlineEl.textContent=onlineUids.size;onlineEl.style.color=onlineUids.size>0?'var(--ac)':'var(--tm)';}
   var total=0;['t','b','s','r'].forEach(function(g){total+=Object.values(wScores[g]).reduce(function(a,w){return a+(w.attempts||0);},0);});
+  total+=Object.values(wScoresPulso).reduce(function(a,w){return a+(w.attempts||0);},0);
   document.getElementById('stP').textContent=total;
   clearTimeout(window._onlineTO);
   window._onlineTO=setTimeout(updateAdmStats,30000);
@@ -2870,6 +2912,9 @@ function buildWinners(){
     '</div>':'<div style="font-size:11px;color:var(--tm)">Sin puntos totales</div>')+
   '</div>';
   ['t','b','s','r'].forEach(function(g){var cfg=GCOLORS[g],isR=g==='r',isS=g==='s';var sorted=getSorted(g,1),w=sorted.length>0?sorted[0][1]:null,wUid=sorted.length>0?sorted[0][0]:null;var email=wUid&&profiles[wUid]?profiles[wUid].email:'—';var label=GAME_LABELS[g];html+='<div style="background:var(--sf);border:1px solid '+cfg.stroke+';border-radius:11px;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:'+cfg.color+';text-transform:uppercase;margin-bottom:5px">'+label+'</div>'+(w?'<div style="font-weight:700;font-size:12px">'+w.name+'</div><div style="font-family:\'DM Mono\',monospace;font-size:13px;color:'+cfg.color+';margin-top:2px">'+w.bestTime+(isR?'ms':'s')+'</div><div style="font-size:10px;color:var(--tm);margin-top:3px;word-break:break-all">'+email+'</div>':'<div style="font-size:11px;color:var(--tm)">Sin partidas</div>')+'</div>';});
+  // Pulso — líder del ranking permanente
+  var pCfg=GCOLORS.p;var pSorted=getPulsoSorted(1);var pW=pSorted.length>0?pSorted[0][1]:null;var pUid=pSorted.length>0?pSorted[0][0]:null;var pEmail=pUid&&profiles[pUid]?profiles[pUid].email:'—';
+  html+='<div style="background:var(--sf);border:1px solid '+pCfg.stroke+';border-radius:11px;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:'+pCfg.color+';text-transform:uppercase;margin-bottom:5px">♾ PULSO</div>'+(pW?'<div style="font-weight:700;font-size:12px">'+pW.name+'</div><div style="font-family:\'DM Mono\',monospace;font-size:13px;color:'+pCfg.color+';margin-top:2px">±'+pW.bestScore+'ms</div><div style="font-size:10px;color:var(--tm);margin-top:3px;word-break:break-all">'+pEmail+'</div>':'<div style="font-size:11px;color:var(--tm)">Sin partidas</div>')+'</div>';
   wrap.innerHTML=html;
 }
 function setAdmTab(g){
