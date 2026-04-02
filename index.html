@@ -1940,8 +1940,17 @@ function scheduleAutoClose(){
 }
 function cancelTorneo(){
   if(!torneoData||torneoData.status!=='waiting')return;
+  // No cancelar si ya hay suficientes jugadores — pueden haberse unido entre el setTimeout y ahora
+  var currentCount=Object.keys(torneoPartic||{}).length;
+  if(torneoData.minPlayers&&currentCount>=torneoData.minPlayers)return;
   var expectedId=torneoData.id;
-  db.ref('torneo/active').transaction(function(c){if(!c||c.status!=='waiting')return;if(c.id!==expectedId)return;c.status='cancelled';c.finishedAt=Date.now();return c;},null,false).then(function(res){
+  db.ref('torneo/active').transaction(function(c){
+    if(!c||c.status!=='waiting')return;
+    if(c.id!==expectedId)return;
+    // Double-check: si ya se llenó no cancelar
+    if(c.status!=='waiting')return;
+    c.status='cancelled';c.finishedAt=Date.now();return c;
+  },null,false).then(function(res){
     if(!res.committed)return;
     var fd=res.snapshot.val();
     var histId=fd.id||fd.createdAt||Date.now();
