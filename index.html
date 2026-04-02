@@ -366,8 +366,8 @@ tr:hover td{background:var(--sf2)}
 @keyframes pulsoHitGood{0%{transform:scale(1.1)}100%{transform:scale(1)}}
 @keyframes pulsoHitOk{0%{transform:scale(1.08)}100%{transform:scale(1)}}
 @keyframes pulsoHitBad{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.pulso-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--cp);line-height:1}
-.pulso-lbl{font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-top:2px}
+.pulso-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--cp);line-height:1;text-align:center}
+.pulso-lbl{font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-top:2px;text-align:center;white-space:nowrap}
 .pulso-expand{position:absolute;inset:0;border-radius:50%;border:2px solid var(--cp);opacity:0;pointer-events:none}
 .pulso-expand.pulse-anim{animation:pulsoExpand 1s ease-out forwards}
 @keyframes pulsoExpand{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.8);opacity:0}}
@@ -528,16 +528,26 @@ body.playing{overflow:hidden}
         <div class="gc2-leader" id="hldr">—</div>
         <div class="gc2-pos" id="hrr">—</div>
       </div>
-      <!-- PULSO -->
-      <div class="gc2 gp" onclick="startPulso()" style="grid-column:1/-1">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div class="gc2-name" style="color:var(--cp)">PULSO</div>
-          <button onclick="event.stopPropagation();showHowPlay('p')" style="background:transparent;border:1px solid var(--cp);border-radius:50%;width:20px;height:20px;color:var(--cp);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+    </div>
+
+    <!-- PULSO — sección especial separada del grid diario -->
+    <div onclick="startPulso()" style="margin-top:10px;background:var(--sf);border:1px solid var(--cp);border-radius:14px;padding:14px 16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+      <div style="position:absolute;inset:0;background:var(--cp);opacity:.05;pointer-events:none"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:3px;color:var(--cp);background:var(--cpd);border:1px solid var(--cpm);border-radius:4px;padding:2px 7px">MODO ESPECIAL</div>
         </div>
-        <div class="gc2-tgt" style="color:var(--cp);font-size:30px">♾</div>
-        <div class="gc2-tgtlbl" style="color:var(--cp)">RITMO EXACTO · RANKING PERMANENTE</div>
-        <div class="gc2-leader" id="hldp">—</div>
-        <div class="gc2-pos" id="hrp">—</div>
+        <button onclick="event.stopPropagation();showHowPlay('p')" style="background:transparent;border:1px solid var(--cp);border-radius:50%;width:20px;height:20px;color:var(--cp);font-size:10px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">?</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--cp);line-height:1">♾ PULSO</div>
+          <div style="font-size:10px;color:var(--tm);margin-top:3px">Ritmo interno · Ranking permanente</div>
+        </div>
+        <div style="text-align:right">
+          <div class="gc2-leader" id="hldp" style="font-size:11px">—</div>
+          <div class="gc2-pos" id="hrp" style="font-size:10px;color:var(--tm)">—</div>
+        </div>
       </div>
     </div>
 
@@ -580,8 +590,8 @@ body.playing{overflow:hidden}
     </div>
     <!-- Instrucción visual debajo del arco -->
     <div id="pulsoArcHint" style="text-align:center;font-size:11px;color:var(--tm);letter-spacing:1px">Toca cuando el punto llegue arriba ↑</div>
-    <!-- Indicadores de taps — 10 toques -->
-    <div class="pulso-tap-row" id="pulsoTapRow" style="flex-wrap:wrap;max-width:280px;gap:4px;justify-content:center">
+    <!-- Indicadores de taps — 7 toques -->
+    <div class="pulso-tap-row" id="pulsoTapRow" style="gap:6px;justify-content:center">
       <div class="pulso-dot pending" id="pd0">1</div>
       <div class="pulso-dot pending" id="pd1">2</div>
       <div class="pulso-dot pending" id="pd2">3</div>
@@ -589,9 +599,6 @@ body.playing{overflow:hidden}
       <div class="pulso-dot pending" id="pd4">5</div>
       <div class="pulso-dot pending" id="pd5">6</div>
       <div class="pulso-dot pending" id="pd6">7</div>
-      <div class="pulso-dot pending" id="pd7">8</div>
-      <div class="pulso-dot pending" id="pd8">9</div>
-      <div class="pulso-dot pending" id="pd9">10</div>
     </div>
     <!-- Timer de referencia -->
     <div style="text-align:center">
@@ -614,6 +621,7 @@ body.playing{overflow:hidden}
         <div><div style="font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:2px">Peor tap</div><div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--dg)" id="irWorstTapP">—</div></div>
       </div>
       <div id="irRecP" style="display:none;font-size:12px;padding:6px 12px;background:var(--cpd);border:1px solid var(--cpm);border-radius:8px;color:var(--cp);margin-bottom:8px">🎉 ¡Nuevo récord personal!</div>
+      <button id="pulsoRetryBtn" onclick="pulsoRetry()" style="width:100%;height:50px;background:var(--cp);color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px">▶ INTENTAR DE NUEVO</button>
     </div>
   </div>
 </div>
@@ -1239,7 +1247,7 @@ function reactStart(){if(reactState!=='idle'||window._reactSavePending){return;}
 
 // ══ PULSO ══
 var PULSO_INTERVAL=1000; // ms entre pulsos — siempre 1.000s
-var PULSO_TAPS=10;       // taps requeridos por intento
+var PULSO_TAPS=7;       // taps requeridos por intento
 var PULSO_MAX_DIFF=600;  // ms — si un tap supera esto, intento inválido
 
 function startPulso(){
@@ -1276,7 +1284,7 @@ function showPulsoTutorial(){
     '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">2</div>'+
       '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Toca cuando el punto llegue arriba</div>'+
-      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Un punto <strong style="color:var(--cp)">morado</strong> da vueltas alrededor del círculo — tarda exactamente <strong style="color:var(--cp)">1 segundo</strong> por vuelta. Toca <strong>10 veces</strong> cada vez que llega arriba. Se pone <strong style="color:#00e87a">verde</strong> en la zona perfecta.</div></div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Un punto <strong style="color:var(--cp)">morado</strong> da vueltas alrededor del círculo — tarda exactamente <strong style="color:var(--cp)">1 segundo</strong> por vuelta. Toca <strong>7 veces</strong> cada vez que llega arriba. Se pone <strong style="color:#00e87a">verde</strong> en la zona perfecta.</div></div>'+
     '</div>'+
     // Paso 3
     '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding:12px;background:var(--sf2);border-radius:10px">'+
@@ -1292,6 +1300,16 @@ function showPulsoTutorial(){
     '</div>'+
     '<button class="btn" onclick="closeModal()" style="width:100%;height:46px;background:var(--cp);color:#fff;border-radius:9px;font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:4px">¡ENTENDIDO, A JUGAR!</button>';
   document.getElementById('overlay').classList.add('show');
+}
+
+function pulsoRetry(){
+  pulsoState='idle';
+  pulsoTaps=[];
+  _pulsoResetDots();
+  _pulsoResetCircle();
+  var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
+  var hint=document.getElementById('pulsoArcHint');if(hint)hint.style.display='block';
+  pulsoStart();
 }
 
 function pulsoBack(){
@@ -1485,7 +1503,7 @@ function _pulsoResetCircle(){
   if(circ){
     circ.className='pulso-circle';
     circ.querySelector('.pulso-num').textContent='▶';
-    circ.querySelector('.pulso-lbl').textContent='TOCA PARA INICIAR';
+    circ.querySelector('.pulso-lbl').textContent='TOCA AQUÍ';
   }
 }
 
