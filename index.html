@@ -372,7 +372,7 @@ tr:hover td{background:var(--sf2)}
 .pulso-expand.pulse-anim{animation:pulsoExpand 1s ease-out forwards}
 @keyframes pulsoExpand{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.8);opacity:0}}
 .pulso-tap-row{display:flex;gap:6px;justify-content:center}
-.pulso-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--cp);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s}
+.pulso-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--cp);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .2s}
 .pulso-dot.pending{background:transparent;color:var(--tm)}
 .pulso-dot.good{background:#00e87a;border-color:#00e87a;color:#000}
 .pulso-dot.ok{background:var(--wn);border-color:var(--wn);color:#000}
@@ -580,13 +580,18 @@ body.playing{overflow:hidden}
     </div>
     <!-- Instrucción visual debajo del arco -->
     <div id="pulsoArcHint" style="text-align:center;font-size:11px;color:var(--tm);letter-spacing:1px">Toca cuando el punto llegue arriba ↑</div>
-    <!-- Indicadores de taps -->
-    <div class="pulso-tap-row" id="pulsoTapRow">
+    <!-- Indicadores de taps — 10 toques -->
+    <div class="pulso-tap-row" id="pulsoTapRow" style="flex-wrap:wrap;max-width:280px;gap:4px;justify-content:center">
       <div class="pulso-dot pending" id="pd0">1</div>
       <div class="pulso-dot pending" id="pd1">2</div>
       <div class="pulso-dot pending" id="pd2">3</div>
       <div class="pulso-dot pending" id="pd3">4</div>
       <div class="pulso-dot pending" id="pd4">5</div>
+      <div class="pulso-dot pending" id="pd5">6</div>
+      <div class="pulso-dot pending" id="pd6">7</div>
+      <div class="pulso-dot pending" id="pd7">8</div>
+      <div class="pulso-dot pending" id="pd8">9</div>
+      <div class="pulso-dot pending" id="pd9">10</div>
     </div>
     <!-- Timer de referencia -->
     <div style="text-align:center">
@@ -594,7 +599,7 @@ body.playing{overflow:hidden}
       <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cp)">1.000s</div>
       <div style="font-size:10px;color:var(--td)">entre cada toque</div>
     </div>
-    <button class="gbtn gbs" id="pulsoBtn" onclick="pulsoStart()" style="background:var(--cp);color:#fff;border:none">INICIAR</button>
+    <!-- Sin botón INICIAR — toca el círculo directamente -->
     <!-- Resultado inline -->
     <div id="inlineResultP" style="display:none;width:100%;text-align:center">
       <div style="text-align:center;margin-bottom:8px">
@@ -1234,7 +1239,7 @@ function reactStart(){if(reactState!=='idle'||window._reactSavePending){return;}
 
 // ══ PULSO ══
 var PULSO_INTERVAL=1000; // ms entre pulsos — siempre 1.000s
-var PULSO_TAPS=5;        // taps requeridos por intento
+var PULSO_TAPS=10;       // taps requeridos por intento
 var PULSO_MAX_DIFF=600;  // ms — si un tap supera esto, intento inválido
 
 function startPulso(){
@@ -1249,10 +1254,8 @@ function startPulso(){
   _pulsoResetDots();
   _pulsoResetCircle();
   var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
-  var btn=document.getElementById('pulsoBtn');
-  if(btn){btn.textContent='INICIAR';btn.style.background='var(--cp)';btn.style.color='#fff';btn.disabled=false;btn.style.opacity='1';btn.onclick=pulsoStart;}
+  var hint=document.getElementById('pulsoArcHint');if(hint)hint.style.display='block';
   showScreen('sPulso');
-  // Mostrar tutorial la primera vez
   if(!localStorage.getItem('pulsoTutorialSeen')){
     setTimeout(function(){showPulsoTutorial();},400);
   }
@@ -1266,14 +1269,14 @@ function showPulsoTutorial(){
     // Paso 1
     '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">1</div>'+
-      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Dale INICIAR</div>'+
-      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Una cuenta regresiva 3-2-1 arranca. Cuando aparezca <strong style="color:var(--cp)">¡YA!</strong>, el juego empieza.</div></div>'+
+      '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Toca el círculo para iniciar</div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">El círculo arranca la cuenta regresiva 3-2-1. Cuando aparezca <strong style="color:var(--cp)">¡YA!</strong>, el punto empieza a girar — toca 10 veces al ritmo.</div></div>'+
     '</div>'+
     // Paso 2
     '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;padding:12px;background:var(--sf2);border-radius:10px">'+
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--cp);line-height:1;flex-shrink:0;width:28px">2</div>'+
       '<div><div style="font-size:13px;font-weight:700;margin-bottom:3px">Toca cuando el punto llegue arriba</div>'+
-      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Un punto <strong style="color:var(--cp)">morado</strong> da vueltas alrededor del círculo — tarda exactamente <strong style="color:var(--cp)">1 segundo</strong> por vuelta. Toca cada vez que llega arriba. Se pone <strong style="color:#00e87a">verde</strong> en la zona perfecta.</div></div>'+
+      '<div style="font-size:12px;color:var(--tm);line-height:1.6">Un punto <strong style="color:var(--cp)">morado</strong> da vueltas alrededor del círculo — tarda exactamente <strong style="color:var(--cp)">1 segundo</strong> por vuelta. Toca <strong>10 veces</strong> cada vez que llega arriba. Se pone <strong style="color:#00e87a">verde</strong> en la zona perfecta.</div></div>'+
     '</div>'+
     // Paso 3
     '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding:12px;background:var(--sf2);border-radius:10px">'+
@@ -1309,7 +1312,6 @@ function pulsoStart(){
   _pulsoArcReset();
   _pulsoResetDots();
   var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
-  var btn=document.getElementById('pulsoBtn');if(btn){btn.disabled=true;btn.style.opacity='.4';}
   // Countdown 3-2-1
   var num=document.getElementById('cdN');
   num.style.color=GCOLORS.p.stroke;
@@ -1405,8 +1407,6 @@ function pulsoTap(){
     _pulsoResetDots();
     _pulsoResetCircle();
     var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='none';
-    var btn=document.getElementById('pulsoBtn');
-    if(btn){btn.textContent='INICIAR';btn.style.background='var(--cp)';btn.disabled=false;btn.style.opacity='1';btn.onclick=pulsoStart;}
     return;
   }
   if(pulsoState!=='running')return;
@@ -1466,8 +1466,6 @@ function _pulsoFinish(){
     pulsoState='idle';
     _pulsoResetDots();
     _pulsoResetCircle();
-    var btn=document.getElementById('pulsoBtn');
-    if(btn){btn.textContent='INTENTAR DE NUEVO';btn.style.background='var(--cp)';btn.disabled=false;btn.style.opacity='1';btn.onclick=pulsoStart;}
     return;
   }
 
@@ -1486,8 +1484,8 @@ function _pulsoResetCircle(){
   var circ=document.getElementById('pulsoCircle');
   if(circ){
     circ.className='pulso-circle';
-    circ.querySelector('.pulso-num').textContent=PULSO_TAPS;
-    circ.querySelector('.pulso-lbl').textContent='TOQUES';
+    circ.querySelector('.pulso-num').textContent='▶';
+    circ.querySelector('.pulso-lbl').textContent='TOCA PARA INICIAR';
   }
 }
 
@@ -1511,8 +1509,11 @@ function _pulsoSaveScore(avg,best,worst){
   }
   // Actualizar local inmediatamente
   wScoresPulso[uid]=Object.assign({},existing,upd);
-  db.ref('pulsoScores/'+uid).update(upd).then(function(){
-    _pulsoShowResult(avg,best,worst,isRec);
+  // Mostrar resultado inmediatamente — no esperar Firebase
+  _pulsoShowResult(avg,best,worst,isRec);
+  // Guardar en Firebase en background
+  db.ref('pulsoScores/'+uid).update(upd).catch(function(){
+    toast('⚠️ Error al guardar — revisa tu conexión');
   });
 }
 
@@ -1540,21 +1541,7 @@ function _pulsoShowResult(avg,best,worst,isRec){
   var srPos=document.getElementById('srPosP');
   if(srPos)srPos.textContent='#'+rankP+' de '+total;
 
-  var btn=document.getElementById('pulsoBtn');
-  if(btn){
-    btn.textContent='▶ INTENTAR DE NUEVO';
-    btn.style.background='var(--cp)';
-    btn.style.color='#fff';
-    btn.disabled=false;btn.style.opacity='1';
-    btn.onclick=function(){
-      pulsoState='idle';
-      pulsoTaps=[];
-      _pulsoResetDots();
-      _pulsoResetCircle();
-      document.getElementById('inlineResultP').style.display='none';
-      pulsoStart();
-    };
-  }
+
 }
 
 // Helpers de ranking Pulso
