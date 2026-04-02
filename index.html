@@ -1726,7 +1726,16 @@ function getRank(uid,g){var sorted=Object.entries(wScores[g]).filter(function(e)
 function goTab(t){
   document.getElementById('nt-home').classList.toggle('on',t==='home');
   document.getElementById('nt-rank').classList.toggle('on',t==='rank');
-  if(t==='home'){showScreen('sHome');updateHomecards();updateConfigUI();}
+  if(t==='home'){
+    // Si el usuario navega al home mientras hay un torneo activo en juego,
+    // resetear inTorneoGame para que no contamine los retos normales
+    if(inTorneoGame){
+      inTorneoGame=false;
+      removeTorneoBanner();
+      removeTorneoLBInject();
+    }
+    showScreen('sHome');updateHomecards();updateConfigUI();
+  }
   else if(t==='rank'){
     ['global','t','b','s','r','yo','torneo'].forEach(function(x){var map={'global':'G','t':'T','b':'B','s':'S','r':'R','yo':'YO','torneo':'TN'};var el=document.getElementById('rgc'+map[x]);if(el)el.classList.remove('active');});
     setRankGame('global');showScreen('sRanking');
