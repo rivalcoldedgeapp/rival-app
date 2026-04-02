@@ -1944,31 +1944,54 @@ function scheduleAutoClose(){
 }
 function cancelTorneo(){
   if(!torneoData||torneoData.status!=='waiting')return;
-  // No cancelar si ya hay suficientes jugadores — pueden haberse unido entre el setTimeout y ahora
+  // Guard local: no cancelar si ya hay suficientes jugadores
   var currentCount=Object.keys(torneoPartic||{}).length;
   if(torneoData.minPlayers&&currentCount>=torneoData.minPlayers)return;
   var expectedId=torneoData.id;
-  db.ref('torneo/active').transaction(function(c){
-    if(!c||c.status!=='waiting')return;
-    if(c.id!==expectedId)return;
-    // Double-check: si ya se llenó no cancelar
-    if(c.status!=='waiting')return;
-    c.status='cancelled';c.finishedAt=Date.now();return c;
-  },null,false).then(function(res){
-    if(!res.committed)return;
-    var fd=res.snapshot.val();
-    var histId=fd.id||fd.createdAt||Date.now();
-    var partSnap=Object.entries(torneoPartic||{}).map(function(e){return{uid:e[0],name:e[1].name||'?',joinedAt:e[1].joinedAt||0};});
-    var updates={};
-    updates['torneoHistorial/'+histId]={id:histId,prize:fd.prize||'',gameMode:fd.gameMode,targetTime:fd.targetTime||null,status:'cancelled',closeReason:'no_fill',createdAt:fd.createdAt||0,startedAt:null,finishedAt:fd.finishedAt||Date.now(),minPlayers:fd.minPlayers||0,durationMs:fd.durationMs||0,waitingStartedAt:fd.waitingStartedAt||null,participantsCount:partSnap.length,winner:null,top3:[],participants:(function(){var cp={};Object.entries(torneoPartic||{}).forEach(function(e){cp[e[0]]=e[1];});return cp;}())};
-    updates['torneo/active']=null;
-    updates['torneo/participants']=null;
-    db.ref().update(updates);
-    if(!torneoCancelledDisplay){
-      torneoCancelledDisplay={at:Date.now()};
-      clearTimeout(window._tornCancelTO);
-      window._tornCancelTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
+  // Leer estado fresco de Firebase antes de cancelar — evita drift de reloj entre clientes
+  db.ref('torneo/active').once('value').then(function(snap){
+    var fresh=snap.val();
+    if(!fresh||fresh.status!=='waiting')return; // ya cambió
+    if(fresh.id!==expectedId)return; // es otro torneo
+    // Verificar que realmente venció el tiempo usando datos del servidor
+    if(fresh.waitingStartedAt){
+      var elapsed=Date.now()-fresh.waitingStartedAt;
+      var waitMs=fresh.waitMs||20*60*1000;
+      if(elapsed<waitMs){
+        // Aún hay tiempo — reprogramar con el tiempo correcto
+        var remaining=waitMs-elapsed;
+        clearTimeout(torneoCancelTO);
+        torneoCancelTO=setTimeout(cancelTorneo,remaining);
+        return;
+      }
     }
+    // Verificar minPlayers con datos frescos de participants
+    db.ref('torneo/participants').once('value').then(function(pSnap){
+      var freshParts=pSnap.val()||{};
+      var freshCount=Object.keys(freshParts).length;
+      if(fresh.minPlayers&&freshCount>=fresh.minPlayers)return; // se llenó
+      // Proceder con la cancelación via transaction
+      db.ref('torneo/active').transaction(function(c){
+        if(!c||c.status!=='waiting')return;
+        if(c.id!==expectedId)return;
+        c.status='cancelled';c.finishedAt=Date.now();return c;
+      },null,false).then(function(res){
+        if(!res.committed)return;
+        var fd=res.snapshot.val();
+        var histId=fd.id||fd.createdAt||Date.now();
+        var partSnap=Object.entries(freshParts).map(function(e){return{uid:e[0],name:e[1].name||'?',joinedAt:e[1].joinedAt||0};});
+        var updates={};
+        updates['torneoHistorial/'+histId]={id:histId,prize:fd.prize||'',gameMode:fd.gameMode,targetTime:fd.targetTime||null,status:'cancelled',closeReason:'no_fill',createdAt:fd.createdAt||0,startedAt:null,finishedAt:fd.finishedAt||Date.now(),minPlayers:fd.minPlayers||0,durationMs:fd.durationMs||0,waitingStartedAt:fd.waitingStartedAt||null,participantsCount:partSnap.length,winner:null,top3:[],participants:(function(){var cp={};Object.entries(freshParts).forEach(function(e){cp[e[0]]=e[1];});return cp;}())};
+        updates['torneo/active']=null;
+        updates['torneo/participants']=null;
+        db.ref().update(updates);
+        if(!torneoCancelledDisplay){
+          torneoCancelledDisplay={at:Date.now()};
+          clearTimeout(window._tornCancelTO);
+          window._tornCancelTO=setTimeout(function(){torneoCancelledDisplay=null;updateTorneoCard();},5*60*1000);
+        }
+      });
+    });
   });
 }
 function activateTorneo(){if(!torneoData||torneoData.status!=='countdown')return;var expectedId=torneoData.id;db.ref('torneo/active').transaction(function(c){if(!c||c.status!=='countdown')return;if(c.id!==expectedId)return;c.status='active';c.startedAt=Date.now();return c;},null,false);}
