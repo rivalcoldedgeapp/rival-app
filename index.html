@@ -1733,6 +1733,13 @@ function goTab(t){
       inTorneoGame=false;
       removeTorneoBanner();
       removeTorneoLBInject();
+      // Restaurar GCFG a los valores reales del día (el torneo los sobreescribe)
+      db.ref('gameConfig').once('value').then(function(s){
+        var cfg=s.val()||{};
+        if(cfg.tt)GCFG.t=parseFloat(cfg.tt);
+        if(cfg.tb)GCFG.b=parseFloat(cfg.tb);
+        updateConfigUI();
+      });
     }
     showScreen('sHome');updateHomecards();updateConfigUI();
   }
