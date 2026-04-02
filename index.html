@@ -1282,16 +1282,14 @@ function pulsoStart(){
 function _pulsoRun(){
   pulsoState='running';
   pulsoTaps=[];
-  pulsoLastTapTs=0;
-  window._pulsoRunAt=performance.now(); // marca de inicio
-  // Actualizar círculo — listo para recibir tap
+  // Timer arranca automáticamente — el primer tap del usuario ya tiene referencia
+  pulsoLastTapTs=performance.now();
   var circ=document.getElementById('pulsoCircle');
   if(circ){
     circ.classList.add('active');
-    circ.querySelector('.pulso-num').textContent='→';
-    circ.querySelector('.pulso-lbl').textContent='TOCA PARA EMPEZAR';
+    circ.querySelector('.pulso-num').textContent=PULSO_TAPS;
+    circ.querySelector('.pulso-lbl').textContent='TOQUES';
   }
-  // Pulso visual de referencia cada 1s para que el jugador calibre
   _pulsoVisualBeat();
 }
 
@@ -1326,27 +1324,6 @@ function pulsoTap(){
   if(pulsoState!=='running')return;
 
   var now=performance.now();
-
-  if(pulsoLastTapTs===0){
-    // Primer tap — solo marca el tiempo de referencia, NO cuenta como tap medido
-    // Feedback visual mínimo para confirmar que se registró
-    pulsoLastTapTs=now;
-    var circ0=document.getElementById('pulsoCircle');
-    if(circ0){
-      circ0.classList.remove('hit-good','hit-ok','hit-bad');
-      circ0.classList.add('hit-good');
-      setTimeout(function(){circ0.classList.remove('hit-good');if(pulsoState==='running')circ0.classList.add('active');},200);
-    }
-    // Actualizar label para indicar que ya empezó
-    var circN=document.getElementById('pulsoCircle');
-    if(circN){
-      circN.querySelector('.pulso-num').textContent=PULSO_TAPS;
-      circN.querySelector('.pulso-lbl').textContent='TOQUES';
-    }
-    return; // no push a pulsoTaps, no avanzar dots
-  }
-
-  // Taps 2-6 (los 5 medidos)
   var elapsed=now-pulsoLastTapTs;
   var diff=Math.abs(elapsed-PULSO_INTERVAL);
   pulsoLastTapTs=now;
@@ -1379,7 +1356,6 @@ function pulsoTap(){
     },250);
   }
 
-  // ¿Completó los 5 taps medidos?
   if(pulsoTaps.length>=PULSO_TAPS){
     clearTimeout(pulsoExpTO);
     pulsoState='done';
@@ -1451,14 +1427,15 @@ function _pulsoSaveScore(avg,best,worst){
 }
 
 function _pulsoShowResult(avg,best,worst,isRec){
-  // Mostrar resultado
+  var uid=curUser?curUser.uid:null;
+  var myP=uid?wScoresPulso[uid]:null;
+  var displayBest=myP&&myP.bestScore!=null?myP.bestScore:avg;
+
   var scoreBig=document.getElementById('pulsoScoreBig');
   if(scoreBig){
     scoreBig.textContent='±'+avg+'ms';
-    // Color según calidad
     scoreBig.style.color=avg<=30?'#00e87a':avg<=80?'var(--wn)':'var(--cp)';
   }
-  var uid=curUser?curUser.uid:null;
   var rankP=uid?getPulsoRank(uid):'—';
   var total=Object.values(wScoresPulso).filter(function(p){return p.bestScore!=null;}).length;
   var irPosEl=document.getElementById('irPosP');if(irPosEl)irPosEl.textContent='#'+rankP+' de '+total;
@@ -1467,11 +1444,12 @@ function _pulsoShowResult(avg,best,worst,isRec){
   var irRecEl=document.getElementById('irRecP');if(irRecEl)irRecEl.style.display=isRec?'block':'none';
   var irP=document.getElementById('inlineResultP');if(irP)irP.style.display='block';
 
-  // Actualizar score-row
-  document.getElementById('srBestP').textContent='±'+avg+'ms';
-  document.getElementById('srPosP').textContent='#'+rankP;
+  // Actualizar score-row con el MEJOR histórico
+  var srBest=document.getElementById('srBestP');
+  if(srBest)srBest.textContent='±'+displayBest+'ms';
+  var srPos=document.getElementById('srPosP');
+  if(srPos)srPos.textContent='#'+rankP+' de '+total;
 
-  // Cambiar botón
   var btn=document.getElementById('pulsoBtn');
   if(btn){
     btn.textContent='▶ INTENTAR DE NUEVO';
